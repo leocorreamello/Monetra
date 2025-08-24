@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { UploadComponent } from './upload/upload';
+import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http'; // Adicione aqui se necessário
 
 @Component({
   selector: 'app-root',
-  standalone: true, // Confirme que está como standalone
-  imports: [UploadComponent], // Importe o UploadComponent aqui
+  standalone: true,
+  imports: [UploadComponent, CommonModule, HttpClientModule], // Adicione HttpClientModule
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
