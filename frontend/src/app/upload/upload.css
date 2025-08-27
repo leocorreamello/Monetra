@@ -16,14 +16,54 @@
 /* Header com controles */
 .controls-section {
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
-  gap: 20px;
-  align-items: start;
-  margin-bottom: 32px;
-  padding: 24px;
+  grid-template-columns: 1fr auto auto;
+  gap: 32px;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 24px 32px;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(51, 65, 85, 0.06);
+  box-shadow: 0 4px 20px rgba(51, 65, 85, 0.08);
+  border: 1px solid #f1f5f9;
+}
+
+/* Seção de filtros separada */
+.filters-section {
+  background: white;
+  padding: 20px 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(51, 65, 85, 0.08);
+  border: 1px solid #f1f5f9;
+  margin-bottom: 24px;
+}
+
+/* Filtros de período (ano e mês) */
+.period-filters {
+  display: flex;
+  gap: 16px;
+  align-items: end;
+}
+
+/* Botões de ação */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Container de filtros */
+.filters {
+  display: flex;
+  gap: 20px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+/* Ações dos filtros */
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  align-items: end;
 }
 
 /* Upload de arquivo */
@@ -122,6 +162,60 @@ select:focus {
 
 select:hover {
   border-color: #cbd5e1;
+}
+
+/* Input de filtro */
+.filter-input {
+  padding: 10px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-input:hover {
+  border-color: #cbd5e1;
+}
+
+.filter-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* Botão de limpar filtros */
+.clear-filters-button {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+  white-space: nowrap;
+}
+
+.clear-filters-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(107, 114, 128, 0.4);
+}
+
+.clear-filters-button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Botão de exclusão */
@@ -363,20 +457,37 @@ td {
   .controls-section {
     grid-template-columns: 1fr;
     gap: 20px;
-    align-items: stretch;
+    text-align: center;
+  }
+  
+  .period-filters {
+    justify-content: center;
+    gap: 12px;
+  }
+  
+  .action-buttons {
+    justify-content: center;
+  }
+  
+  .filters-section {
+    padding: 16px 20px;
   }
   
   .filters {
-    justify-self: stretch;
-    flex-direction: column;
+    justify-content: center;
     gap: 16px;
   }
   
   .filter-group {
-    width: 100%;
+    min-width: 140px;
   }
   
-  select {
+  .filter-actions {
+    justify-content: center;
+  }
+  
+  select,
+  .filter-input {
     width: 100%;
   }
   
@@ -405,6 +516,38 @@ td {
     padding: 2px 8px;
     font-size: 10px;
   }
+  
+  .categoria-select {
+    font-size: 11px;
+    padding: 4px 8px;
+    min-width: 120px;
+  }
+}
+
+/* Select de categoria */
+.categoria-select {
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  min-width: 150px;
+}
+
+.categoria-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.categoria-select:hover {
+  border-color: #cbd5e1;
+  background: #fafafa;
 }
 
 @media (max-width: 480px) {
@@ -415,6 +558,32 @@ td {
   
   .controls-section {
     padding: 20px;
+  }
+  
+  .period-filters {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .filters-section {
+    padding: 16px;
+  }
+  
+  .filters {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .filter-group {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .filter-actions {
+    width: 100%;
+    justify-content: center;
   }
   
   .file-upload-button {

@@ -19,32 +19,102 @@ export class UploadComponent implements OnInit {
   uniqueMeses: string[] = [];
   selectedAno: string = '';
   selectedMes: string = '';
+  selectedCategoria: string = '';
+  selectedTipo: string = '';
   saldoFinal: number = 0;
   isLoading: boolean = false;
+  categorias: string[] = [];
 
   constructor(private http: HttpClient, private transactionService: TransactionService) {}
 
   ngOnInit() {
     this.loadTransactions();
+    this.loadCategorias();
+  }
+
+  loadCategorias() {
+    this.transactionService.getCategorias().subscribe((categorias: string[]) => {
+      this.categorias = categorias;
+    });
+  }
+
+  updateTransactionCategory(transaction: Transaction) {
+    this.transactionService.updateTransactionCategory(transaction.id, transaction.categoria).subscribe({
+      next: () => {
+        console.log(`Categoria da transação ${transaction.id} atualizada para: ${transaction.categoria}`);
+      },
+      error: (error) => {
+        console.error('Erro ao atualizar categoria:', error);
+        alert('Erro ao atualizar categoria');
+      }
+    });
+  }
+
+  getCategoryDisplayName(categoria: string): string {
+    const categoryNames: { [key: string]: string } = {
+      'alimentacao': '🍔 Alimentação',
+      'transporte': '🚗 Transporte',
+      'saude': '🏥 Saúde',
+      'educacao': '📚 Educação',
+      'lazer': '🎭 Lazer',
+      'casa': '🏠 Casa',
+      'transferencia': '💸 Transferência',
+      'renda': '💰 Renda',
+      'investimento': '📈 Investimento',
+      'vestuario': '👕 Vestuário',
+      'saque': '🏧 Saque',
+      'taxas': '📋 Taxas',
+      'outros': '📦 Outros'
+    };
+    return categoryNames[categoria] || categoria;
   }
 
   loadTransactions() {
     this.isLoading = true;
     this.transactionService.getTransactions().subscribe((data: Transaction[]) => {
       this.transactions = data.filter(t => t.mes && t.ano && t.mes !== 'null' && t.ano !== 'null');
-      this.filteredTransactions = this.transactions;
       this.uniqueAnos = [...new Set(this.transactions.map(t => t.ano))].sort();
       this.uniqueMeses = [...new Set(this.transactions.map(t => t.mes))].sort();
-      this.calculateSaldoFinal(); // Calcula inicial
+      this.applyFilters(); // Aplica filtros após carregar
       this.isLoading = false;
     });
   }
 
-  filterByAnoMes() {
+  applyFilters() {
     this.filteredTransactions = this.transactions.filter(t => {
-      return (this.selectedAno ? t.ano === this.selectedAno : true) && (this.selectedMes ? t.mes === this.selectedMes : true);
+      // Filtro por ano
+      if (this.selectedAno && t.ano !== this.selectedAno) return false;
+      
+      // Filtro por mês
+      if (this.selectedMes && t.mes !== this.selectedMes) return false;
+      
+      // Filtro por categoria
+      if (this.selectedCategoria && t.categoria !== this.selectedCategoria) return false;
+      
+      // Filtro por tipo
+      if (this.selectedTipo && t.tipo !== this.selectedTipo) return false;
+      
+      return true;
     });
-    this.calculateSaldoFinal(); // Recalcula após filtro
+    
+    this.calculateSaldoFinal();
+  }
+
+  clearFilters() {
+    this.selectedAno = '';
+    this.selectedMes = '';
+    this.selectedCategoria = '';
+    this.selectedTipo = '';
+    this.applyFilters();
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.selectedAno || this.selectedMes || this.selectedCategoria || this.selectedTipo);
+  }
+
+  // Método antigo mantido para compatibilidade com exclusão
+  filterByAnoMes() {
+    this.applyFilters();
   }
 
   calculateSaldoFinal() {

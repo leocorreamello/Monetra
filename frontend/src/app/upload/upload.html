@@ -10,11 +10,11 @@
       <p class="upload-text">Selecione seu extrato PDF do banco</p>
     </div>
 
-    <!-- Filtros -->
-    <div class="filters">
+    <!-- Seleção de período -->
+    <div class="period-filters">
       <div class="filter-group">
         <label class="filter-label">Ano</label>
-        <select [(ngModel)]="selectedAno" (change)="filterByAnoMes()">
+        <select [(ngModel)]="selectedAno" (change)="applyFilters()">
           <option value="">Todos os Anos</option>
           <option *ngFor="let ano of uniqueAnos" [value]="ano">{{ ano }}</option>
         </select>
@@ -22,18 +22,54 @@
       
       <div class="filter-group">
         <label class="filter-label">Mês</label>
-        <select [(ngModel)]="selectedMes" (change)="filterByAnoMes()">
+        <select [(ngModel)]="selectedMes" (change)="applyFilters()">
           <option value="">Todos os Meses</option>
           <option *ngFor="let mes of uniqueMeses" [value]="mes">{{ getMonthName(mes) }}</option>
         </select>
       </div>
-      
+    </div>
+
+    <!-- Botão de exclusão -->
+    <div class="action-buttons">
       <button 
         class="delete-button" 
         (click)="deleteSelectedAnoMes()" 
         [disabled]="!selectedAno || !selectedMes">
         🗑️ Excluir Período
       </button>
+    </div>
+  </div>
+
+  <!-- Seção de filtros separada -->
+  <div class="filters-section">
+    <div class="filters">
+      <div class="filter-group">
+        <label class="filter-label">Categoria</label>
+        <select [(ngModel)]="selectedCategoria" (change)="applyFilters()">
+          <option value="">Todas as Categorias</option>
+          <option *ngFor="let categoria of categorias" [value]="categoria">
+            {{ getCategoryDisplayName(categoria) }}
+          </option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label class="filter-label">Tipo</label>
+        <select [(ngModel)]="selectedTipo" (change)="applyFilters()">
+          <option value="">Todos os Tipos</option>
+          <option value="entrada">⬆ Entradas</option>
+          <option value="saida">⬇ Saídas</option>
+        </select>
+      </div>
+      
+      <div class="filter-actions">
+        <button 
+          class="clear-filters-button" 
+          (click)="clearFilters()"
+          [disabled]="!hasActiveFilters()">
+          🗂️ Limpar Filtros
+        </button>
+      </div>
     </div>
   </div>
 
@@ -71,7 +107,14 @@
             </span>
           </td>
           <td>
-            <span class="categoria">{{ transaction.categoria }}</span>
+            <select 
+              class="categoria-select" 
+              [(ngModel)]="transaction.categoria" 
+              (change)="updateTransactionCategory(transaction)">
+              <option *ngFor="let categoria of categorias" [value]="categoria">
+                {{ getCategoryDisplayName(categoria) }}
+              </option>
+            </select>
           </td>
         </tr>
         <tr class="saldo-row">

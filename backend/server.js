@@ -21,6 +21,130 @@ const upload = multer({ storage: storage });
 
 const db = new sqlite3.Database('./finance.db');
 
+// Função de categorização inteligente
+function categorizarTransacao(descricao, valor) {
+  const desc = descricao.toLowerCase();
+  const isEntrada = valor > 0;
+  
+  console.log(`🏷️ Categorizando: "${descricao}" (${desc}) - Valor: ${valor}`);
+  
+  // Regras de categorização baseadas em palavras-chave
+  const regras = {
+    // Alimentação
+    'alimentacao': [
+      'ifood', 'uber eats', 'rappi', 'food', 'lanches', 'pizza', 'burger',
+      'mcdonalds', 'bk', 'subway', 'restaurante', 'padaria', 'acougue',
+      'mercado', 'supermercado', 'hortifruti', 'emporio', 'delicatessen'
+    ],
+    
+    // Transporte
+    'transporte': [
+      'uber', '99', 'taxi', 'metro', 'onibus', 'combustivel', 'posto',
+      'estacionamento', 'pedagio', 'ipva', 'seguro auto', 'oficina',
+      'manutencao veicular'
+    ],
+    
+    // Saúde
+    'saude': [
+      'farmacia', 'drogaria', 'hospital', 'clinica', 'medico', 'dentista',
+      'laboratorio', 'exame', 'consulta', 'plano de saude', 'unimed',
+      'sulamerica', 'amil', 'gympass', 'academia'
+    ],
+    
+    // Educação
+    'educacao': [
+      'escola', 'faculdade', 'universidade', 'curso', 'livro', 'material escolar',
+      'mensalidade', 'matricula', 'biblioteca'
+    ],
+    
+    // Lazer
+    'lazer': [
+      'cinema', 'teatro', 'show', 'evento', 'netflix', 'spotify', 'amazon prime',
+      'disney', 'streaming', 'jogo', 'viagem', 'hotel', 'turismo'
+    ],
+    
+    // Casa
+    'casa': [
+      'aluguel', 'iptu', 'condominio', 'energia', 'agua', 'gas', 'internet',
+      'telefone', 'tv', 'limpeza', 'manutencao', 'reforma', 'mobilia',
+      'eletrodomestico'
+    ],
+    
+    // Transferências
+    'transferencia': [
+      'pix', 'pix transf', 'ted', 'doc', 'transferencia', 'deposito'
+    ],
+    
+    // Renda (para entradas)
+    'renda': [
+      'salario', 'ordenado', 'pagamento', 'freelance', 'renda', 'receita'
+    ],
+    
+    // Investimentos
+    'investimento': [
+      'investimento', 'aplicacao', 'poupanca', 'renda fixa', 'tesouro',
+      'cdb', 'lci', 'lca', 'fundo', 'acoes', 'bolsa'
+    ],
+    
+    // Roupas e Acessórios
+    'vestuario': [
+      'roupa', 'camisa', 'calca', 'sapato', 'tenis', 'loja', 'moda',
+      'shopping', 'boutique', 'calcado'
+    ]
+  };
+  
+  // Padrões específicos por tipo de transação (primeira prioridade)
+  if (desc.includes('pix')) {
+    console.log(`✅ PIX detectado → transferencia`);
+    return 'transferencia';
+  }
+  
+  if (desc.includes('ted') || desc.includes('doc')) {
+    console.log(`✅ TED/DOC detectado → transferencia`);
+    return 'transferencia';
+  }
+  
+  if (desc.includes('saque') || desc.includes('atm')) {
+    console.log(`✅ Saque detectado → saque`);
+    return 'saque';
+  }
+  
+  if (desc.includes('taxa') || desc.includes('tarifa') || desc.includes('anuidade')) {
+    console.log(`✅ Taxa detectada → taxas`);
+    return 'taxas';
+  }
+  
+  // Para entradas, prioriza categorias de renda
+  if (isEntrada) {
+    for (const [categoria, palavras] of Object.entries(regras)) {
+      if (categoria === 'renda' || categoria === 'investimento') {
+        for (const palavra of palavras) {
+          if (desc.includes(palavra)) {
+            console.log(`✅ Entrada: ${palavra} → ${categoria}`);
+            return categoria;
+          }
+        }
+      }
+    }
+    console.log(`✅ Entrada padrão → renda`);
+    return 'renda'; // Padrão para entradas
+  }
+  
+  // Para saídas, verifica todas as categorias
+  for (const [categoria, palavras] of Object.entries(regras)) {
+    for (const palavra of palavras) {
+      if (desc.includes(palavra)) {
+        console.log(`✅ Palavra-chave: ${palavra} → ${categoria}`);
+        return categoria;
+      }
+    }
+  }
+  
+  // Categoria padrão
+  console.log(`❓ Não identificado → outros`);
+  return 'outros';
+}
+
 db.serialize(() => {
   db.run("CREATE TABLE IF NOT EXISTS transacoes (id INTEGER PRIMARY KEY, data TEXT, descricao TEXT, valor REAL, tipo TEXT, categoria TEXT, mes TEXT, ano TEXT)");
   db.run("ALTER TABLE transacoes ADD COLUMN ano TEXT", (err) => {
@@ -150,16 +274,20 @@ app.post('/upload', upload.single('pdf'), (req, res) => {
         
         const [dia, mes, ano] = data.split('/');
 
+        // Categorização automática
+        const categoria = categorizarTransacao(descricaoLimpa, valorFinal);
+
         console.log(`💰 Valor final: ${valorFinal} (${tipo})`);
+        console.log(`🏷️ Categoria: ${categoria}`);
 
         db.run(
           "INSERT INTO transacoes (data, descricao, valor, tipo, categoria, mes, ano) VALUES (?, ?, ?, ?, ?, ?, ?)",
-          [data, descricaoLimpa, valorFinal, tipo, 'outros', mes, ano],
+          [data, descricaoLimpa, valorFinal, tipo, categoria, mes, ano],
           (err) => {
             if (err) {
               console.error('❌ Erro ao inserir:', err);
             } else {
-              console.log(`✅ INSERIDO: ${data} | "${descricaoLimpa}" | ${valorFinal} | ${tipo}`);
+              console.log(`✅ INSERIDO: ${data} | "${descricaoLimpa}" | ${valorFinal} | ${tipo} | ${categoria}`);
             }
           }
         );
@@ -180,8 +308,65 @@ app.get('/transactions', (req, res) => {
       console.error('Erro ao consultar transações:', err);
       return res.status(500).send('Erro ao consultar transações');
     }
-    res.json(rows);
+    
+    // Ordena as transações por data (DD/MM/AAAA) corretamente
+    const sortedRows = rows.sort((a, b) => {
+      // Converte DD/MM/AAAA para AAAA-MM-DD para comparação
+      const dateA = a.data.split('/').reverse().join('-');
+      const dateB = b.data.split('/').reverse().join('-');
+      return dateA.localeCompare(dateB);
+    });
+    
+    res.json(sortedRows);
   });
+});
+
+// Endpoint para atualizar categoria de uma transação
+app.put('/transactions/:id/categoria', (req, res) => {
+  const { id } = req.params;
+  const { categoria } = req.body;
+  
+  if (!categoria) {
+    return res.status(400).json({ error: 'Categoria é obrigatória' });
+  }
+  
+  db.run(
+    "UPDATE transacoes SET categoria = ? WHERE id = ?",
+    [categoria, id],
+    function(err) {
+      if (err) {
+        console.error('Erro ao atualizar categoria:', err);
+        return res.status(500).json({ error: 'Erro ao atualizar categoria' });
+      }
+      
+      if (this.changes === 0) {
+        return res.status(404).json({ error: 'Transação não encontrada' });
+      }
+      
+      res.json({ message: 'Categoria atualizada com sucesso' });
+    }
+  );
+});
+
+// Endpoint para obter lista de categorias disponíveis
+app.get('/categorias', (req, res) => {
+  const categorias = [
+    'alimentacao',
+    'transporte', 
+    'saude',
+    'educacao',
+    'lazer',
+    'casa',
+    'transferencia',
+    'renda',
+    'investimento',
+    'vestuario',
+    'saque',
+    'taxas',
+    'outros'
+  ];
+  
+  res.json(categorias);
 });
 
 app.listen(port, () => {
