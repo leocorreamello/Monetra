@@ -1,49 +1,432 @@
+/* Reset básico */
+* {
+  box-sizing: border-box;
+}
+
 .upload-container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 20px auto;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
+  padding: 32px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(51, 65, 85, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header com controles */
+.controls-section {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(51, 65, 85, 0.06);
+}
+
+/* Upload de arquivo */
+.file-upload {
+  position: relative;
+  display: inline-block;
+  width: auto; /* Limita a largura */
+}
+
+.file-upload input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1; /* Garante que só sobreponha o botão */
+}
+
+.file-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
   border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  position: relative;
+  z-index: 0;
+  white-space: nowrap; /* Evita quebra de linha */
+}
+
+.file-upload-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+}
+
+.upload-text {
+  margin: 8px 0 0 0;
+  color: #64748b;
+  font-size: 14px;
+  position: relative;
+  z-index: 0; /* Garante que não seja sobreposto */
+}
+
+/* Filtros */
+.filters {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-self: center; /* Centraliza os filtros */
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px; /* Garante largura mínima */
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+select {
+  padding: 10px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  position: relative;
+  z-index: 10; /* Garante que os selects fiquem acima */
+}
+
+select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  z-index: 20; /* Ainda mais alto quando focado */
+}
+
+select:hover {
+  border-color: #cbd5e1;
+}
+
+/* Botão de exclusão */
+.delete-button {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.delete-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+}
+
+.delete-button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Tabela */
+.table-container {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(51, 65, 85, 0.08);
+  margin-top: 24px;
+  border: 1px solid #f1f5f9;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin: 0;
 }
 
-th, td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
+thead {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  position: relative;
+}
+
+thead::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8, #3b82f6);
 }
 
 th {
-  background-color: #f2f2f2;
+  padding: 18px 24px;
+  color: white;
+  font-weight: 600;
+  text-align: left;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border: none;
+  position: relative;
 }
 
-tr:nth-child(even) {
-  background-color: #f9f9f9;
+th:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 25%;
+  bottom: 25%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.2);
 }
 
+tbody tr {
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #f1f5f9;
+  position: relative;
+}
+
+tbody tr:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transform: translateX(4px);
+  box-shadow: inset 4px 0 0 #3b82f6;
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+td {
+  padding: 18px 24px;
+  border: none;
+  color: #334155;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+/* Linha do saldo */
+.saldo-row {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  font-weight: 700;
+  border-top: 3px solid #e2e8f0;
+  position: sticky;
+  bottom: 0;
+}
+
+.saldo-row:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.saldo-row td {
+  padding: 24px;
+  font-size: 16px;
+  background: inherit;
+}
+
+/* Cores para valores */
 .entrada {
-  color: green;
+  color: #059669;
+  font-weight: 600;
 }
 
 .saida {
-  color: red;
+  color: #dc2626;
+  font-weight: 600;
 }
 
-.saldo-final {
-  font-weight: bold;
-  margin-bottom: 10px;
+/* Badges para tipos */
+.tipo-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.positivo {
-  color: green;
+.tipo-entrada {
+  background: rgba(5, 150, 105, 0.1);
+  color: #059669;
 }
 
-.negativo {
-  color: red;
+.tipo-saida {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+/* Categoria */
+.categoria {
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+}
+
+/* Data */
+.data {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* Loading state */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(51, 65, 85, 0.06);
+  margin-top: 24px;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f1f5f9;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Mensagem quando vazio */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(51, 65, 85, 0.06);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .upload-container {
+    margin: 10px;
+    padding: 20px;
+  }
+  
+  .controls-section {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    align-items: stretch;
+  }
+  
+  .filters {
+    justify-self: stretch;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  select {
+    width: 100%;
+  }
+  
+  /* Tabela responsiva */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  table {
+    min-width: 600px;
+    font-size: 12px;
+  }
+  
+  th, td {
+    padding: 12px 8px;
+    white-space: nowrap;
+  }
+  
+  .tipo-badge {
+    padding: 2px 8px;
+    font-size: 10px;
+  }
+  
+  .categoria {
+    padding: 2px 8px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .upload-container {
+    margin: 5px;
+    padding: 16px;
+  }
+  
+  .controls-section {
+    padding: 20px;
+  }
+  
+  .file-upload-button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .app-title {
+    font-size: 1.5rem;
+  }
+  
+  .title-icon {
+    font-size: 2rem;
+  }
 }

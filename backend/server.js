@@ -57,42 +57,112 @@ app.post('/upload', upload.single('pdf'), (req, res) => {
 
     linhas.forEach(linha => {
       if (linha !== 'datalançamentosvalor (R$)saldo (R$)' && linha.trim().length > 0) {
-        // Novo regex para capturar data, descrição (tudo até o último valor) e valor final
-        const lineMatch = linha.match(/^(\d{2}\/\d{2}\/\d{4})(.+?)(\d{1,3}(?:\.\d{3})*(?:,\d{2}))$/);
-        if (lineMatch) {
-          const data = lineMatch[1];
-          const descricao = lineMatch[2].trim();
-          const valorStr = lineMatch[3];
-
-          const isSaida = descricao.includes('-');
-
-          if (descricao.includes('SALDO') || descricao.includes('TOTAL DISPONÃVEL') || descricao.includes('ANTERIOR')) {
-            console.log(`Ignorado: ${linha} (resumo, não transação)`);
-            return;
-          }
-
-          const valor = parseFloat(valorStr.replace('.', '').replace(',', '.')) || 0;
-          const adjustedValor = isSaida ? -valor : valor;
-          const tipo = adjustedValor < 0 ? 'saida' : 'entrada';
-          const categoria = 'outros';
-          const [dia, mes, ano] = data.split('/');
-
-          if (!mes || !ano || mes === 'null' || ano === 'null') {
-            console.log(`Ignorado: ${linha} (mes ou ano inválido)`);
-            return;
-          }
-
-          db.run(
-            "INSERT INTO transacoes (data, descricao, valor, tipo, categoria, mes, ano) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            [data || '', descricao.replace('-', '').trim() || '', adjustedValor, tipo, categoria, mes || '01', ano || '2025'],
-            (err) => {
-              if (err) console.error('Erro ao inserir:', err);
-            }
-          );
-          console.log(`Inserido: ${data}, ${descricao.replace('-', '').trim()}, ${adjustedValor}, ${tipo}, ${categoria}, ${mes}, ${ano}`);
-        } else {
-          console.log(`Ignorado: ${linha} (formato inválido)`);
+        console.log(`\n🔍 Processando: "${linha}"`);
+        
+        // Extrai a data do início
+        const dataMatch = linha.match(/^(\d{2}\/\d{2}\/\d{4})/);
+        if (!dataMatch) {
+          console.log(`❌ Sem data válida`);
+          return;
         }
+        
+        const data = dataMatch[1];
+        let resto = linha.substring(10); // Remove data
+        
+        // Ignora saldos e resumos
+        if (resto.includes('SALDO') || resto.includes('TOTAL DISPONÃVEL') || resto.includes('ANTERIOR')) {
+          console.log(`⚠️ Ignorado: linha de saldo`);
+          return;
+        }
+        
+        console.log(`📝 Analisando: "${resto}"`);
+        
+        // CORREÇÃO FINAL: O problema é que alguns valores estão grudados na descrição
+        // Exemplos reais:
+        // "PIX TRANSF FATIMA 08/08450,00" → deve ser "PIX TRANSF FATIMA 08/08" + "450,00"
+        // "PIX TRANSF JOAO SI15/0834,34" → deve ser "PIX TRANSF JOAO SI15/08" + "34,34"
+        
+        // Estratégia: encontrar onde termina uma data dentro da descrição e começa o valor
+        
+        // Procura padrões como XX/XX seguidos imediatamente por números,vírgula
+        // ou espaço seguido de valor
+        let match = null;
+        
+        // Primeiro tenta: descrição + espaço + valor
+        match = resto.match(/^(.+?)\s+(-?\d+,\d{2})$/);
+        
+        if (!match) {
+          // Segundo tenta: descrição + data (XX/XX) + valor grudado
+          match = resto.match(/^(.+?)(\d{2}\/\d{2})(\d+,\d{2})$/);
+          if (match) {
+            // Reconstrói: descrição + data, e valor separado
+            const descricao = match[1] + match[2];
+            const valorStr = match[3];
+            match = [resto, descricao, '', valorStr];
+          }
+        }
+        
+        if (!match) {
+          // Terceiro tenta: valor grudado direto no final (sem data no meio)
+          match = resto.match(/^(.+?)(\d+,\d{2})$/);
+          if (match) {
+            // Precisa verificar se não está capturando parte de uma data
+            const possibleDesc = match[1];
+            const possibleValue = match[2];
+            
+            // Se a descrição termina com algo que parece data (XX/ ou XX), 
+            // é provável que parte do valor foi misturada
+            if (possibleDesc.match(/\d{1,2}\/$/) || possibleDesc.match(/\d{1,2}$/)) {
+              console.log(`⚠️ Possível valor grudado detectado, tentando separar melhor`);
+              // Tenta encontrar onde realmente deveria separar
+              const betterMatch = resto.match(/^(.+?)(\d{1,3},\d{2})$/);
+              if (betterMatch) {
+                match = [resto, betterMatch[1], '', betterMatch[2]];
+              }
+            } else {
+              match = [resto, possibleDesc, '', possibleValue];
+            }
+          }
+        }
+        
+        if (!match) {
+          console.log(`❌ Não conseguiu separar descrição e valor`);
+          return;
+        }
+        
+        const descricao = match[1].trim();
+        const valorStr = match[3] || match[2]; // Dependendo do match usado
+        
+        console.log(`🎯 PARSING:`);
+        console.log(`   Descrição: "${descricao}"`);
+        console.log(`   Valor: "${valorStr}"`);
+        
+        // Determina se é entrada ou saída
+        const isSaida = valorStr.startsWith('-') || descricao.includes('-');
+        
+        // Limpa a descrição removendo possíveis sinais de menos extras
+        const descricaoLimpa = descricao.replace(/^-+/, '').trim();
+
+        // Converte valor para número
+        const valorNumerico = parseFloat(valorStr.replace('-', '').replace(',', '.'));
+        const valorFinal = isSaida ? -valorNumerico : valorNumerico;
+        const tipo = valorFinal < 0 ? 'saida' : 'entrada';
+        
+        const [dia, mes, ano] = data.split('/');
+
+        console.log(`💰 Valor final: ${valorFinal} (${tipo})`);
+
+        db.run(
+          "INSERT INTO transacoes (data, descricao, valor, tipo, categoria, mes, ano) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [data, descricaoLimpa, valorFinal, tipo, 'outros', mes, ano],
+          (err) => {
+            if (err) {
+              console.error('❌ Erro ao inserir:', err);
+            } else {
+              console.log(`✅ INSERIDO: ${data} | "${descricaoLimpa}" | ${valorFinal} | ${tipo}`);
+            }
+          }
+        );
       }
     });
 
@@ -136,4 +206,15 @@ app.delete('/transactions', (req, res) => {
       res.json({ message: 'Transações excluídas com sucesso' }); // JSON para sucesso
     }
   );
+});
+
+// Endpoint para limpar todas as transações (útil para testes)
+app.delete('/transactions/all', (req, res) => {
+  db.run("DELETE FROM transacoes", [], (err) => {
+    if (err) {
+      console.error('Erro ao limpar todas as transações:', err);
+      return res.status(500).json({ error: 'Erro ao limpar transações' });
+    }
+    res.json({ message: 'Todas as transações foram removidas' });
+  });
 });
