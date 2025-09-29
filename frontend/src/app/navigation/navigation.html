@@ -1,0 +1,32 @@
+<nav class="navigation-container">
+  <div class="nav-content">
+    <!-- Logo/Brand -->
+    <div class="brand">
+      <span class="brand-text">Monetra</span>
+    </div>
+
+    <!-- Navigation Menu -->
+    <div class="nav-menu">
+      <button 
+        class="nav-item" 
+        [class.active]="activeTab === 'home'"
+        (click)="setActiveTab('home')">
+        <span class="nav-text">Home</span>
+      </button>
+      
+      <button 
+        class="nav-item" 
+        [class.active]="activeTab === 'planilhas'"
+        (click)="setActiveTab('planilhas')">
+        <span class="nav-text">Planilhas</span>
+      </button>
+    </div>
+
+    <!-- User Profile (placeholder for future) -->
+    <div class="user-section">
+      <div class="user-avatar">
+        <span class="user-icon">👤</span>
+      </div>
+    </div>
+  </div>
+</nav>

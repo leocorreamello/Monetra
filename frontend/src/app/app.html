@@ -1,15 +1,15 @@
 <div class="app-container">
-  <header class="app-header">
-    <div class="header-content">
-      <h1 class="app-title">
-        <span class="title-icon">💰</span>
-        Monetra
-        <span class="title-subtitle">Controle Financeiro Inteligente</span>
-      </h1>
-    </div>
-  </header>
+  <app-navigation #navigation></app-navigation>
   
   <main class="app-main">
-    <app-upload></app-upload>
+    <!-- Home Tab -->
+    <div *ngIf="navigation.activeTab === 'home'" class="tab-content">
+      <app-home></app-home>
+    </div>
+    
+    <!-- Planilhas Tab -->
+    <div *ngIf="navigation.activeTab === 'planilhas'" class="tab-content">
+      <app-upload></app-upload>
+    </div>
   </main>
 </div>

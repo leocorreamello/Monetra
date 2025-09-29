@@ -1,0 +1,223 @@
+/* Home V2 - Clean & Minimal */
+::ng-deep app-wavy-background .wavy-container {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-content-overlay {
+  padding: 0 32px;
+  max-width: 1200px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+  color: #ffffff;
+  z-index: 10;
+  position: relative;
+  text-align: center;
+  width: 100%;
+}
+
+/* Hero Center - Foco principal */
+.hero-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.main-title {
+  font-size: 5rem;
+  font-weight: 900;
+  margin: 0;
+  letter-spacing: -3px;
+}
+
+.highlight {
+  background: linear-gradient(135deg, #60a5fa 0%, #8b5cf6 50%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 40px rgba(96, 165, 250, 0.6)) drop-shadow(0 0 20px rgba(139, 92, 246, 0.4));
+}
+
+.description {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 700px;
+}
+
+/* CTA Section */
+.cta-section {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 36px;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #ec4899 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+  text-decoration: none;
+}
+
+.upload-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.6);
+}
+
+.btn-icon {
+  font-size: 18px;
+}
+
+/* Benefits Cards */
+.benefits-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+  justify-items: center;
+  width: 100%;
+}
+
+.benefit-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+  text-align: center;
+  width: 100%;
+  max-width: 300px;
+}
+
+.benefit-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.benefit-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, 
+    rgba(96, 165, 250, 0.15) 0%, 
+    rgba(168, 85, 247, 0.15) 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.benefit-emoji {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+.benefit-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  ::ng-deep app-wavy-background .wavy-container {
+    min-height: calc(100vh - 60px);
+  }
+  
+  .home-content-overlay {
+    padding: 40px 20px;
+  }
+  
+  .home-container {
+    gap: 60px;
+  }
+  
+  .main-title {
+    font-size: 3.5rem;
+    letter-spacing: -2px;
+  }
+  
+  .description {
+    font-size: 1.1rem;
+  }
+  
+  .upload-btn {
+    padding: 16px 32px;
+    font-size: 15px;
+  }
+  
+  .benefits-row {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .benefit-card {
+    padding: 20px 16px;
+    max-width: 100%;
+    min-height: 70px;
+  }
+  
+  .benefit-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-content-overlay {
+    padding: 30px 16px;
+  }
+  
+  .home-container {
+    gap: 50px;
+  }
+  
+  .main-title {
+    font-size: 2.8rem;
+  }
+  
+  .description {
+    font-size: 1rem;
+  }
+  
+  .benefit-card {
+    padding: 18px 16px;
+    min-height: 60px;
+  }
+  
+  .benefit-title {
+    font-size: 1rem;
+  }
+}

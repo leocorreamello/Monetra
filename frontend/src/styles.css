@@ -11,12 +11,13 @@ html, body {
   height: 100%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  color: #334155;
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #ffffff;
+  background: linear-gradient(135deg, #020617 0%, #0c0a1e 50%, #0f172a 100%);
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  padding: 20px 0;
   min-height: 100vh;
 }
 
