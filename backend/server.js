@@ -179,7 +179,10 @@ app.post('/upload', upload.single('pdf'), (req, res) => {
     const relevantText = text.substring(startIndex);
     const linhas = relevantText.split('\n').filter(line => line.trim());
 
-    linhas.forEach(linha => {
+    // Processa as linhas com look-ahead para casos de valor em linha separada
+    for (let i = 0; i < linhas.length; i++) {
+      const linha = linhas[i];
+      
       if (linha !== 'datalançamentosvalor (R$)saldo (R$)' && linha.trim().length > 0) {
         console.log(`\n🔍 Processando: "${linha}"`);
         
@@ -187,7 +190,7 @@ app.post('/upload', upload.single('pdf'), (req, res) => {
         const dataMatch = linha.match(/^(\d{2}\/\d{2}\/\d{4})/);
         if (!dataMatch) {
           console.log(`❌ Sem data válida`);
-          return;
+          continue;
         }
         
         const data = dataMatch[1];
@@ -196,7 +199,7 @@ app.post('/upload', upload.single('pdf'), (req, res) => {
         // Ignora saldos e resumos
         if (resto.includes('SALDO') || resto.includes('TOTAL DISPONÃVEL') || resto.includes('ANTERIOR')) {
           console.log(`⚠️ Ignorado: linha de saldo`);
-          return;
+          continue;
         }
         
         console.log(`📝 Analisando: "${resto}"`);
@@ -208,18 +211,96 @@ app.post('/upload', upload.single('pdf'), (req, res) => {
         
         // Estratégia: encontrar onde termina uma data dentro da descrição e começa o valor
         
-        // Procura padrões como XX/XX seguidos imediatamente por números,vírgula
-        // ou espaço seguido de valor
+        // Procura padrões incluindo valores com separador de milhares (ex: 1.628,17)
         let match = null;
         
-        // Primeiro tenta: descrição + espaço + valor
-        match = resto.match(/^(.+?)\s+(-?\d+,\d{2})$/);
+        console.log(`🔍 Tentando fazer match em: "${resto}"`);
+        
+        // Primeiro tenta: descrição + espaço + valor com separador de milhares
+        // Padrão mais específico para capturar valores como 1.628,17 ou 628,17
+        match = resto.match(/^(.+?)\s+(-?(?:\d{1,3}(?:\.\d{3})*),\d{2})$/);
         
         if (!match) {
-          // Segundo tenta: descrição + data (XX/XX) + valor grudado
+          console.log(`❌ Primeiro padrão não funcionou, tentando detectar casos específicos`);
+          
+          // Caso específico: SALARIO/REMUNERACAO com valor grudado (ex: SALARIO1.628,17)
+          // Só aplica para descrições que terminam com palavra + dígito sem barra
+          match = resto.match(/^(.+?[A-Z])(\d)\.(\d{3},\d{2})$/);
+          if (match) {
+            const descricao = match[1];
+            const milhar = match[2];
+            const resto_valor = match[3];
+            const valorCompleto = milhar + '.' + resto_valor;
+            
+            console.log(`✅ Detectado caso específico SALARIO/REMUNERACAO:`);
+            console.log(`   Texto original: "${resto}"`);
+            console.log(`   Descrição: "${descricao}"`);
+            console.log(`   Valor: "${valorCompleto}"`);
+            
+            match = [resto, descricao, '', valorCompleto];
+          }
+        }
+        
+        if (!match) {
+          console.log(`❌ Caso específico não funcionou, tentando padrão PIX melhorado`);
+          
+          // Padrão específico para PIX: NOME XX/XX + valor grudado
+          // Ex: "PIX TRANSF LUIGI P15/0834,34" → "PIX TRANSF LUIGI P15/08" + "34,34"
           match = resto.match(/^(.+?)(\d{2}\/\d{2})(\d+,\d{2})$/);
           if (match) {
-            // Reconstrói: descrição + data, e valor separado
+            const descricaoBase = match[1];
+            const data = match[2];
+            const valorBruto = match[3];
+            
+            console.log(`🔍 PIX detectado: "${descricaoBase}" + "${data}" + "${valorBruto}"`);
+            
+            // Para valores com 3+ dígitos, geralmente os primeiros dígitos fazem parte da data
+            if (valorBruto.match(/^\d{3,4},\d{2}$/)) {
+              // Para 0834,34 → pega últimos 2 dígitos: 34,34
+              // Para 08340,00 → pega últimos 2 dígitos: 40,00 (mas isso pode estar errado)
+              
+              // Estratégia: se começa com 08, provavelmente é parte da data
+              if (valorBruto.startsWith('08')) {
+                const valorCorrigido = valorBruto.substring(2); // Remove os primeiros 2 dígitos
+                const descricaoCompleta = descricaoBase + data;
+                
+                console.log(`✅ Corrigindo PIX com data grudada no valor:`);
+                console.log(`   Descrição final: "${descricaoCompleta}"`);
+                console.log(`   Valor original: "${valorBruto}"`);
+                console.log(`   Valor corrigido: "${valorCorrigido}"`);
+                
+                match = [resto, descricaoCompleta, '', valorCorrigido];
+              } else {
+                // Valor parece estar correto
+                const descricaoCompleta = descricaoBase + data;
+                console.log(`✅ PIX com valor normal: "${descricaoCompleta}" + "${valorBruto}"`);
+                match = [resto, descricaoCompleta, '', valorBruto];
+              }
+            } else {
+              // Valor tem 1-2 dígitos, provavelmente correto
+              const descricaoCompleta = descricaoBase + data;
+              console.log(`✅ PIX valor pequeno: "${descricaoCompleta}" + "${valorBruto}"`);
+              match = [resto, descricaoCompleta, '', valorBruto];
+            }
+          }
+        }
+        
+        if (!match) {
+          console.log(`❌ Padrão PIX não funcionou, tentando valor grudado simples`);
+          // Último recurso: valor grudado simples
+          match = resto.match(/^(.+?)(\d+,\d{2})$/);
+          if (match) {
+            console.log(`✅ Padrão simples encontrado: "${match[1]}" + "${match[2]}"`);
+            match = [resto, match[1], '', match[2]];
+          }
+        }
+        
+        if (!match) {
+          console.log(`❌ Segundo padrão não funcionou`);
+          // Terceiro tenta: descrição + data (XX/XX) + valor grudado
+          match = resto.match(/^(.+?)(\d{2}\/\d{2})(\d(?:\.\d{3})*,\d{2})$/);
+          if (match) {
+            console.log(`✅ Terceiro padrão funcionou - data + valor grudado`);
             const descricao = match[1] + match[2];
             const valorStr = match[3];
             match = [resto, descricao, '', valorStr];
@@ -227,31 +308,35 @@ app.post('/upload', upload.single('pdf'), (req, res) => {
         }
         
         if (!match) {
-          // Terceiro tenta: valor grudado direto no final (sem data no meio)
-          match = resto.match(/^(.+?)(\d+,\d{2})$/);
+          console.log(`❌ Terceiro padrão não funcionou`);
+          // Quarto tenta: padrão original para valores simples sem separador de milhares
+          match = resto.match(/^(.+?)\s+(-?\d+,\d{2})$/);
           if (match) {
-            // Precisa verificar se não está capturando parte de uma data
-            const possibleDesc = match[1];
-            const possibleValue = match[2];
-            
-            // Se a descrição termina com algo que parece data (XX/ ou XX), 
-            // é provável que parte do valor foi misturada
-            if (possibleDesc.match(/\d{1,2}\/$/) || possibleDesc.match(/\d{1,2}$/)) {
-              console.log(`⚠️ Possível valor grudado detectado, tentando separar melhor`);
-              // Tenta encontrar onde realmente deveria separar
-              const betterMatch = resto.match(/^(.+?)(\d{1,3},\d{2})$/);
-              if (betterMatch) {
-                match = [resto, betterMatch[1], '', betterMatch[2]];
-              }
-            } else {
-              match = [resto, possibleDesc, '', possibleValue];
-            }
+            console.log(`✅ Padrão simples funcionou`);
           }
         }
         
         if (!match) {
-          console.log(`❌ Não conseguiu separar descrição e valor`);
-          return;
+          console.log(`❌ Não conseguiu separar descrição e valor na mesma linha`);
+          
+          // Verifica se a próxima linha contém apenas um valor
+          if (i + 1 < linhas.length) {
+            const proximaLinha = linhas[i + 1].trim();
+            console.log(`🔍 Verificando próxima linha: "${proximaLinha}"`);
+            
+            // Verifica se a próxima linha é apenas um valor monetário
+            if (proximaLinha.match(/^-?\d+,\d{2}$/)) {
+              console.log(`✅ Valor encontrado na próxima linha!`);
+              match = [resto, resto, '', proximaLinha];
+              i++; // Pula a próxima linha pois já foi processada
+            } else {
+              console.log(`❌ Próxima linha não é um valor válido`);
+              continue;
+            }
+          } else {
+            console.log(`❌ Não há próxima linha para verificar`);
+            continue;
+          }
         }
         
         const descricao = match[1].trim();
@@ -267,8 +352,9 @@ app.post('/upload', upload.single('pdf'), (req, res) => {
         // Limpa a descrição removendo possíveis sinais de menos extras
         const descricaoLimpa = descricao.replace(/^-+/, '').trim();
 
-        // Converte valor para número
-        const valorNumerico = parseFloat(valorStr.replace('-', '').replace(',', '.'));
+        // Converte valor para número (remove separador de milhares e troca vírgula por ponto)
+        const valorLimpo = valorStr.replace('-', '').replace(/\./g, '').replace(',', '.');
+        const valorNumerico = parseFloat(valorLimpo);
         const valorFinal = isSaida ? -valorNumerico : valorNumerico;
         const tipo = valorFinal < 0 ? 'saida' : 'entrada';
         
@@ -292,7 +378,7 @@ app.post('/upload', upload.single('pdf'), (req, res) => {
           }
         );
       }
-    });
+    }
 
     res.json({ message: 'Arquivo processado e dados de lançamentos salvos' }); // Aqui, Leo! Substitua o res.send por isso
   }).catch(err => {
