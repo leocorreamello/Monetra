@@ -40,3 +40,14 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Database files (contains sensitive financial data)
+finance.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Upload directory (temporary files and user data)
+uploads/
+*.pdf
+*.csv
