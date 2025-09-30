@@ -487,7 +487,7 @@ th:nth-child(3) { width: 30%; min-width: 300px; } /* Valor */
 th:nth-child(4) { width: 13%; min-width: 130px; } /* Tipo */
 th:nth-child(5) { width: 15%; min-width: 150px; } /* Categoria */
 
-/* CORPO DA TABELA REDESENHADO */
+/* CORPO DA TABELA REDESENHADO - SEM movimento no hover */
 tbody tr {
   background: rgba(15, 23, 42, 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -509,7 +509,6 @@ tbody tr::before {
 
 tbody tr:hover {
   background: rgba(59, 130, 246, 0.08);
-  transform: translateX(2px);
   box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
 }
 
@@ -590,7 +589,7 @@ td:nth-child(5) {
   padding: 12px 16px;
 }
 
-/* LINHA DE SALDO REDESENHADA */
+/* LINHA DE SALDO COM CORES - REDESENHADA */
 .saldo-row {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2)) !important;
   border-top: 3px solid rgba(59, 130, 246, 0.4);
@@ -621,6 +620,38 @@ td:nth-child(5) {
 
 .saldo-row td:not(:last-child)::after {
   display: none;
+}
+
+/* CORES PARA SALDO POSITIVO E NEGATIVO - ADICIONADO */
+.saldo-row .entrada {
+  color: #22c55e !important;
+  text-shadow: 0 2px 8px rgba(34, 197, 94, 0.4) !important;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.1));
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  display: inline-block;
+}
+
+.saldo-row .saida {
+  color: #ef4444 !important;
+  text-shadow: 0 2px 8px rgba(239, 68, 68, 0.4) !important;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  display: inline-block;
+}
+
+/* Saldo neutro (zero) */
+.saldo-row td[class*="saldo"]:not(.entrada):not(.saida) {
+  color: #94a3b8 !important;
+  text-shadow: 0 2px 8px rgba(148, 163, 184, 0.4) !important;
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.1), rgba(100, 116, 139, 0.1));
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  display: inline-block;
 }
 
 /* BADGES REDESENHADOS */

@@ -159,7 +159,9 @@
               </tr>
               <tr class="saldo-row">
                 <td colspan="2"><strong>Saldo Final do Período</strong></td>
-                <td [class.entrada]="saldoFinal > 0" [class.saida]="saldoFinal < 0">
+                <td [class.entrada]="saldoFinal > 0" 
+                    [class.saida]="saldoFinal < 0"
+                    [class.neutro]="saldoFinal === 0">
                   <strong>{{ formatCurrency(saldoFinal) }}</strong>
                 </td>
                 <td colspan="2"></td>
