@@ -11,7 +11,7 @@
     <div class="controls-section">
       <!-- Upload de arquivo -->
       <div class="file-upload-zone">
-        <input type="file" (change)="onFileSelected($event)" accept=".pdf" />
+        <input type="file" accept=".pdf,.csv" (change)="onFileSelected($event)" />
         <div class="upload-icon">📄</div>
         <h3 class="upload-title">Enviar Extrato PDF</h3>
         <p class="upload-subtitle">Arraste seu arquivo aqui ou clique para selecionar</p>
@@ -33,7 +33,7 @@
           
           <div class="controls-section">
             <div class="file-upload-zone">
-              <input type="file" (change)="onFileSelected($event)" accept=".pdf" />
+              <input type="file" accept=".pdf,.csv" (change)="onFileSelected($event)" />
               <div class="upload-icon">📄</div>
               <h3 class="upload-title">Enviar PDF</h3>
               <p class="upload-subtitle">Clique aqui</p>

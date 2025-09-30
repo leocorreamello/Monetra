@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3').verbose();
 const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const fs = require('fs');
+const path = require('path');
 const app = express();
 const port = 3000;
 
@@ -17,7 +18,29 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   }
 });
-const upload = multer({ storage: storage });
+
+// Configuração do multer com filtro de arquivos
+const upload = multer({ 
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    const allowedExtensions = ['.pdf', '.csv'];
+    const fileExtension = path.extname(file.originalname).toLowerCase();
+    
+    console.log(`📁 Verificando arquivo: ${file.originalname}`);
+    console.log(`🔍 Extensão: ${fileExtension}`);
+    
+    if (allowedExtensions.includes(fileExtension)) {
+      console.log(`✅ Arquivo aceito: ${fileExtension}`);
+      cb(null, true);
+    } else {
+      console.log(`❌ Arquivo rejeitado: ${fileExtension}`);
+      cb(new Error(`Tipo de arquivo não suportado. Apenas arquivos PDF e CSV são aceitos.`), false);
+    }
+  },
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limite
+  }
+});
 
 const db = new sqlite3.Database('./finance.db');
 
@@ -156,235 +179,395 @@ db.serialize(() => {
   });
 });
 
-app.post('/upload', upload.single('pdf'), (req, res) => {
+// Função para processar arquivo CSV
+function processarCSV(filePath) {
+  return new Promise((resolve, reject) => {
+    try {
+      const data = fs.readFileSync(filePath, 'utf-8');
+      const linhas = data.split('\n').map(linha => linha.trim()).filter(linha => linha.length > 0);
+      
+      console.log('📄 Processando arquivo CSV...');
+      console.log(`📊 Total de linhas: ${linhas.length}`);
+      
+      // Encontra onde começam os dados das transações
+      let inicioTransacoes = -1;
+      for (let i = 0; i < linhas.length; i++) {
+        if (linhas[i].includes('Data Lançamento;Histórico;Descrição;Valor;Saldo')) {
+          inicioTransacoes = i + 1;
+          console.log(`✅ Cabeçalho encontrado na linha ${i}`);
+          break;
+        }
+      }
+      
+      if (inicioTransacoes === -1) {
+        throw new Error('Cabeçalho das transações não encontrado no CSV');
+      }
+      
+      const transacoes = [];
+      
+      // Processa cada linha de transação
+      for (let i = inicioTransacoes; i < linhas.length; i++) {
+        const linha = linhas[i];
+        
+        // Ignora linhas vazias ou que não parecem ser transações
+        if (!linha || linha.length < 10) continue;
+        
+        // Divide a linha pelos pontos e vírgulas
+        const campos = linha.split(';');
+        
+        if (campos.length < 4) {
+          console.log(`⚠️ Linha ignorada (poucos campos): ${linha}`);
+          continue;
+        }
+        
+        const data = campos[0];
+        const historico = campos[1];
+        const descricao = campos[2];
+        const valorStr = campos[3];
+        
+        // Valida se a data está no formato correto
+        if (!data.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+          console.log(`⚠️ Data inválida ignorada: ${data}`);
+          continue;
+        }
+        
+        // Processa o valor
+        if (!valorStr) {
+          console.log(`⚠️ Valor vazio ignorado na linha: ${linha}`);
+          continue;
+        }
+        
+        // Remove possíveis espaços e converte o valor
+        const valorLimpo = valorStr.trim().replace(',', '.');
+        const valorNumerico = parseFloat(valorLimpo);
+        
+        if (isNaN(valorNumerico)) {
+          console.log(`⚠️ Valor não numérico ignorado: ${valorStr}`);
+          continue;
+        }
+        
+        // Cria descrição completa combinando histórico e descrição
+        const descricaoCompleta = `${historico} ${descricao}`.trim();
+        
+        const tipo = valorNumerico < 0 ? 'saida' : 'entrada';
+        const [dia, mes, ano] = data.split('/');
+        
+        // Categorização automática
+        const categoria = categorizarTransacao(descricaoCompleta, valorNumerico);
+        
+        console.log(`💰 CSV: ${data} | "${descricaoCompleta}" | ${valorNumerico} | ${tipo} | ${categoria}`);
+        
+        transacoes.push({
+          data,
+          descricao: descricaoCompleta,
+          valor: valorNumerico,
+          tipo,
+          categoria,
+          mes,
+          ano
+        });
+      }
+      
+      console.log(`✅ CSV processado: ${transacoes.length} transações encontradas`);
+      resolve(transacoes);
+      
+    } catch (error) {
+      console.error('❌ Erro ao processar CSV:', error);
+      reject(error);
+    }
+  });
+}
+
+// Função para salvar transações no banco
+function salvarTransacoes(transacoes) {
+  return new Promise((resolve, reject) => {
+    let processadas = 0;
+    let erros = 0;
+    
+    transacoes.forEach((transacao) => {
+      db.run(
+        "INSERT INTO transacoes (data, descricao, valor, tipo, categoria, mes, ano) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [transacao.data, transacao.descricao, transacao.valor, transacao.tipo, transacao.categoria, transacao.mes, transacao.ano],
+        (err) => {
+          if (err) {
+            console.error('❌ Erro ao inserir transação:', err);
+            erros++;
+          } else {
+            processadas++;
+          }
+          
+          // Verifica se todas as transações foram processadas
+          if (processadas + erros === transacoes.length) {
+            if (erros > 0) {
+              reject(new Error(`${erros} transações falharam ao ser inseridas`));
+            } else {
+              resolve(processadas);
+            }
+          }
+        }
+      );
+    });
+  });
+}
+
+app.post('/upload', upload.single('pdf'), async (req, res) => {
   if (!req.file) {
-    return res.status(400).send('Nenhum arquivo enviado');
+    return res.status(400).json({ error: 'Nenhum arquivo enviado' });
   }
 
-  const pdfFile = req.file;
-  console.log('Arquivo recebido:', pdfFile.originalname);
+  const uploadedFile = req.file;
+  const fileExtension = path.extname(uploadedFile.originalname).toLowerCase();
+  const filePath = `./uploads/${uploadedFile.originalname}`;
+  
+  console.log(`📁 Arquivo recebido: ${uploadedFile.originalname}`);
+  console.log(`🔍 Extensão detectada: ${fileExtension}`);
 
-  const pdfPath = `./uploads/${pdfFile.originalname}`;
-  const dataBuffer = fs.readFileSync(pdfPath);
-
-  pdfParse(dataBuffer).then((data) => {
-    const text = data.text;
-    console.log('Conteúdo do PDF (seção lançamentos):');
-
-    const startIndex = text.indexOf('datalançamentosvalor (R$)saldo (R$)');
-    if (startIndex === -1) {
-      return res.status(400).json({ error: 'Seção de lançamentos não encontrada' }); // JSON para erro
-    }
-
-    const relevantText = text.substring(startIndex);
-    const linhas = relevantText.split('\n').filter(line => line.trim());
-
-    // Processa as linhas com look-ahead para casos de valor em linha separada
-    for (let i = 0; i < linhas.length; i++) {
-      const linha = linhas[i];
+  try {
+    if (fileExtension === '.pdf') {
+      console.log('📄 Processando como PDF...');
       
-      if (linha !== 'datalançamentosvalor (R$)saldo (R$)' && linha.trim().length > 0) {
-        console.log(`\n🔍 Processando: "${linha}"`);
+      // Código existente do PDF permanece inalterado
+      const dataBuffer = fs.readFileSync(filePath);
+
+      const data = await pdfParse(dataBuffer);
+      const text = data.text;
+      console.log('Conteúdo do PDF (seção lançamentos):');
+
+      const startIndex = text.indexOf('datalançamentosvalor (R$)saldo (R$)');
+      if (startIndex === -1) {
+        return res.status(400).json({ error: 'Seção de lançamentos não encontrada' });
+      }
+
+      const relevantText = text.substring(startIndex);
+      const linhas = relevantText.split('\n').filter(line => line.trim());
+
+      // Processa as linhas com look-ahead para casos de valor em linha separada
+      for (let i = 0; i < linhas.length; i++) {
+        const linha = linhas[i];
         
-        // Extrai a data do início
-        const dataMatch = linha.match(/^(\d{2}\/\d{2}\/\d{4})/);
-        if (!dataMatch) {
-          console.log(`❌ Sem data válida`);
-          continue;
-        }
-        
-        const data = dataMatch[1];
-        let resto = linha.substring(10); // Remove data
-        
-        // Ignora saldos e resumos
-        if (resto.includes('SALDO') || resto.includes('TOTAL DISPONÃVEL') || resto.includes('ANTERIOR')) {
-          console.log(`⚠️ Ignorado: linha de saldo`);
-          continue;
-        }
-        
-        console.log(`📝 Analisando: "${resto}"`);
-        
-        // CORREÇÃO FINAL: O problema é que alguns valores estão grudados na descrição
-        // Exemplos reais:
-        // "PIX TRANSF FATIMA 08/08450,00" → deve ser "PIX TRANSF FATIMA 08/08" + "450,00"
-        // "PIX TRANSF JOAO SI15/0834,34" → deve ser "PIX TRANSF JOAO SI15/08" + "34,34"
-        
-        // Estratégia: encontrar onde termina uma data dentro da descrição e começa o valor
-        
-        // Procura padrões incluindo valores com separador de milhares (ex: 1.628,17)
-        let match = null;
-        
-        console.log(`🔍 Tentando fazer match em: "${resto}"`);
-        
-        // Primeiro tenta: descrição + espaço + valor com separador de milhares
-        // Padrão mais específico para capturar valores como 1.628,17 ou 628,17
-        match = resto.match(/^(.+?)\s+(-?(?:\d{1,3}(?:\.\d{3})*),\d{2})$/);
-        
-        if (!match) {
-          console.log(`❌ Primeiro padrão não funcionou, tentando detectar casos específicos`);
+        if (linha !== 'datalançamentosvalor (R$)saldo (R$)' && linha.trim().length > 0) {
+          console.log(`\n🔍 Processando: "${linha}"`);
           
-          // Caso específico: SALARIO/REMUNERACAO com valor grudado (ex: SALARIO1.628,17)
-          // Só aplica para descrições que terminam com palavra + dígito sem barra
-          match = resto.match(/^(.+?[A-Z])(\d)\.(\d{3},\d{2})$/);
-          if (match) {
-            const descricao = match[1];
-            const milhar = match[2];
-            const resto_valor = match[3];
-            const valorCompleto = milhar + '.' + resto_valor;
-            
-            console.log(`✅ Detectado caso específico SALARIO/REMUNERACAO:`);
-            console.log(`   Texto original: "${resto}"`);
-            console.log(`   Descrição: "${descricao}"`);
-            console.log(`   Valor: "${valorCompleto}"`);
-            
-            match = [resto, descricao, '', valorCompleto];
-          }
-        }
-        
-        if (!match) {
-          console.log(`❌ Caso específico não funcionou, tentando padrão PIX melhorado`);
-          
-          // Padrão específico para PIX: NOME XX/XX + valor grudado
-          // Ex: "PIX TRANSF LUIGI P15/0834,34" → "PIX TRANSF LUIGI P15/08" + "34,34"
-          match = resto.match(/^(.+?)(\d{2}\/\d{2})(\d+,\d{2})$/);
-          if (match) {
-            const descricaoBase = match[1];
-            const data = match[2];
-            const valorBruto = match[3];
-            
-            console.log(`🔍 PIX detectado: "${descricaoBase}" + "${data}" + "${valorBruto}"`);
-            
-            // Para valores com 3+ dígitos, geralmente os primeiros dígitos fazem parte da data
-            if (valorBruto.match(/^\d{3,4},\d{2}$/)) {
-              // Para 0834,34 → pega últimos 2 dígitos: 34,34
-              // Para 08340,00 → pega últimos 2 dígitos: 40,00 (mas isso pode estar errado)
-              
-              // Estratégia: se começa com 08, provavelmente é parte da data
-              if (valorBruto.startsWith('08')) {
-                const valorCorrigido = valorBruto.substring(2); // Remove os primeiros 2 dígitos
-                const descricaoCompleta = descricaoBase + data;
-                
-                console.log(`✅ Corrigindo PIX com data grudada no valor:`);
-                console.log(`   Descrição final: "${descricaoCompleta}"`);
-                console.log(`   Valor original: "${valorBruto}"`);
-                console.log(`   Valor corrigido: "${valorCorrigido}"`);
-                
-                match = [resto, descricaoCompleta, '', valorCorrigido];
-              } else {
-                // Valor parece estar correto
-                const descricaoCompleta = descricaoBase + data;
-                console.log(`✅ PIX com valor normal: "${descricaoCompleta}" + "${valorBruto}"`);
-                match = [resto, descricaoCompleta, '', valorBruto];
-              }
-            } else {
-              // Valor tem 1-2 dígitos, provavelmente correto
-              const descricaoCompleta = descricaoBase + data;
-              console.log(`✅ PIX valor pequeno: "${descricaoCompleta}" + "${valorBruto}"`);
-              match = [resto, descricaoCompleta, '', valorBruto];
-            }
-          }
-        }
-        
-        if (!match) {
-          console.log(`❌ Padrão PIX não funcionou, tentando valor grudado simples`);
-          // Último recurso: valor grudado simples
-          match = resto.match(/^(.+?)(\d+,\d{2})$/);
-          if (match) {
-            console.log(`✅ Padrão simples encontrado: "${match[1]}" + "${match[2]}"`);
-            match = [resto, match[1], '', match[2]];
-          }
-        }
-        
-        if (!match) {
-          console.log(`❌ Segundo padrão não funcionou`);
-          // Terceiro tenta: descrição + data (XX/XX) + valor grudado
-          match = resto.match(/^(.+?)(\d{2}\/\d{2})(\d(?:\.\d{3})*,\d{2})$/);
-          if (match) {
-            console.log(`✅ Terceiro padrão funcionou - data + valor grudado`);
-            const descricao = match[1] + match[2];
-            const valorStr = match[3];
-            match = [resto, descricao, '', valorStr];
-          }
-        }
-        
-        if (!match) {
-          console.log(`❌ Terceiro padrão não funcionou`);
-          // Quarto tenta: padrão original para valores simples sem separador de milhares
-          match = resto.match(/^(.+?)\s+(-?\d+,\d{2})$/);
-          if (match) {
-            console.log(`✅ Padrão simples funcionou`);
-          }
-        }
-        
-        if (!match) {
-          console.log(`❌ Não conseguiu separar descrição e valor na mesma linha`);
-          
-          // Verifica se a próxima linha contém apenas um valor
-          if (i + 1 < linhas.length) {
-            const proximaLinha = linhas[i + 1].trim();
-            console.log(`🔍 Verificando próxima linha: "${proximaLinha}"`);
-            
-            // Verifica se a próxima linha é apenas um valor monetário
-            if (proximaLinha.match(/^-?\d+,\d{2}$/)) {
-              console.log(`✅ Valor encontrado na próxima linha!`);
-              match = [resto, resto, '', proximaLinha];
-              i++; // Pula a próxima linha pois já foi processada
-            } else {
-              console.log(`❌ Próxima linha não é um valor válido`);
-              continue;
-            }
-          } else {
-            console.log(`❌ Não há próxima linha para verificar`);
+          const dataMatch = linha.match(/^(\d{2}\/\d{2}\/\d{4})/);
+          if (!dataMatch) {
+            console.log(`❌ Sem data válida`);
             continue;
           }
-        }
-        
-        const descricao = match[1].trim();
-        const valorStr = match[3] || match[2]; // Dependendo do match usado
-        
-        console.log(`🎯 PARSING:`);
-        console.log(`   Descrição: "${descricao}"`);
-        console.log(`   Valor: "${valorStr}"`);
-        
-        // Determina se é entrada ou saída
-        const isSaida = valorStr.startsWith('-') || descricao.includes('-');
-        
-        // Limpa a descrição removendo possíveis sinais de menos extras
-        const descricaoLimpa = descricao.replace(/^-+/, '').trim();
-
-        // Converte valor para número (remove separador de milhares e troca vírgula por ponto)
-        const valorLimpo = valorStr.replace('-', '').replace(/\./g, '').replace(',', '.');
-        const valorNumerico = parseFloat(valorLimpo);
-        const valorFinal = isSaida ? -valorNumerico : valorNumerico;
-        const tipo = valorFinal < 0 ? 'saida' : 'entrada';
-        
-        const [dia, mes, ano] = data.split('/');
-
-        // Categorização automática
-        const categoria = categorizarTransacao(descricaoLimpa, valorFinal);
-
-        console.log(`💰 Valor final: ${valorFinal} (${tipo})`);
-        console.log(`🏷️ Categoria: ${categoria}`);
-
-        db.run(
-          "INSERT INTO transacoes (data, descricao, valor, tipo, categoria, mes, ano) VALUES (?, ?, ?, ?, ?, ?, ?)",
-          [data, descricaoLimpa, valorFinal, tipo, categoria, mes, ano],
-          (err) => {
-            if (err) {
-              console.error('❌ Erro ao inserir:', err);
-            } else {
-              console.log(`✅ INSERIDO: ${data} | "${descricaoLimpa}" | ${valorFinal} | ${tipo} | ${categoria}`);
+          
+          const data = dataMatch[1];
+          let resto = linha.substring(10); // Remove data
+          
+          // Ignora saldos e resumos
+          if (resto.includes('SALDO') || resto.includes('TOTAL DISPONÃVEL') || resto.includes('ANTERIOR')) {
+            console.log(`⚠️ Ignorado: linha de saldo`);
+            continue;
+          }
+          
+          console.log(`📝 Analisando: "${resto}"`);
+          
+          // CORREÇÃO FINAL: O problema é que alguns valores estão grudados na descrição
+          // Exemplos reais:
+          // "PIX TRANSF FATIMA 08/08450,00" → deve ser "PIX TRANSF FATIMA 08/08" + "450,00"
+          // "PIX TRANSF JOAO SI15/0834,34" → deve ser "PIX TRANSF JOAO SI15/08" + "34,34"
+          
+          // Estratégia: encontrar onde termina uma data dentro da descrição e começa o valor
+          
+          // Procura padrões incluindo valores com separador de milhares (ex: 1.628,17)
+          let match = null;
+          
+          console.log(`🔍 Tentando fazer match em: "${resto}"`);
+          
+          // Primeiro tenta: descrição + espaço + valor com separador de milhares
+          // Padrão mais específico para capturar valores como 1.628,17 ou 628,17
+          match = resto.match(/^(.+?)\s+(-?(?:\d{1,3}(?:\.\d{3})*),\d{2})$/);
+          
+          if (!match) {
+            console.log(`❌ Primeiro padrão não funcionou, tentando detectar casos específicos`);
+            
+            // Caso específico: SALARIO/REMUNERACAO com valor grudado (ex: SALARIO1.628,17)
+            // Só aplica para descrições que terminam com palavra + dígito sem barra
+            match = resto.match(/^(.+?[A-Z])(\d)\.(\d{3},\d{2})$/);
+            if (match) {
+              const descricao = match[1];
+              const milhar = match[2];
+              const resto_valor = match[3];
+              const valorCompleto = milhar + '.' + resto_valor;
+              
+              console.log(`✅ Detectado caso específico SALARIO/REMUNERACAO:`);
+              console.log(`   Texto original: "${resto}"`);
+              console.log(`   Descrição: "${descricao}"`);
+              console.log(`   Valor: "${valorCompleto}"`);
+              
+              match = [resto, descricao, '', valorCompleto];
             }
           }
-        );
-      }
-    }
+          
+          if (!match) {
+            console.log(`❌ Caso específico não funcionou, tentando padrão PIX melhorado`);
+            
+            // Padrão específico para PIX: NOME XX/XX + valor grudado
+            // Ex: "PIX TRANSF LUIGI P15/0834,34" → "PIX TRANSF LUIGI P15/08" + "34,34"
+            match = resto.match(/^(.+?)(\d{2}\/\d{2})(\d+,\d{2})$/);
+            if (match) {
+              const descricaoBase = match[1];
+              const data = match[2];
+              const valorBruto = match[3];
+              
+              console.log(`🔍 PIX detectado: "${descricaoBase}" + "${data}" + "${valorBruto}"`);
+              
+              // Para valores com 3+ dígitos, geralmente os primeiros dígitos fazem parte da data
+              if (valorBruto.match(/^\d{3,4},\d{2}$/)) {
+                // Para 0834,34 → pega últimos 2 dígitos: 34,34
+                // Para 08340,00 → pega últimos 2 dígitos: 40,00 (mas isso pode estar errado)
+                
+                // Estratégia: se começa com 08, provavelmente é parte da data
+                if (valorBruto.startsWith('08')) {
+                  const valorCorrigido = valorBruto.substring(2); // Remove os primeiros 2 dígitos
+                  const descricaoCompleta = descricaoBase + data;
+                  
+                  console.log(`✅ Corrigindo PIX com data grudada no valor:`);
+                  console.log(`   Descrição final: "${descricaoCompleta}"`);
+                  console.log(`   Valor original: "${valorBruto}"`);
+                  console.log(`   Valor corrigido: "${valorCorrigido}"`);
+                  
+                  match = [resto, descricaoCompleta, '', valorCorrigido];
+                } else {
+                  // Valor parece estar correto
+                  const descricaoCompleta = descricaoBase + data;
+                  console.log(`✅ PIX com valor normal: "${descricaoCompleta}" + "${valorBruto}"`);
+                  match = [resto, descricaoCompleta, '', valorBruto];
+                }
+              } else {
+                // Valor tem 1-2 dígitos, provavelmente correto
+                const descricaoCompleta = descricaoBase + data;
+                console.log(`✅ PIX valor pequeno: "${descricaoCompleta}" + "${valorBruto}"`);
+                match = [resto, descricaoCompleta, '', valorBruto];
+              }
+            }
+          }
+          
+          if (!match) {
+            console.log(`❌ Padrão PIX não funcionou, tentando valor grudado simples`);
+            // Último recurso: valor grudado simples
+            match = resto.match(/^(.+?)(\d+,\d{2})$/);
+            if (match) {
+              console.log(`✅ Padrão simples encontrado: "${match[1]}" + "${match[2]}"`);
+              match = [resto, match[1], '', match[2]];
+            }
+          }
+          
+          if (!match) {
+            console.log(`❌ Segundo padrão não funcionou`);
+            // Terceiro tenta: descrição + data (XX/XX) + valor grudado
+            match = resto.match(/^(.+?)(\d{2}\/\d{2})(\d(?:\.\d{3})*,\d{2})$/);
+            if (match) {
+              console.log(`✅ Terceiro padrão funcionou - data + valor grudado`);
+              const descricao = match[1] + match[2];
+              const valorStr = match[3];
+              match = [resto, descricao, '', valorStr];
+            }
+          }
+          
+          if (!match) {
+            console.log(`❌ Terceiro padrão não funcionou`);
+            // Quarto tenta: padrão original para valores simples sem separador de milhares
+            match = resto.match(/^(.+?)\s+(-?\d+,\d{2})$/);
+            if (match) {
+              console.log(`✅ Padrão simples funcionou`);
+            }
+          }
+          
+          if (!match) {
+            console.log(`❌ Não conseguiu separar descrição e valor na mesma linha`);
+            
+            // Verifica se a próxima linha contém apenas um valor
+            if (i + 1 < linhas.length) {
+              const proximaLinha = linhas[i + 1].trim();
+              console.log(`🔍 Verificando próxima linha: "${proximaLinha}"`);
+              
+              // Verifica se a próxima linha é apenas um valor monetário
+              if (proximaLinha.match(/^-?\d+,\d{2}$/)) {
+                console.log(`✅ Valor encontrado na próxima linha!`);
+                match = [resto, resto, '', proximaLinha];
+                i++; // Pula a próxima linha pois já foi processada
+              } else {
+                console.log(`❌ Próxima linha não é um valor válido`);
+                continue;
+              }
+            } else {
+              console.log(`❌ Não há próxima linha para verificar`);
+              continue;
+            }
+          }
+          
+          const descricao = match[1].trim();
+          const valorStr = match[3] || match[2]; // Dependendo do match usado
+          
+          console.log(`🎯 PARSING:`);
+          console.log(`   Descrição: "${descricao}"`);
+          console.log(`   Valor: "${valorStr}"`);
+          
+          // Determina se é entrada ou saída
+          const isSaida = valorStr.startsWith('-') || descricao.includes('-');
+          
+          // Limpa a descrição removendo possíveis sinais de menos extras
+          const descricaoLimpa = descricao.replace(/^-+/, '').trim();
 
-    res.json({ message: 'Arquivo processado e dados de lançamentos salvos' }); // Aqui, Leo! Substitua o res.send por isso
-  }).catch(err => {
-    console.error('Erro ao processar PDF:', err);
-    res.status(500).json({ error: 'Erro ao processar o PDF' }); // E aqui para erros
-  });
+          // Converte valor para número (remove separador de milhares e troca vírgula por ponto)
+          const valorLimpo = valorStr.replace('-', '').replace(/\./g, '').replace(',', '.');
+          const valorNumerico = parseFloat(valorLimpo);
+          const valorFinal = isSaida ? -valorNumerico : valorNumerico;
+          const tipo = valorFinal < 0 ? 'saida' : 'entrada';
+          
+          const [dia, mes, ano] = data.split('/');
+
+          // Categorização automática
+          const categoria = categorizarTransacao(descricaoLimpa, valorFinal);
+
+          console.log(`💰 Valor final: ${valorFinal} (${tipo})`);
+          console.log(`🏷️ Categoria: ${categoria}`);
+
+          db.run(
+            "INSERT INTO transacoes (data, descricao, valor, tipo, categoria, mes, ano) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [data, descricaoLimpa, valorFinal, tipo, categoria, mes, ano],
+            (err) => {
+              if (err) {
+                console.error('❌ Erro ao inserir:', err);
+              } else {
+                console.log(`✅ INSERIDO: ${data} | "${descricaoLimpa}" | ${valorFinal} | ${tipo} | ${categoria}`);
+              }
+            }
+          );
+        }
+      }
+
+      res.json({ message: 'Arquivo PDF processado e dados salvos', tipo: 'pdf' });
+      
+    } else if (fileExtension === '.csv') {
+      console.log('📊 Processando como CSV...');
+      
+      const transacoes = await processarCSV(filePath);
+      const transacoesSalvas = await salvarTransacoes(transacoes);
+      
+      res.json({ 
+        message: `Arquivo CSV processado com sucesso! ${transacoesSalvas} transações salvas.`,
+        tipo: 'csv',
+        totalTransacoes: transacoesSalvas
+      });
+      
+    } else {
+      return res.status(400).json({ 
+        error: `Tipo de arquivo não suportado: ${fileExtension}. Apenas PDF e CSV são aceitos.` 
+      });
+    }
+    
+  } catch (error) {
+    console.error('❌ Erro ao processar arquivo:', error);
+    res.status(500).json({ 
+      error: 'Erro ao processar o arquivo',
+      details: error.message 
+    });
+  }
 });
 
 // Novo endpoint para consultar transações
