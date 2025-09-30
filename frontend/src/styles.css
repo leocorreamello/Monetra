@@ -19,6 +19,7 @@ html, body {
 
 body {
   min-height: 100vh;
+  padding-top: 20px; /* ADICIONADO: espaçamento do topo global */
 }
 
 /* Scrollbar personalizada */
@@ -70,6 +71,6 @@ body {
 /* Responsividade base */
 @media (max-width: 768px) {
   body {
-    padding: 10px 0;
+    padding: 15px 0; /* CORRIGIDO: menos espaçamento em mobile */
   }
 }

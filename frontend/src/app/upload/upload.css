@@ -4,78 +4,116 @@
 }
 
 .upload-container {
-  max-width: 1200px;
-  margin: 20px auto;
-  padding: 32px;
-  background: rgba(15, 12, 30, 0.7);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  max-width: 1600px; /* MUDANÇA: aumentar de 1400px para 1600px */
+  margin: 0 auto;
+  padding: 0 15px; /* MUDANÇA: reduzir padding lateral */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
 }
 
-/* Header com controles */
-.controls-section {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 32px;
-  align-items: center;
+/* Header principal com gradiente - CONDICIONAL */
+.upload-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b  50%, #334155 100%);
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease; /* Transição suave para mudança de layout */
+}
+
+/* Estado compacto quando há transações */
+.upload-header.compact {
+  padding: 20px;
+  margin-bottom: 0;
+  border-radius: 16px;
+}
+
+.upload-header.compact .header-title {
   margin-bottom: 16px;
-  padding: 24px 32px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(51, 65, 85, 0.08);
-  border: 1px solid #f1f5f9;
 }
 
-/* Seção de filtros separada */
-.filters-section {
-  background: white;
-  padding: 20px 32px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(51, 65, 85, 0.08);
-  border: 1px solid #f1f5f9;
+.upload-header.compact .header-title h1 {
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+}
+
+.upload-header.compact .header-subtitle {
+  font-size: 0.85rem;
+}
+
+/* Títulos e textos do cabeçalho */
+.header-title {
+  text-align: center;
   margin-bottom: 24px;
 }
 
-/* Filtros de período (ano e mês) */
-.period-filters {
-  display: flex;
-  gap: 16px;
-  align-items: end;
+.header-title h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+  text-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
 }
 
-/* Botões de ação */
-.action-buttons {
+.header-subtitle {
+  color: #94a3b8;
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Seção de controles principal */
+.controls-section {
   display: flex;
-  gap: 12px;
+  justify-content: center;
   align-items: center;
 }
 
-/* Container de filtros */
-.filters {
-  display: flex;
-  gap: 20px;
-  align-items: end;
-  flex-wrap: wrap;
-}
-
-/* Ações dos filtros */
-.filter-actions {
-  display: flex;
-  gap: 12px;
-  align-items: end;
-}
-
-/* Upload de arquivo */
-.file-upload {
+/* Upload de arquivo moderno */
+.file-upload-zone {
   position: relative;
-  display: inline-block;
-  width: auto; /* Limita a largura */
+  background: rgba(15, 23, 42, 0.6);
+  border: 2px dashed rgba(59, 130, 246, 0.4);
+  border-radius: 16px;
+  padding: 20px 28px;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  overflow: hidden;
+  max-width: 320px;
 }
 
-.file-upload input[type="file"] {
+.file-upload-zone::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.file-upload-zone:hover {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.05);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
+}
+
+.file-upload-zone:hover::before {
+  left: 100%;
+}
+
+.file-upload-zone input[type="file"] {
   position: absolute;
   top: 0;
   left: 0;
@@ -83,336 +121,550 @@
   height: 100%;
   opacity: 0;
   cursor: pointer;
-  z-index: 1; /* Garante que só sobreponha o botão */
+  z-index: 2;
 }
 
-.file-upload-button {
-  display: inline-flex;
+.upload-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  color: #3b82f6;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.upload-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 4px;
+}
+
+.upload-subtitle {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Layout principal com sidebar - AUMENTAR espaço da tabela */
+.main-content {
+  display: grid;
+  grid-template-columns: 260px 1fr; /* MUDANÇA: sidebar menor para tabela maior */
+  gap: 20px; /* MUDANÇA: gap menor para mais espaço */
+  margin-top: 40px;
+  transition: all 0.4s ease;
+  align-items: start;
+  justify-content: center;
+}
+
+.main-content.with-upload {
+  grid-template-columns: 260px 1fr; /* MUDANÇA: consistente */
+  gap: 20px;
+  margin-top: 40px;
+}
+
+/* Layout com sidebar vertical quando há transações - CORRIGIDO */
+.main-content.with-upload {
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  margin-top: 40px; /* CORRIGIDO: espaçamento consistente */
+}
+
+/* Sidebar container - CORRIGIDO para centralizar */
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* CORRIGIDO: mais espaçamento */
+  height: fit-content;
+  position: sticky;
+  top: 40px; /* CORRIGIDO: mais espaçamento do topo */
+}
+
+/* Upload sidebar - estilo compacto para ficar em cima dos filtros */
+.upload-sidebar {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
+  border-radius: 16px;
+  padding: 16px;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.upload-sidebar .upload-header {
+  background: none;
+  box-shadow: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  backdrop-filter: none;
+}
+
+.upload-sidebar .upload-header::before {
+  display: none;
+}
+
+.upload-sidebar .header-title {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.upload-sidebar .header-title h1 {
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+.upload-sidebar .header-subtitle {
+  font-size: 0.75rem;
+}
+
+.upload-sidebar .file-upload-zone {
+  max-width: none;
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.upload-sidebar .upload-icon {
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+.upload-sidebar .upload-title {
+  font-size: 0.8rem;
+  margin-bottom: 2px;
+}
+
+.upload-sidebar .upload-subtitle {
+  font-size: 0.7rem;
+}
+
+/* Sidebar de filtros - VOLTAR AO ESTILO ORIGINAL */
+.filters-sidebar {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-title {
+  display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-  position: relative;
-  z-index: 0;
-  white-space: nowrap; /* Evita quebra de linha */
+  margin-bottom: 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.file-upload-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
-}
-
-.upload-text {
-  margin: 8px 0 0 0;
-  color: #64748b;
-  font-size: 14px;
-  position: relative;
-  z-index: 0; /* Garante que não seja sobreposto */
-}
-
-/* Filtros */
-.filters {
+.filters-list {
   display: flex;
+  flex-direction: column;
   gap: 16px;
-  align-items: center;
-  justify-self: center; /* Centraliza os filtros */
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 140px; /* Garante largura mínima */
+  gap: 6px;
 }
 
 .filter-label {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #475569;
+  color: #cbd5e1;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  margin-bottom: 2px;
 }
 
-select {
-  padding: 10px 16px;
-  border: 2px solid #e2e8f0;
+/* VOLTAR AO ESTILO ORIGINAL dos selects */
+.compact-select {
+  padding: 10px 12px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: 8px;
-  background: white;
-  color: #334155;
-  font-size: 14px;
+  color: #f1f5f9;
+  font-size: 0.85rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-  position: relative;
-  z-index: 10; /* Garante que os selects fiquem acima */
-}
-
-select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  z-index: 20; /* Ainda mais alto quando focado */
-}
-
-select:hover {
-  border-color: #cbd5e1;
-}
-
-/* Input de filtro */
-.filter-input {
-  padding: 10px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  background: white;
-  color: #334155;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
   width: 100%;
 }
 
-.filter-input:focus {
+.compact-select:focus {
   outline: none;
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
-.filter-input:hover {
-  border-color: #cbd5e1;
+.compact-select:hover {
+  border-color: #64748b;
+  background: rgba(15, 23, 42, 0.9);
 }
 
-.filter-input::placeholder {
-  color: #94a3b8;
-  font-weight: 400;
+.compact-select option {
+  background: #0f172a;
+  color: #f1f5f9;
+  padding: 8px;
 }
 
-/* Botão de limpar filtros */
-.clear-filters-button {
-  padding: 10px 20px;
-  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-  color: white;
+/* Ações da sidebar - VOLTAR AO ESTILO ORIGINAL */
+.sidebar-actions {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-button {
+  padding: 10px 16px;
   border: none;
   border-radius: 8px;
   font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
 }
 
-.clear-filters-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(107, 114, 128, 0.4);
+.clear-button {
+  background: linear-gradient(135deg, rgba(71, 85, 105, 0.8), rgba(51, 65, 85, 0.8));
+  color: #cbd5e1;
+  border: 1px solid rgba(71, 85, 105, 0.5);
 }
 
-.clear-filters-button:disabled {
-  background: #94a3b8;
+.clear-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #475569, #334155);
+  transform: translateY(-1px);
+}
+
+.clear-button:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
 }
 
-/* Botão de exclusão */
 .delete-button {
-  padding: 10px 20px;
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .delete-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4);
 }
 
 .delete-button:disabled {
-  background: #94a3b8;
+  background: linear-gradient(135deg, #374151, #4b5563);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
-/* Tabela */
-.table-container {
-  background: white;
-  border-radius: 12px;
+/* Quando não há transações, a sidebar de filtros mantém position sticky - CORRIGIDO */
+.filters-sidebar.standalone {
+  height: fit-content;
+  position: sticky;
+  top: 40px; /* CORRIGIDO: consistente com container */
+}
+
+/* Área de conteúdo principal - CORRIGIDO para centralizar */
+.content-area {
+  min-height: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 20px; /* CORRIGIDO: espaçamento do topo */
+}
+
+.content-area.with-sidebar {
+  min-height: 500px;
+  padding-top: 0;
+}
+
+/* Tabela moderna - AUMENTAR tamanho */
+.data-table {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(51, 65, 85, 0.08);
-  margin-top: 24px;
-  border: 1px solid #f1f5f9;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%; /* ADICIONADO: garantir largura total */
+  max-width: none; /* ADICIONADO: remover limite de largura */
+}
+
+.table-header {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-container {
+  overflow-x: auto;
+  max-height: 75vh; /* MUDANÇA: aumentar altura de 70vh para 75vh */
+  width: 100%; /* ADICIONADO: garantir largura total */
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   margin: 0;
+  table-layout: fixed;
+  min-width: 100%; /* ADICIONADO: garantir largura mínima */
 }
 
-thead {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  position: relative;
-}
-
-thead::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #3b82f6, #1d4ed8, #3b82f6);
-}
-
-th {
-  padding: 18px 24px;
-  color: white;
-  font-weight: 600;
-  text-align: left;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  border: none;
-  position: relative;
-}
-
-th:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 25%;
-  bottom: 25%;
-  width: 1px;
-  background: rgba(255, 255, 255, 0.2);
-}
+/* AJUSTAR larguras das colunas para aproveitar mais espaço */
+th:nth-child(1) { width: 10%; } /* Data - REDUZIDO */
+th:nth-child(2) { width: 50%; } /* Descrição - AUMENTADO */
+th:nth-child(3) { width: 12%; } /* Valor - REDUZIDO */
+th:nth-child(4) { width: 13%; } /* Tipo - mantido */
+th:nth-child(5) { width: 15%; } /* Categoria */
 
 tbody tr {
-  transition: all 0.3s ease;
-  border-bottom: 1px solid #f1f5f9;
+  background: rgba(15, 23, 42, 0.3);
+  transition: background-color 0.3s ease;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.2);
   position: relative;
+}
+
+tbody tr::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  transition: width 0.3s ease;
 }
 
 tbody tr:hover {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  transform: translateX(4px);
-  box-shadow: inset 4px 0 0 #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
 }
 
-tbody tr:last-child {
-  border-bottom: none;
+tbody tr:hover::before {
+  width: 3px;
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(30, 41, 59, 0.2);
 }
 
 td {
-  padding: 18px 24px;
   border: none;
-  color: #334155;
-  font-size: 14px;
+  color: #e2e8f0;
+  font-size: 0.9rem;
   vertical-align: middle;
+  box-sizing: border-box;
+  text-align: left;
+  padding: 16px 8px 16px 16px; /* CORRIGIDO: padding-left menor, consistente com th */
 }
 
-/* Linha do saldo */
+/* SIMPLIFICADO - Larguras que correspondem exatamente aos TH */
+td:nth-child(1) { 
+  width: 10%; /* MUDANÇA: consistente com th */
+  white-space: nowrap;
+} /* Data */
+
+td:nth-child(2) { 
+  width: 50%; /* MUDANÇA: mais espaço para descrição */
+  white-space: normal;
+  word-break: break-word;
+} /* Descrição */
+
+td:nth-child(3) { 
+  width: 12%; /* MUDANÇA: consistente com th */
+  white-space: nowrap;
+} /* Valor */
+
+td:nth-child(4) { 
+  width: 13%; /* MUDANÇA: consistente com th */
+  white-space: nowrap;
+} /* Tipo */
+
+td:nth-child(5) { 
+  width: 15%; /* MUDANÇA: consistente com th */
+} /* Categoria */
+
+/* Saldo final */
 .saldo-row {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  font-weight: 700;
-  border-top: 3px solid #e2e8f0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.15));
+  border-top: 2px solid rgba(59, 130, 246, 0.3);
   position: sticky;
   bottom: 0;
+  font-weight: 700;
+  backdrop-filter: blur(10px);
 }
 
 .saldo-row:hover {
   transform: none;
-  box-shadow: none;
+}
+
+.saldo-row::before {
+  display: none;
 }
 
 .saldo-row td {
-  padding: 24px;
-  font-size: 16px;
-  background: inherit;
+  padding: 20px;
+  font-size: 1rem;
+  color: #f1f5f9;
 }
 
-/* Cores para valores */
+/* Valores coloridos */
 .entrada {
-  color: #059669;
-  font-weight: 600;
+  color: #22c55e;
+  font-weight: 700;
 }
 
 .saida {
-  color: #dc2626;
-  font-weight: 600;
+  color: #ef4444;
+  font-weight: 700;
 }
 
-/* Badges para tipos */
+/* Badges modernos */
 .tipo-badge {
   display: inline-flex;
   align-items: center;
   padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  border-radius: 16px;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
 }
 
 .tipo-entrada {
-  background: rgba(5, 150, 105, 0.1);
-  color: #059669;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.2));
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .tipo-saida {
-  background: rgba(220, 38, 38, 0.1);
-  color: #dc2626;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-/* Categoria */
-.categoria {
-  background: #f1f5f9;
-  padding: 4px 12px;
+/* Select de categoria - CORRIGIDO para ocupar espaço disponível */
+.categoria-select {
+  padding: 4px 8px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: 6px;
-  font-size: 12px;
+  color: #e2e8f0;
+  font-size: 0.75rem;
   font-weight: 500;
-  color: #475569;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Data */
-.data {
-  font-family: 'Courier New', monospace;
-  font-weight: 600;
-  color: #64748b;
+.categoria-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
-/* Loading state */
+.categoria-select option {
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+/* Upload sidebar - novo estilo para quando está lateral */
+.upload-sidebar {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.upload-sidebar .upload-header {
+  background: none;
+  box-shadow: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  backdrop-filter: none;
+}
+
+.upload-sidebar .upload-header::before {
+  display: none;
+}
+
+.upload-sidebar .file-upload-zone {
+  max-width: none;
+  padding: 16px;
+}
+
+.upload-sidebar .upload-icon {
+  font-size: 1.5rem;
+  margin-bottom: 6px;
+}
+
+.upload-sidebar .upload-title {
+  font-size: 0.9rem;
+  margin-bottom: 3px;
+}
+
+.upload-sidebar .upload-subtitle {
+  font-size: 0.75rem;
+}
+
+/* Estados especiais */
 .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(51, 65, 85, 0.06);
-  margin-top: 24px;
+  padding: 80px 20px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .loading-spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #f1f5f9;
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(59, 130, 246, 0.2);
   border-top: 4px solid #3b82f6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 @keyframes spin {
@@ -421,183 +673,155 @@ td {
 }
 
 .loading-text {
-  color: #64748b;
-  font-size: 16px;
-  font-weight: 500;
+  color: #cbd5e1;
+  font-size: 1.1rem;
+  font-weight: 600;
   margin: 0;
 }
 
-/* Mensagem quando vazio */
 .empty-state {
   text-align: center;
-  padding: 60px 20px;
-  color: #64748b;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(51, 65, 85, 0.06);
+  padding: 80px 20px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .empty-state-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-  opacity: 0.5;
+  font-size: 4rem;
+  margin-bottom: 24px;
+  opacity: 0.6;
 }
 
 .empty-state-text {
-  font-size: 18px;
+  font-size: 1.2rem;
   font-weight: 500;
   margin: 0;
+  color: #94a3b8;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
+/* Responsividade CORRIGIDA */
+@media (max-width: 1400px) {
   .upload-container {
-    margin: 10px;
-    padding: 20px;
+    max-width: 1300px;
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .main-content,
+  .main-content.with-upload {
+    grid-template-columns: 240px 1fr; /* MUDANÇA: sidebar ainda menor */
+    gap: 18px;
+    margin-top: 30px;
   }
   
-  .controls-section {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    text-align: center;
+  .upload-container {
+    max-width: 1200px;
   }
   
-  .period-filters {
-    justify-content: center;
-    gap: 12px;
-  }
-  
-  .action-buttons {
-    justify-content: center;
-  }
-  
-  .filters-section {
-    padding: 16px 20px;
-  }
-  
-  .filters {
-    justify-content: center;
+  /* ...existing code... */
+}
+
+@media (max-width: 1024px) {
+  .main-content,
+  .main-content.with-upload {
+    grid-template-columns: 220px 1fr; /* MUDANÇA: sidebar menor */
     gap: 16px;
+    margin-top: 24px;
   }
   
-  .filter-group {
-    min-width: 140px;
+  .upload-container {
+    max-width: 1000px;
   }
   
-  .filter-actions {
-    justify-content: center;
-  }
-  
-  select,
-  .filter-input {
-    width: 100%;
-  }
-  
-  /* Tabela responsiva */
   .table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    max-height: 70vh; /* MUDANÇA: ajustar para telas menores */
   }
   
-  table {
-    min-width: 600px;
-    font-size: 12px;
-  }
-  
-  th, td {
-    padding: 12px 8px;
-    white-space: nowrap;
-  }
-  
-  .tipo-badge {
-    padding: 2px 8px;
-    font-size: 10px;
-  }
-  
-  .categoria {
-    padding: 2px 8px;
-    font-size: 10px;
-  }
-  
-  .categoria-select {
-    font-size: 11px;
-    padding: 4px 8px;
-    min-width: 120px;
-  }
+  /* ...existing code... */
 }
 
-/* Select de categoria */
-.categoria-select {
-  padding: 6px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  background: white;
-  color: #374151;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: 100%;
-  min-width: 150px;
-}
-
-.categoria-select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.categoria-select:hover {
-  border-color: #cbd5e1;
-  background: #fafafa;
+@media (max-width: 768px) {
+  .main-content.with-upload {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  
+  .upload-container {
+    max-width: 100%;
+    padding: 0 15px;
+  }
+  
+  .table-container {
+    max-height: 65vh; /* MUDANÇA: ajustar para mobile */
+  }
+  
+  /* Ajustar proporções das colunas em mobile */
+  th:nth-child(1) { width: 12%; }
+  th:nth-child(2) { width: 46%; }
+  th:nth-child(3) { width: 14%; }
+  th:nth-child(4) { width: 13%; }
+  th:nth-child(5) { width: 15%; }
+  
+  td:nth-child(1) { width: 12%; }
+  td:nth-child(2) { width: 46%; }
+  td:nth-child(3) { width: 14%; }
+  td:nth-child(4) { width: 13%; }
+  td:nth-child(5) { width: 15%; }
+  
+  /* ...existing code... */
 }
 
 @media (max-width: 480px) {
-  .upload-container {
-    margin: 5px;
-    padding: 16px;
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-height: 60vh; /* MUDANÇA: altura menor em telas muito pequenas */
   }
   
-  .controls-section {
-    padding: 20px;
+  table {
+    min-width: 650px; /* MUDANÇA: aumentar largura mínima */
+    font-size: 0.8rem;
+    table-layout: fixed;
   }
   
-  .period-filters {
-    flex-direction: column;
-    gap: 12px;
-    align-items: center;
-  }
+  /* Larguras fixas para scroll horizontal em mobile */
+  th:nth-child(1) { width: 80px; }
+  th:nth-child(2) { width: 280px; } /* MUDANÇA: mais espaço para descrição */
+  th:nth-child(3) { width: 90px; }
+  th:nth-child(4) { width: 90px; }
+  th:nth-child(5) { width: 110px; }
   
-  .filters-section {
-    padding: 16px;
-  }
+  td:nth-child(1) { width: 80px; }
+  td:nth-child(2) { width: 280px; }
+  td:nth-child(3) { width: 90px; }
+  td:nth-child(4) { width: 90px; }
+  td:nth-child(5) { width: 110px; }
   
-  .filters {
-    flex-direction: column;
-    gap: 12px;
-    align-items: center;
+  /* ...existing code... */
+}
+
+/* Responsividade - CORRIGIDO para categoria */
+@media (max-width: 1024px) {
+  .categoria-select {
+    font-size: 0.75rem;
+    padding: 5px 10px;
   }
-  
-  .filter-group {
-    width: 100%;
-    max-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .categoria-select {
+    font-size: 0.7rem;
+    padding: 4px 8px;
   }
-  
-  .filter-actions {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .file-upload-button {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .app-title {
-    font-size: 1.5rem;
-  }
-  
-  .title-icon {
-    font-size: 2rem;
+}
+
+@media (max-width: 480px) {
+  .categoria-select {
+    font-size: 0.65rem;
+    padding: 3px 6px;
   }
 }
