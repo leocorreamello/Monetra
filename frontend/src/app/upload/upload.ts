@@ -74,10 +74,18 @@ export class UploadComponent implements OnInit {
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
-    if (file && file.type === 'application/pdf') {
-      this.uploadFile(file);
-    } else {
-      alert('Por favor, selecione um arquivo PDF válido.');
+    if (file) {
+      // Verifica se o arquivo é PDF ou CSV
+      const allowedTypes = ['application/pdf', 'text/csv', 'application/vnd.ms-excel'];
+      const allowedExtensions = ['.pdf', '.csv'];
+      
+      const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+      
+      if (allowedTypes.includes(file.type) || allowedExtensions.includes(fileExtension)) {
+        this.uploadFile(file);
+      } else {
+        alert('Por favor, selecione um arquivo PDF ou CSV válido.');
+      }
     }
   }
 
