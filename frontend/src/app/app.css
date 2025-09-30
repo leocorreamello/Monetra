@@ -8,10 +8,14 @@
 
 .app-main {
   flex: 1;
+  margin: 0; /* MUDANÇA: garantir que não há margin */
+  padding: 0; /* MUDANÇA: garantir que não há padding */
 }
 
 .tab-content {
   animation: fadeIn 0.4s ease-out;
+  height: 100%; /* MUDANÇA: ocupar toda a altura disponível */
+  margin: 0; /* MUDANÇA: remover margins */
 }
 
 @keyframes fadeIn {

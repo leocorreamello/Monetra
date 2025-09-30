@@ -6,7 +6,7 @@
 .upload-container {
   max-width: 1600px; /* MUDANÇA: aumentar de 1400px para 1600px */
   margin: 0 auto;
-  padding: 0 15px; /* MUDANÇA: reduzir padding lateral */
+  padding: 102px 15px 0 15px; /* MUDANÇA: remover padding-bottom já que o footer não é mais fixo */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #ffffff;
 }
@@ -16,7 +16,7 @@
   background: linear-gradient(135deg, #0f172a 0%, #1e293b  50%, #334155 100%);
   border-radius: 20px;
   padding: 32px;
-  margin-bottom: 24px;
+  margin-bottom: 32px; /* MUDANÇA: aumentar espaçamento inferior */
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -864,5 +864,93 @@ td:nth-child(5) {
   .categoria-select {
     font-size: 0.65rem;
     padding: 3px 6px;
+  }
+}
+
+/* Empty State Melhorado */
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 2rem;
+}
+
+.empty-state-content {
+  text-align: center;
+  max-width: 450px;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8));
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+.empty-state-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.empty-state-text {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state-actions {
+  margin-top: 1.5rem;
+}
+
+.supported-formats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.supported-formats small {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.format-badges {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.format-badge {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+/* Animação suave para o estado vazio */
+.empty-state-content {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

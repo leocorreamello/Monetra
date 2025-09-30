@@ -1,5 +1,5 @@
 ::ng-deep app-wavy-background .wavy-container {
-  min-height: calc(100vh - 70px);
+  margin-bottom: 0; /* MUDANÇA: garantir que não há margin inferior */
 }
 
 .home-content-overlay {

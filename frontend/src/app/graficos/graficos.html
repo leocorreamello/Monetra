@@ -1,0 +1,258 @@
+<div class="graficos-container">
+  <!-- Header principal - apenas quando não há transações -->
+  <div class="graficos-header" 
+       *ngIf="filteredTransactions.length === 0">
+    <div class="header-title">
+      <h1>📊 Análise Financeira</h1>
+      <p class="header-subtitle">Visualize seus dados financeiros através de gráficos interativos</p>
+    </div>
+    
+    <!-- Seção de controles -->
+    <div class="controls-section">
+      <!-- Upload de arquivo -->
+      <div class="file-upload-zone">
+        <input type="file" accept=".pdf,.csv" (change)="onFileSelected($event)" />
+        <div class="upload-icon">📈</div>
+        <h3 class="upload-title">Enviar Extrato para Análise</h3>
+        <p class="upload-subtitle">Arraste seu arquivo aqui ou clique para selecionar</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layout principal com sidebar -->
+  <div class="main-content" [class.with-charts]="filteredTransactions.length > 0">
+    <!-- Container da sidebar - agrupa upload + filtros verticalmente -->
+    <div class="sidebar-container">
+      <!-- Upload Sidebar - apenas quando há transações -->
+      <div class="upload-sidebar" *ngIf="filteredTransactions.length > 0">
+        <div class="upload-header">
+          <div class="header-title">
+            <h1>📄 Upload</h1>
+            <p class="header-subtitle">Adicionar extratos</p>
+          </div>
+          
+          <div class="controls-section">
+            <div class="file-upload-zone">
+              <input type="file" accept=".pdf,.csv" (change)="onFileSelected($event)" />
+              <div class="upload-icon">📄</div>
+              <h3 class="upload-title">Enviar Extrato</h3>
+              <p class="upload-subtitle">Clique aqui</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar de filtros -->
+      <div class="filters-sidebar" [class.standalone]="filteredTransactions.length === 0">
+        <div class="sidebar-title">
+          🔍 <span>Filtros</span>
+        </div>
+        
+        <div class="filters-list">
+          <!-- Filtros de período -->
+          <div class="filter-group">
+            <label class="filter-label">Ano</label>
+            <select class="compact-select" [(ngModel)]="selectedAno" (change)="applyFilters()">
+              <option value="">Todos</option>
+              <option *ngFor="let ano of uniqueAnos" [value]="ano">{{ ano }}</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">Mês</label>
+            <select class="compact-select" [(ngModel)]="selectedMes" (change)="applyFilters()">
+              <option value="">Todos</option>
+              <option *ngFor="let mes of uniqueMeses" [value]="mes">{{ getMonthName(mes) }}</option>
+            </select>
+          </div>
+          
+          <!-- Filtros de categoria e tipo -->
+          <div class="filter-group">
+            <label class="filter-label">Categoria</label>
+            <select class="compact-select" [(ngModel)]="selectedCategoria" (change)="applyFilters()">
+              <option value="">Todas</option>
+              <option *ngFor="let categoria of categorias" [value]="categoria">
+                {{ getCategoryDisplayName(categoria) }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">Tipo</label>
+            <select class="compact-select" [(ngModel)]="selectedTipo" (change)="applyFilters()">
+              <option value="">Todos</option>
+              <option value="entrada">⬆ Entradas</option>
+              <option value="saida">⬇ Saídas</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="sidebar-actions">
+          <button 
+            class="sidebar-button clear-button" 
+            (click)="clearFilters()"
+            [disabled]="!hasActiveFilters()">
+            🗂️ Limpar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Área de conteúdo principal - gráficos -->
+    <div class="content-area" [class.with-sidebar]="filteredTransactions.length > 0">
+      <!-- Loading state -->
+      <div class="loading-container" *ngIf="isLoading">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Processando seus dados financeiros...</p>
+      </div>
+
+      <!-- Gráficos modernos -->
+      <div class="charts-grid fade-in" *ngIf="filteredTransactions.length > 0 && !isLoading">
+        <!-- Resumo financeiro -->
+        <div class="summary-cards">
+          <div class="summary-card entrada">
+            <div class="card-icon">⬆️</div>
+            <div class="card-content">
+              <h3>Total Entradas</h3>
+              <p class="card-value">{{ formatCurrency(getTotalEntradas()) }}</p>
+            </div>
+          </div>
+          
+          <div class="summary-card saida">
+            <div class="card-icon">⬇️</div>
+            <div class="card-content">
+              <h3>Total Saídas</h3>
+              <p class="card-value">{{ formatCurrency(getTotalSaidas()) }}</p>
+            </div>
+          </div>
+          
+          <div class="summary-card saldo">
+            <div class="card-icon">💰</div>
+            <div class="card-content">
+              <h3>Saldo Período</h3>
+              <p class="card-value" [class.positive]="isSaldoPositivo()" 
+                 [class.negative]="isSaldoNegativo()">
+                {{ formatCurrency(getSaldoPeriodo()) }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid de gráficos -->
+        <div class="charts-container">
+          <!-- Gráfico de Pizza -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">🥧 Gastos por Categoria</h3>
+              <p class="chart-subtitle">Distribuição dos gastos</p>
+            </div>
+            <div class="chart-content">
+              <div class="pie-chart" *ngIf="pieChartData.labels.length > 0">
+                <div class="chart-placeholder">
+                  <canvas id="pieChart" width="300" height="300"></canvas>
+                  <!-- Simulação visual do gráfico de pizza -->
+                  <div class="pie-simulation">
+                    <div class="pie-slice" 
+                         *ngFor="let label of pieChartData.labels; let i = index"
+                         [style.background-color]="pieChartData.datasets[0].backgroundColor[i]">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="chart-legend">
+                <div class="legend-item" 
+                     *ngFor="let label of pieChartData.labels; let i = index">
+                  <span class="legend-color" 
+                        [style.background-color]="pieChartData.datasets[0].backgroundColor[i]"></span>
+                  <span class="legend-text">{{ label }}</span>
+                  <span class="legend-value">{{ formatCurrency(pieChartData.datasets[0].data[i]) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráfico de Linha Temporal -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">📈 Evolução Temporal</h3>
+              <p class="chart-subtitle">Entradas vs Saídas ao longo do tempo</p>
+            </div>
+            <div class="chart-content">
+              <div class="line-chart" *ngIf="lineChartData.labels.length > 0">
+                <canvas id="lineChart" width="400" height="200"></canvas>
+                <!-- Simulação visual do gráfico de linha -->
+                <div class="line-simulation">
+                  <div class="line-axis">
+                    <div class="axis-label" *ngFor="let label of lineChartData.labels">{{ label }}</div>
+                  </div>
+                  <div class="line-values">
+                    <div class="value-bar entrada" 
+                         *ngFor="let value of lineChartData.datasets[0].data"
+                         [style.height.%]="getLineValuePercentage(value)">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráfico de Barras -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">📊 Comparativo por Categoria</h3>
+              <p class="chart-subtitle">Entradas vs Saídas por categoria</p>
+            </div>
+            <div class="chart-content">
+              <div class="bar-chart" *ngIf="barChartData.labels.length > 0">
+                <canvas id="barChart" width="400" height="200"></canvas>
+                <!-- Simulação visual do gráfico de barras -->
+                <div class="bar-simulation">
+                  <div class="bar-group" *ngFor="let label of barChartData.labels; let i = index">
+                    <div class="bar-label">{{ label.split(' ')[1] || label }}</div>
+                    <div class="bar-values">
+                      <div class="bar entrada" 
+                           [style.height.%]="getBarHeightPercentage(0, i)"
+                           title="Entradas: {{ formatCurrency(barChartData.datasets[0].data[i]) }}">
+                      </div>
+                      <div class="bar saida" 
+                           [style.height.%]="getBarHeightPercentage(1, i)"
+                           title="Saídas: {{ formatCurrency(barChartData.datasets[1].data[i]) }}">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estado vazio melhorado -->
+      <div class="empty-state" *ngIf="filteredTransactions.length === 0 && !isLoading">
+        <div class="empty-state-content">
+          <div class="empty-state-icon">
+            <span *ngIf="transactions.length === 0">📊</span>
+            <span *ngIf="transactions.length > 0">🔍</span>
+          </div>
+          <h3 class="empty-state-title">
+            {{ transactions.length === 0 ? 'Visualize suas Finanças!' : 'Nenhum resultado encontrado' }}
+          </h3>
+          <p class="empty-state-text">
+            {{ transactions.length === 0 ? 
+                'Faça upload do seu extrato bancário (PDF ou CSV) para gerar gráficos e análises inteligentes dos seus dados financeiros.' : 
+                'Ajuste os filtros acima para encontrar as transações que você está procurando.' }}
+          </p>
+          <div class="empty-state-actions" *ngIf="transactions.length === 0">
+            <div class="supported-formats">
+              <small>Formatos suportados:</small>
+              <div class="format-badges">
+                <span class="format-badge">📄 PDF</span>
+                <span class="format-badge">📊 CSV</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
