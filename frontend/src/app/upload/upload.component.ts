@@ -54,9 +54,20 @@ export class UploadComponent {
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
+      // Verifica se o arquivo é PDF ou CSV
+      const allowedTypes = ['application/pdf', 'text/csv', 'application/vnd.ms-excel'];
+      const allowedExtensions = ['.pdf', '.csv'];
+      
+      const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+      
+      if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+        alert('Apenas arquivos PDF e CSV são aceitos!');
+        return;
+      }
+
       this.isLoading = true;
       const formData = new FormData();
-      formData.append('pdf', file);
+      formData.append('pdf', file); // Mantém 'pdf' pois o servidor espera esse nome
 
       this.http.post('http://localhost:3000/upload', formData).subscribe({
         next: (response) => {
@@ -66,6 +77,7 @@ export class UploadComponent {
         },
         error: (error) => {
           console.error('Erro no upload:', error);
+          alert('Erro no upload: ' + (error.error?.error || 'Erro desconhecido'));
           this.isLoading = false;
         }
       });
