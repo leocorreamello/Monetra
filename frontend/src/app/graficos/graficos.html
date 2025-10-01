@@ -3,7 +3,7 @@
   <div class="graficos-header" 
        *ngIf="filteredTransactions.length === 0">
     <div class="header-title">
-      <h1>📊 Análise Financeira</h1>
+      <h1>Análise Financeira</h1>
       <p class="header-subtitle">Visualize seus dados financeiros através de gráficos interativos</p>
     </div>
     
@@ -140,56 +140,228 @@
 
         <!-- Grid de gráficos -->
         <div class="charts-container">
+          <!-- Gráfico de Linha Temporal - NOVO SIMPLES -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Evolução Temporal</h3>
+              <p class="chart-subtitle">Entradas vs Saídas ao longo do tempo</p>
+            </div>
+            <div class="chart-content">
+              @if (hasLineChartData()) {
+              <div class="line-chart-simple">
+                <!-- Legenda -->
+                <div class="chart-legend-simple">
+                  <div class="legend-item">
+                    <span class="legend-color" style="background-color: #10b981;"></span>
+                    <span>Entradas</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color" style="background-color: #ef4444;"></span>
+                    <span>Saídas</span>
+                  </div>
+                </div>
+
+                <!-- SVG Chart -->
+                <div class="svg-container">
+                  <svg viewBox="0 80 1000 390" class="line-svg">
+                    <!-- Gradientes -->
+                    <defs>
+                      <linearGradient id="greenGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="rgba(16, 185, 129, 0.4)" />
+                        <stop offset="100%" stop-color="rgba(16, 185, 129, 0.1)" />
+                      </linearGradient>
+                      <linearGradient id="redGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="rgba(239, 68, 68, 0.4)" />
+                        <stop offset="100%" stop-color="rgba(239, 68, 68, 0.1)" />
+                      </linearGradient>
+                    </defs>
+
+                    <!-- Grid horizontal -->
+                    @for (yLabel of getYLabels(getChartData().maxValue); track yLabel.value) {
+                    <line 
+                      [attr.x1]="120" 
+                      [attr.y1]="yLabel.y"
+                      [attr.x2]="900" 
+                      [attr.y2]="yLabel.y"
+                      stroke="rgba(255, 255, 255, 0.1)" 
+                      stroke-width="1">
+                    </line>
+                    }
+
+                    <!-- Área de entradas -->
+                    <path 
+                      [attr.d]="getAreaPath(getChartData().entradas, getChartData().maxValue)"
+                      fill="url(#greenGradient)">
+                    </path>
+
+                    <!-- Área de saídas -->
+                    <path 
+                      [attr.d]="getAreaPath(getChartData().saidas, getChartData().maxValue)"
+                      fill="url(#redGradient)">
+                    </path>
+
+                    <!-- Linha de entradas -->
+                    <path 
+                      [attr.d]="getLinePoints(getChartData().entradas, getChartData().maxValue)"
+                      stroke="#10b981" 
+                      stroke-width="3" 
+                      fill="none"
+                      stroke-linecap="round">
+                    </path>
+
+                    <!-- Linha de saídas -->
+                    <path 
+                      [attr.d]="getLinePoints(getChartData().saidas, getChartData().maxValue)"
+                      stroke="#ef4444" 
+                      stroke-width="3" 
+                      fill="none"
+                      stroke-linecap="round">
+                    </path>
+
+                    <!-- Labels Y -->
+                    @for (yLabel of getYLabels(getChartData().maxValue); track yLabel.value) {
+                    <text 
+                      [attr.x]="110" 
+                      [attr.y]="yLabel.y + 4"
+                      fill="rgba(255, 255, 255, 0.7)" 
+                      font-size="16" 
+                      text-anchor="end">
+                      {{ yLabel.label }}
+                    </text>
+                    }
+
+                    <!-- Labels X (mostrar apenas dias específicos: 1, 5, 10, 15, 20, 25, 30) -->
+                    @for (label of getChartData().labels; track label; let i = $index) {
+                      @if ([0, 4, 9, 14, 19, 24, 29].includes(i)) {
+                        <text 
+                          [attr.x]="120 + (i * 780) / mathMax(getChartData().labels.length - 1, 1)"
+                          y="470"
+                          fill="rgba(255, 255, 255, 0.7)" 
+                          font-size="16" 
+                          text-anchor="middle">
+                          {{ label }}
+                        </text>
+                      }
+                    }
+
+                    <!-- Pontos invisíveis para hover -->
+                    @for (point of getHoverPoints(); track point.x) {
+                    <circle 
+                      [attr.cx]="point.x"
+                      [attr.cy]="point.y"
+                      r="20"
+                      fill="transparent"
+                      class="hover-point"
+                      (mouseenter)="onLineHover(point, $event)"
+                      (mouseleave)="onLineLeave()">
+                    </circle>
+                    }
+                  </svg>
+
+                  <!-- Tooltip -->
+                  @if (hoverInfo.visible) {
+                  <div class="line-tooltip" 
+                       [style.left.px]="hoverInfo.x"
+                       [style.top.px]="hoverInfo.y">
+                    <div class="tooltip-title">{{ hoverInfo.day }}</div>
+                    <div class="tooltip-item green">
+                      <span class="tooltip-label">Entradas:</span>
+                      <span class="tooltip-value">{{ formatCurrency(hoverInfo.entradas) }}</span>
+                    </div>
+                    <div class="tooltip-item red">
+                      <span class="tooltip-label">Saídas:</span>
+                      <span class="tooltip-value">{{ formatCurrency(hoverInfo.saidas) }}</span>
+                    </div>
+                  </div>
+                  }
+                </div>
+
+                <!-- Resumo -->
+                <div class="chart-summary">
+                  <div class="summary-stat">
+                    <span class="stat-label">Total Entradas</span>
+                    <span class="stat-value green">{{ formatCurrency(getTotalEntradas()) }}</span>
+                  </div>
+                  <div class="summary-stat">
+                    <span class="stat-label">Total Saídas</span>
+                    <span class="stat-value red">{{ formatCurrency(getTotalSaidas()) }}</span>
+                  </div>
+                </div>
+              </div>
+              } @else {
+              <div class="empty-chart">
+                <div class="empty-icon">�</div>
+                <h4>Sem dados para exibir</h4>
+                <p>Faça upload de extratos para visualizar a evolução temporal.</p>
+              </div>
+              }
+            </div>
+          </div>
+
           <!-- Gráfico de Pizza -->
           <div class="chart-card">
             <div class="chart-header">
-              <h3 class="chart-title">🥧 Gastos por Categoria</h3>
+              <h3 class="chart-title">Gastos por Categoria</h3>
               <p class="chart-subtitle">Distribuição dos gastos</p>
             </div>
             <div class="chart-content">
               <div class="pie-chart" *ngIf="pieChartData.labels.length > 0">
-                <div class="chart-placeholder">
-                  <canvas id="pieChart" width="300" height="300"></canvas>
-                  <!-- Simulação visual do gráfico de pizza -->
-                  <div class="pie-simulation">
-                    <div class="pie-slice" 
-                         *ngFor="let label of pieChartData.labels; let i = index"
-                         [style.background-color]="pieChartData.datasets[0].backgroundColor[i]">
-                    </div>
-                  </div>
+                <!-- Gráfico de Pizza em SVG -->
+                <div class="pie-svg-container">
+                  <svg class="pie-svg" viewBox="0 0 200 200" width="280" height="280">
+                    <!-- Centro do gráfico -->
+                    <circle cx="100" cy="100" r="35" fill="rgba(15, 23, 42, 0.9)" stroke="rgba(255, 255, 255, 0.2)" stroke-width="2"/>
+                    
+                    <!-- Fatias do gráfico -->
+                    <g class="pie-slices">
+                      <path *ngFor="let slice of getPieSlices(); let i = index"
+                            [attr.d]="slice.path"
+                            [attr.fill]="pieChartData.datasets[0].backgroundColor[i]"
+                            [attr.stroke]="'rgba(255, 255, 255, 0.3)'"
+                            [attr.stroke-width]="2"
+                            class="pie-slice-path"
+                            [style.animation-delay]="i * 0.1 + 's'">
+                      </path>
+                    </g>
+                    
+                    <!-- Labels das porcentagens -->
+                    <g class="pie-labels">
+                      <text *ngFor="let slice of getPieSlices(); let i = index"
+                            [attr.x]="slice.labelX"
+                            [attr.y]="slice.labelY"
+                            class="pie-label"
+                            text-anchor="middle"
+                            dominant-baseline="middle"
+                            [style.animation-delay]="i * 0.15 + 's'">
+                        {{ slice.percentage }}%
+                      </text>
+                    </g>
+                    
+                    <!-- Texto central -->
+                    <text x="100" y="95" class="pie-center-text" text-anchor="middle" dominant-baseline="middle">
+                      Total
+                    </text>
+                    <text x="100" y="110" class="pie-center-value" text-anchor="middle" dominant-baseline="middle">
+                      {{ formatCurrency(getTotalSaidas()) }}
+                    </text>
+                  </svg>
+                  
+
                 </div>
               </div>
+              
+              <!-- Legenda melhorada -->
               <div class="chart-legend">
                 <div class="legend-item" 
                      *ngFor="let label of pieChartData.labels; let i = index">
-                  <span class="legend-color" 
-                        [style.background-color]="pieChartData.datasets[0].backgroundColor[i]"></span>
-                  <span class="legend-text">{{ label }}</span>
-                  <span class="legend-value">{{ formatCurrency(pieChartData.datasets[0].data[i]) }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Gráfico de Linha Temporal -->
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">📈 Evolução Temporal</h3>
-              <p class="chart-subtitle">Entradas vs Saídas ao longo do tempo</p>
-            </div>
-            <div class="chart-content">
-              <div class="line-chart" *ngIf="lineChartData.labels.length > 0">
-                <canvas id="lineChart" width="400" height="200"></canvas>
-                <!-- Simulação visual do gráfico de linha -->
-                <div class="line-simulation">
-                  <div class="line-axis">
-                    <div class="axis-label" *ngFor="let label of lineChartData.labels">{{ label }}</div>
+                  <div class="legend-color-wrapper">
+                    <span class="legend-color" 
+                          [style.background-color]="pieChartData.datasets[0].backgroundColor[i]"></span>
+                    <span class="legend-percentage">{{ getPieSlicePercentage(i) }}%</span>
                   </div>
-                  <div class="line-values">
-                    <div class="value-bar entrada" 
-                         *ngFor="let value of lineChartData.datasets[0].data"
-                         [style.height.%]="getLineValuePercentage(value)">
-                    </div>
+                  <div class="legend-content">
+                    <span class="legend-text">{{ label }}</span>
+                    <span class="legend-value">{{ formatCurrency(pieChartData.datasets[0].data[i]) }}</span>
                   </div>
                 </div>
               </div>
@@ -199,7 +371,7 @@
           <!-- Gráfico de Barras -->
           <div class="chart-card">
             <div class="chart-header">
-              <h3 class="chart-title">📊 Comparativo por Categoria</h3>
+              <h3 class="chart-title">Comparativo por Categoria</h3>
               <p class="chart-subtitle">Entradas vs Saídas por categoria</p>
             </div>
             <div class="chart-content">

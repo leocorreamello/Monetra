@@ -47,6 +47,21 @@ export class GraficosComponent implements OnInit {
   lineChartData: ChartData = { labels: [], datasets: [] };
   barChartData: ChartData = { labels: [], datasets: [] };
 
+  // Estado do gráfico de pizza
+  activePieSlice: number = -1;
+  
+  // Estado do gráfico de linha - hover
+  hoverInfo: { visible: boolean, day: string, entradas: number, saidas: number, x: number, y: number } = {
+    visible: false,
+    day: '',
+    entradas: 0,
+    saidas: 0,
+    x: 0,
+    y: 0
+  };
+
+
+
   private apiUrl = 'http://localhost:3000';
 
   constructor(private http: HttpClient) {}
@@ -146,43 +161,52 @@ export class GraficosComponent implements OnInit {
   }
 
   updateLineChart() {
-    const monthlyData = new Map<string, { entradas: number, saidas: number }>();
+    // Usar dados diários para melhor visualização
+    const dailyData = new Map<string, { entradas: number, saidas: number }>();
     
     this.filteredTransactions.forEach(transaction => {
-      const monthKey = `${transaction.ano}-${transaction.mes.padStart(2, '0')}`;
-      if (!monthlyData.has(monthKey)) {
-        monthlyData.set(monthKey, { entradas: 0, saidas: 0 });
+      // Extrair o dia da data (formato: "dd/mm/yyyy")
+      const dateParts = transaction.data.split('/');
+      const dayKey = dateParts[0]; // Primeiro elemento é o dia
+      
+      if (!dailyData.has(dayKey)) {
+        dailyData.set(dayKey, { entradas: 0, saidas: 0 });
       }
       
-      const data = monthlyData.get(monthKey)!;
+      const data = dailyData.get(dayKey)!;
       if (transaction.tipo === 'entrada') {
-        data.entradas += transaction.valor;
+        data.entradas += Math.abs(transaction.valor);
       } else {
         data.saidas += Math.abs(transaction.valor);
       }
     });
 
-    const sortedKeys = Array.from(monthlyData.keys()).sort();
+    // Criar array com todos os dias de 1 a 31
+    const allDays = [];
+    for (let day = 1; day <= 31; day++) {
+      const dayKey = day.toString().padStart(2, '0');
+      allDays.push({
+        key: dayKey,
+        label: day.toString(),
+        entradas: dailyData.get(dayKey)?.entradas || 0,
+        saidas: dailyData.get(dayKey)?.saidas || 0
+      });
+    }
     
     this.lineChartData = {
-      labels: sortedKeys.map(key => {
-        const [ano, mes] = key.split('-');
-        return `${this.getMonthName(parseInt(mes))}/${ano}`;
-      }),
+      labels: allDays.map(day => day.label),
       datasets: [
         {
           label: 'Entradas',
-          data: sortedKeys.map(key => monthlyData.get(key)!.entradas),
+          data: allDays.map(day => day.entradas),
           borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          tension: 0.4
+          backgroundColor: 'rgba(16, 185, 129, 0.2)'
         },
         {
           label: 'Saídas',
-          data: sortedKeys.map(key => monthlyData.get(key)!.saidas),
-          borderColor: '#ef4444',
-          backgroundColor: 'rgba(239, 68, 68, 0.1)',
-          tension: 0.4
+          data: allDays.map(day => day.saidas),
+          borderColor: '#ef4444', 
+          backgroundColor: 'rgba(239, 68, 68, 0.2)'
         }
       ]
     };
@@ -265,6 +289,7 @@ export class GraficosComponent implements OnInit {
       'alimentacao': '🍽️ Alimentação',
       'transporte': '🚗 Transporte',
       'moradia': '🏠 Moradia',
+      'transferencia': '💸 Transferência',
       'saude': '🏥 Saúde',
       'lazer': '🎮 Lazer',
       'educacao': '📚 Educação',
@@ -351,4 +376,247 @@ export class GraficosComponent implements OnInit {
     const maxValue = this.getLineChartMaxValue();
     return (value / maxValue) * 100;
   }
+
+  // Métodos para o gráfico de pizza
+  getPieSlices(): any[] {
+    if (!this.pieChartData.datasets[0] || !this.pieChartData.datasets[0].data.length) {
+      return [];
+    }
+
+    const data = this.pieChartData.datasets[0].data;
+    const total = data.reduce((sum: number, value: number) => sum + value, 0);
+    
+    if (total === 0) return [];
+
+    let currentAngle = -90; // Começar no topo
+    
+    return data.map((value: number, index: number) => {
+      const percentage = Math.round((value / total) * 100);
+      const angle = (value / total) * 360;
+      
+      // Calcular o path SVG para a fatia
+      const startAngle = currentAngle;
+      const endAngle = currentAngle + angle;
+      
+      const startAngleRad = (startAngle * Math.PI) / 180;
+      const endAngleRad = (endAngle * Math.PI) / 180;
+      
+      const largeArcFlag = angle > 180 ? 1 : 0;
+      
+      const x1 = 100 + 65 * Math.cos(startAngleRad);
+      const y1 = 100 + 65 * Math.sin(startAngleRad);
+      const x2 = 100 + 65 * Math.cos(endAngleRad);
+      const y2 = 100 + 65 * Math.sin(endAngleRad);
+      
+      const path = [
+        `M 100 100`,
+        `L ${x1} ${y1}`,
+        `A 65 65 0 ${largeArcFlag} 1 ${x2} ${y2}`,
+        `Z`
+      ].join(' ');
+
+      // Calcular posição do label
+      const labelAngle = (startAngle + endAngle) / 2;
+      const labelAngleRad = (labelAngle * Math.PI) / 180;
+      const labelX = 100 + 45 * Math.cos(labelAngleRad);
+      const labelY = 100 + 45 * Math.sin(labelAngleRad);
+      
+      currentAngle = endAngle;
+      
+      return {
+        path,
+        labelX,
+        labelY,
+        percentage,
+        value,
+        angle: labelAngle
+      };
+    });
+  }
+
+  getPieSlicePercentage(index: number): number {
+    const slices = this.getPieSlices();
+    return slices[index]?.percentage || 0;
+  }
+
+  onSliceHover(index: number, isHover: boolean): void {
+    this.activePieSlice = isHover ? index : -1;
+  }
+
+  // === NOVOS MÉTODOS SIMPLES PARA O GRÁFICO DE LINHA ===
+  
+  // Obter dados preparados para o gráfico
+  getChartData(): { entradas: number[], saidas: number[], labels: string[], maxValue: number } {
+    if (!this.lineChartData.datasets || this.lineChartData.datasets.length < 2) {
+      return { entradas: [], saidas: [], labels: [], maxValue: 0 };
+    }
+
+    const entradas = this.lineChartData.datasets[0].data as number[];
+    const saidas = this.lineChartData.datasets[1].data as number[];
+    const labels = this.lineChartData.labels;
+    
+    const maxEntrada = entradas.length > 0 ? Math.max(...entradas) : 0;
+    const maxSaida = saidas.length > 0 ? Math.max(...saidas) : 0;
+    const rawMaxValue = Math.max(maxEntrada, maxSaida, 100);
+    const maxValue = this.getRoundedMaxValue(rawMaxValue); // Usar valor arredondado
+
+    return { entradas, saidas, labels, maxValue };
+  }
+
+  // Gerar pontos SVG para as linhas
+  getLinePoints(values: number[], maxValue: number, width: number = 1000, height: number = 390): string {
+    if (!values || values.length === 0) return '';
+
+    const offsetY = 80; // Offset do viewBox
+    const padding = 120;
+    const chartWidth = width - (padding * 2);
+    const chartHeight = height - (padding * 2);
+
+    let path = '';
+    
+    values.forEach((value, index) => {
+      const x = padding + (index * chartWidth) / Math.max(values.length - 1, 1);
+      const y = offsetY + padding + chartHeight - ((value / maxValue) * chartHeight);
+      
+      if (index === 0) {
+        path += `M ${x} ${y}`;
+      } else {
+        path += ` L ${x} ${y}`;
+      }
+    });
+
+    return path;
+  }
+
+  // Gerar área preenchida
+  getAreaPath(values: number[], maxValue: number, width: number = 1000, height: number = 390): string {
+    const linePath = this.getLinePoints(values, maxValue, width, height);
+    if (!linePath) return '';
+
+    const offsetY = 80; // Offset do viewBox
+    const padding = 120;
+    const chartHeight = height - (padding * 2);
+    const baseY = offsetY + padding + chartHeight;
+    
+    // Adicionar linha da base
+    const firstX = padding;
+    const lastX = padding + (width - padding * 2);
+    
+    return `${linePath} L ${lastX} ${baseY} L ${firstX} ${baseY} Z`;
+  }
+
+  // Obter labels do eixo Y com valores arredondados
+  getYLabels(maxValue: number): Array<{value: number, label: string, y: number}> {
+    const height = 390; // Ajustado para o viewBox modificado
+    const offsetY = 80; // Offset do viewBox
+    const padding = 120;
+    const chartHeight = height - (padding * 2);
+    
+    // Determinar a escala apropriada baseada no valor máximo
+    const roundedMax = this.getRoundedMaxValue(maxValue);
+    const steps = [0, 0.2, 0.4, 0.6, 0.8, 1.0]; // 6 steps para melhor granularidade
+    const labels: Array<{value: number, label: string, y: number}> = [];
+
+    steps.forEach(step => {
+      const value = roundedMax * step;
+      const y = offsetY + padding + chartHeight - ((value / roundedMax) * chartHeight);
+      
+      let label = '';
+      if (value >= 1000000) {
+        label = `${(value / 1000000).toFixed(1)}M`;
+      } else if (value >= 1000) {
+        label = `${(value / 1000).toFixed(0)}K`;
+      } else {
+        label = value.toFixed(0);
+      }
+      
+      labels.push({ value, label, y });
+    });
+
+    return labels;
+  }
+
+  // Arredondar valor máximo para números legíveis como 50, 100, 500, 1000, etc.
+  private getRoundedMaxValue(maxValue: number): number {
+    if (maxValue <= 0) return 100;
+    
+    const magnitude = Math.pow(10, Math.floor(Math.log10(maxValue)));
+    const normalized = maxValue / magnitude;
+    
+    let roundedNormalized;
+    if (normalized <= 1) roundedNormalized = 1;
+    else if (normalized <= 2) roundedNormalized = 2;
+    else if (normalized <= 5) roundedNormalized = 5;
+    else roundedNormalized = 10;
+    
+    const result = roundedNormalized * magnitude;
+    
+    // Garantir que seja pelo menos 50 e que esteja em valores "redondos"
+    const roundValues = [50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, 1000000];
+    
+    for (let i = 0; i < roundValues.length; i++) {
+      if (maxValue <= roundValues[i]) {
+        return roundValues[i];
+      }
+    }
+    
+    return Math.max(result, 100);
+  }
+
+  // Verificar se tem dados para mostrar o gráfico
+  hasLineChartData(): boolean {
+    return this.lineChartData && 
+           this.lineChartData.labels && 
+           this.lineChartData.labels.length > 0;
+  }
+
+  // Método para cálculos matemáticos no template
+  mathMax(...values: number[]): number {
+    return Math.max(...values);
+  }
+
+  // === MÉTODOS PARA HOVER DO GRÁFICO ===
+  
+  // Obter pontos de hover invisíveis para detectar mouse
+  getHoverPoints(): Array<{x: number, y: number, day: string, entradas: number, saidas: number}> {
+    const chartData = this.getChartData();
+    if (!chartData.entradas.length) return [];
+
+    const width = 1000;
+    const height = 390; // Ajustado para o viewBox modificado
+    const offsetY = 80; // Offset do viewBox
+    const padding = 120;
+    const chartWidth = width - (padding * 2);
+
+    return chartData.entradas.map((entrada, index) => {
+      const x = padding + (index * chartWidth) / Math.max(chartData.entradas.length - 1, 1);
+      const day = chartData.labels[index];
+      const saida = chartData.saidas[index] || 0;
+
+      return { x, y: offsetY + 200, day, entradas: entrada, saidas: saida }; // y ajustado para a nova área
+    });
+  }
+
+  // Mostrar tooltip no hover
+  onLineHover(point: {x: number, y: number, day: string, entradas: number, saidas: number}, event: MouseEvent): void {
+    const rect = (event.target as SVGElement).ownerSVGElement?.getBoundingClientRect();
+    if (!rect) return;
+
+    this.hoverInfo = {
+      visible: true,
+      day: `Dia ${point.day}`,
+      entradas: point.entradas,
+      saidas: point.saidas,
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top - 60
+    };
+  }
+
+  // Esconder tooltip
+  onLineLeave(): void {
+    this.hoverInfo.visible = false;
+  }
+
+
+
 }
