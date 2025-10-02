@@ -278,6 +278,99 @@ function processarCSV(filePath) {
   });
 }
 
+// Função para detectar o período (data mínima e máxima) de um conjunto de transações
+function detectarPeriodoExtrato(transacoes) {
+  if (!transacoes || transacoes.length === 0) {
+    return null;
+  }
+  
+  let dataMinima = null;
+  let dataMaxima = null;
+  
+  transacoes.forEach(transacao => {
+    if (transacao.data) {
+      // Converte DD/MM/AAAA para objeto Date para comparação
+      const [dia, mes, ano] = transacao.data.split('/');
+      const dataAtual = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
+      
+      if (!dataMinima || dataAtual < dataMinima) {
+        dataMinima = dataAtual;
+      }
+      
+      if (!dataMaxima || dataAtual > dataMaxima) {
+        dataMaxima = dataAtual;
+      }
+    }
+  });
+  
+  // Converte de volta para formato DD/MM/AAAA
+  const formatarData = (date) => {
+    const dia = String(date.getDate()).padStart(2, '0');
+    const mes = String(date.getMonth() + 1).padStart(2, '0');
+    const ano = date.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  };
+  
+  return {
+    dataInicio: formatarData(dataMinima),
+    dataFim: formatarData(dataMaxima),
+    totalDias: Math.ceil((dataMaxima - dataMinima) / (1000 * 60 * 60 * 24)) + 1
+  };
+}
+
+// Função para remover transações existentes de um período específico
+function removerTransacoesPeriodo(dataInicio, dataFim) {
+  return new Promise((resolve, reject) => {
+    // Converte as datas para formato Date para comparação
+    const [diaIni, mesIni, anoIni] = dataInicio.split('/');
+    const [diaFim, mesFim, anoFim] = dataFim.split('/');
+    const dataInicioObj = new Date(parseInt(anoIni), parseInt(mesIni) - 1, parseInt(diaIni));
+    const dataFimObj = new Date(parseInt(anoFim), parseInt(mesFim) - 1, parseInt(diaFim));
+    
+    console.log(`🗑️ Removendo transações existentes do período: ${dataInicio} até ${dataFim}`);
+    
+    // Busca todas as transações para filtrar por período (SQLite não tem comparação direta de datas DD/MM/AAAA)
+    db.all("SELECT id, data FROM transacoes", [], (err, rows) => {
+      if (err) {
+        console.error('❌ Erro ao buscar transações existentes:', err);
+        reject(err);
+        return;
+      }
+      
+      // Filtra transações que estão no período
+      const idsParaRemover = rows.filter(row => {
+        const [dia, mes, ano] = row.data.split('/');
+        const dataTransacao = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
+        return dataTransacao >= dataInicioObj && dataTransacao <= dataFimObj;
+      }).map(row => row.id);
+      
+      if (idsParaRemover.length === 0) {
+        console.log(`ℹ️ Nenhuma transação encontrada no período para remoção`);
+        resolve(0);
+        return;
+      }
+      
+      console.log(`🗑️ Encontradas ${idsParaRemover.length} transações para remover`);
+      
+      // Remove as transações encontradas
+      const placeholders = idsParaRemover.map(() => '?').join(',');
+      db.run(
+        `DELETE FROM transacoes WHERE id IN (${placeholders})`,
+        idsParaRemover,
+        function(err) {
+          if (err) {
+            console.error('❌ Erro ao remover transações do período:', err);
+            reject(err);
+          } else {
+            console.log(`✅ ${this.changes} transações removidas do período ${dataInicio} - ${dataFim}`);
+            resolve(this.changes);
+          }
+        }
+      );
+    });
+  });
+}
+
 // Função para salvar transações no banco
 function salvarTransacoes(transacoes) {
   return new Promise((resolve, reject) => {
@@ -340,6 +433,8 @@ app.post('/upload', upload.single('pdf'), async (req, res) => {
 
       const relevantText = text.substring(startIndex);
       const linhas = relevantText.split('\n').filter(line => line.trim());
+      
+      const transacoes = []; // Array para coletar todas as transações antes de salvar
 
       // Processa as linhas com look-ahead para casos de valor em linha separada
       for (let i = 0; i < linhas.length; i++) {
@@ -527,32 +622,66 @@ app.post('/upload', upload.single('pdf'), async (req, res) => {
           console.log(`💰 Valor final: ${valorFinal} (${tipo})`);
           console.log(`🏷️ Categoria: ${categoria}`);
 
-          db.run(
-            "INSERT INTO transacoes (data, descricao, valor, tipo, categoria, mes, ano) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            [data, descricaoLimpa, valorFinal, tipo, categoria, mes, ano],
-            (err) => {
-              if (err) {
-                console.error('❌ Erro ao inserir:', err);
-              } else {
-                console.log(`✅ INSERIDO: ${data} | "${descricaoLimpa}" | ${valorFinal} | ${tipo} | ${categoria}`);
-              }
-            }
-          );
+          // Adiciona transação ao array em vez de inserir diretamente
+          transacoes.push({
+            data,
+            descricao: descricaoLimpa,
+            valor: valorFinal,
+            tipo,
+            categoria,
+            mes,
+            ano
+          });
         }
       }
 
-      res.json({ message: 'Arquivo PDF processado e dados salvos', tipo: 'pdf' });
+      console.log(`📊 PDF processado: ${transacoes.length} transações encontradas`);
+
+      // Detecta o período das transações do extrato
+      const periodo = detectarPeriodoExtrato(transacoes);
+      
+      if (periodo) {
+        console.log(`📅 Período detectado: ${periodo.dataInicio} até ${periodo.dataFim} (${periodo.totalDias} dias)`);
+        
+        // Remove transações existentes do mesmo período
+        const transacoesRemovidas = await removerTransacoesPeriodo(periodo.dataInicio, periodo.dataFim);
+        console.log(`🗑️ ${transacoesRemovidas} transações antigas removidas do período`);
+      }
+
+      // Salva as novas transações
+      const transacoesSalvas = await salvarTransacoes(transacoes);
+      
+      res.json({ 
+        message: `Arquivo PDF processado com sucesso! ${transacoesSalvas} transações salvas.`,
+        tipo: 'pdf',
+        totalTransacoes: transacoesSalvas,
+        periodo: periodo
+      });
       
     } else if (fileExtension === '.csv') {
       console.log('📊 Processando como CSV...');
       
       const transacoes = await processarCSV(filePath);
+      
+      // Detecta o período das transações do extrato
+      const periodo = detectarPeriodoExtrato(transacoes);
+      
+      if (periodo) {
+        console.log(`📅 Período detectado: ${periodo.dataInicio} até ${periodo.dataFim} (${periodo.totalDias} dias)`);
+        
+        // Remove transações existentes do mesmo período
+        const transacoesRemovidas = await removerTransacoesPeriodo(periodo.dataInicio, periodo.dataFim);
+        console.log(`🗑️ ${transacoesRemovidas} transações antigas removidas do período`);
+      }
+      
+      // Salva as novas transações
       const transacoesSalvas = await salvarTransacoes(transacoes);
       
       res.json({ 
         message: `Arquivo CSV processado com sucesso! ${transacoesSalvas} transações salvas.`,
         tipo: 'csv',
-        totalTransacoes: transacoesSalvas
+        totalTransacoes: transacoesSalvas,
+        periodo: periodo
       });
       
     } else {
