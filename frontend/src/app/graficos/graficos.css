@@ -3,12 +3,94 @@
   box-sizing: border-box;
 }
 
+/* Background global para a aba gráficos */
+:host {
+  display: block;
+  min-height: 100vh;
+  background: 
+    linear-gradient(135deg, 
+      #020617 0%, 
+      #0c1426 15%, 
+      #1e293b 35%, 
+      #0f172a 65%, 
+      #020617 100%),
+    radial-gradient(ellipse 600px 400px at 50% 0%, 
+      rgba(59, 130, 246, 0.15) 0%, 
+      transparent 50%);
+  background-attachment: fixed;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Overlay com neon azul desfocado */
+:host::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle 800px at 20% 30%, 
+      rgba(0, 123, 255, 0.08) 0%, 
+      transparent 40%),
+    radial-gradient(circle 600px at 80% 70%, 
+      rgba(59, 130, 246, 0.06) 0%, 
+      transparent 40%),
+    radial-gradient(circle 400px at 50% 90%, 
+      rgba(139, 92, 246, 0.05) 0%, 
+      transparent 30%);
+  filter: blur(1px);
+  pointer-events: none;
+  z-index: -1;
+  animation: neonPulse 8s ease-in-out infinite alternate;
+}
+
+/* Efeito de partículas/luz adicional */
+:host::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle 300px at 10% 20%, 
+      rgba(0, 191, 255, 0.04) 0%, 
+      transparent 50%),
+    radial-gradient(circle 200px at 90% 10%, 
+      rgba(59, 130, 246, 0.03) 0%, 
+      transparent 50%),
+    radial-gradient(circle 250px at 30% 80%, 
+      rgba(139, 92, 246, 0.03) 0%, 
+      transparent 50%);
+  filter: blur(2px);
+  pointer-events: none;
+  z-index: -2;
+  animation: neonFloat 12s ease-in-out infinite alternate;
+}
+
+@keyframes neonPulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.7; }
+}
+
+@keyframes neonFloat {
+  0% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(1deg); }
+  66% { transform: translateY(5px) rotate(-0.5deg); }
+  100% { transform: translateY(-5px) rotate(0.5deg); }
+}
+
 .graficos-container {
   max-width: 1600px;
   margin: 0 auto;
   padding: 102px 15px 40px 15px; /* 70px (nav) + 32px (espaçamento) + 40px (gap com footer) */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #ffffff;
+  position: relative;
+  z-index: 1;
 }
 
 /* Header principal - similar ao upload */
