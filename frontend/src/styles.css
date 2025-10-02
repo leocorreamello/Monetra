@@ -19,7 +19,6 @@ html, body {
 
 body {
   min-height: 100vh;
-  padding-top: 20px; /* ADICIONADO: espaçamento do topo global */
 }
 
 /* Scrollbar personalizada */
@@ -68,9 +67,32 @@ body {
   outline-offset: 2px;
 }
 
+/* Footer global */
+.global-footer {
+  background: linear-gradient(135deg, #0f0c1e 0%, #1a1730 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 20px 0;
+  text-align: center;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.footer-content {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 400;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
 /* Responsividade base */
 @media (max-width: 768px) {
   body {
     padding: 15px 0; /* CORRIGIDO: menos espaçamento em mobile */
+  }
+  
+  .footer-content {
+    font-size: 0.75rem;
+    padding: 0 20px;
   }
 }
