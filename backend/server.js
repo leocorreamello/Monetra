@@ -278,18 +278,22 @@ function processarCSV(filePath) {
   });
 }
 
-// Função para detectar o período (data mínima e máxima) de um conjunto de transações
-function detectarPeriodoExtrato(transacoes) {
+// Função para detectar dias únicos presentes em um conjunto de transações
+function detectarDiasExtrato(transacoes) {
   if (!transacoes || transacoes.length === 0) {
     return null;
   }
   
+  const diasUnicos = new Set();
   let dataMinima = null;
   let dataMaxima = null;
   
   transacoes.forEach(transacao => {
     if (transacao.data) {
-      // Converte DD/MM/AAAA para objeto Date para comparação
+      // Adiciona o dia único ao conjunto
+      diasUnicos.add(transacao.data);
+      
+      // Também mantém controle da data mínima e máxima para estatísticas
       const [dia, mes, ano] = transacao.data.split('/');
       const dataAtual = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
       
@@ -311,25 +315,36 @@ function detectarPeriodoExtrato(transacoes) {
     return `${dia}/${mes}/${ano}`;
   };
   
+  // Converte Set para Array ordenado
+  const diasOrdenados = Array.from(diasUnicos).sort((a, b) => {
+    const [diaA, mesA, anoA] = a.split('/');
+    const [diaB, mesB, anoB] = b.split('/');
+    const dateA = new Date(parseInt(anoA), parseInt(mesA) - 1, parseInt(diaA));
+    const dateB = new Date(parseInt(anoB), parseInt(mesB) - 1, parseInt(diaB));
+    return dateA - dateB;
+  });
+  
   return {
+    diasUnicos: diasOrdenados,
     dataInicio: formatarData(dataMinima),
     dataFim: formatarData(dataMaxima),
-    totalDias: Math.ceil((dataMaxima - dataMinima) / (1000 * 60 * 60 * 24)) + 1
+    totalDiasUnicos: diasOrdenados.length,
+    totalDiasIntervalo: Math.ceil((dataMaxima - dataMinima) / (1000 * 60 * 60 * 24)) + 1
   };
 }
 
-// Função para remover transações existentes de um período específico
-function removerTransacoesPeriodo(dataInicio, dataFim) {
+// Função para remover transações existentes de dias específicos
+function removerTransacoesDias(diasEspecificos) {
   return new Promise((resolve, reject) => {
-    // Converte as datas para formato Date para comparação
-    const [diaIni, mesIni, anoIni] = dataInicio.split('/');
-    const [diaFim, mesFim, anoFim] = dataFim.split('/');
-    const dataInicioObj = new Date(parseInt(anoIni), parseInt(mesIni) - 1, parseInt(diaIni));
-    const dataFimObj = new Date(parseInt(anoFim), parseInt(mesFim) - 1, parseInt(diaFim));
+    if (!diasEspecificos || diasEspecificos.length === 0) {
+      console.log(`ℹ️ Nenhum dia específico fornecido para remoção`);
+      resolve(0);
+      return;
+    }
     
-    console.log(`🗑️ Removendo transações existentes do período: ${dataInicio} até ${dataFim}`);
+    console.log(`🗑️ Removendo transações existentes dos dias: ${diasEspecificos.join(', ')}`);
     
-    // Busca todas as transações para filtrar por período (SQLite não tem comparação direta de datas DD/MM/AAAA)
+    // Busca todas as transações para filtrar por dias específicos
     db.all("SELECT id, data FROM transacoes", [], (err, rows) => {
       if (err) {
         console.error('❌ Erro ao buscar transações existentes:', err);
@@ -337,20 +352,18 @@ function removerTransacoesPeriodo(dataInicio, dataFim) {
         return;
       }
       
-      // Filtra transações que estão no período
+      // Filtra transações que estão nos dias específicos
       const idsParaRemover = rows.filter(row => {
-        const [dia, mes, ano] = row.data.split('/');
-        const dataTransacao = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
-        return dataTransacao >= dataInicioObj && dataTransacao <= dataFimObj;
+        return diasEspecificos.includes(row.data);
       }).map(row => row.id);
       
       if (idsParaRemover.length === 0) {
-        console.log(`ℹ️ Nenhuma transação encontrada no período para remoção`);
+        console.log(`ℹ️ Nenhuma transação encontrada nos dias especificados para remoção`);
         resolve(0);
         return;
       }
       
-      console.log(`🗑️ Encontradas ${idsParaRemover.length} transações para remover`);
+      console.log(`🗑️ Encontradas ${idsParaRemover.length} transações para remover nos dias especificados`);
       
       // Remove as transações encontradas
       const placeholders = idsParaRemover.map(() => '?').join(',');
@@ -359,10 +372,10 @@ function removerTransacoesPeriodo(dataInicio, dataFim) {
         idsParaRemover,
         function(err) {
           if (err) {
-            console.error('❌ Erro ao remover transações do período:', err);
+            console.error('❌ Erro ao remover transações dos dias especificados:', err);
             reject(err);
           } else {
-            console.log(`✅ ${this.changes} transações removidas do período ${dataInicio} - ${dataFim}`);
+            console.log(`✅ ${this.changes} transações removidas dos dias: ${diasEspecificos.join(', ')}`);
             resolve(this.changes);
           }
         }
@@ -637,15 +650,17 @@ app.post('/upload', upload.single('pdf'), async (req, res) => {
 
       console.log(`📊 PDF processado: ${transacoes.length} transações encontradas`);
 
-      // Detecta o período das transações do extrato
-      const periodo = detectarPeriodoExtrato(transacoes);
+      // Detecta os dias únicos das transações do extrato
+      const diasInfo = detectarDiasExtrato(transacoes);
       
-      if (periodo) {
-        console.log(`📅 Período detectado: ${periodo.dataInicio} até ${periodo.dataFim} (${periodo.totalDias} dias)`);
+      if (diasInfo) {
+        console.log(`📅 Dias detectados: ${diasInfo.totalDiasUnicos} dias únicos`);
+        console.log(`📅 Intervalo: ${diasInfo.dataInicio} até ${diasInfo.dataFim}`);
+        console.log(`📅 Dias: ${diasInfo.diasUnicos.join(', ')}`);
         
-        // Remove transações existentes do mesmo período
-        const transacoesRemovidas = await removerTransacoesPeriodo(periodo.dataInicio, periodo.dataFim);
-        console.log(`🗑️ ${transacoesRemovidas} transações antigas removidas do período`);
+        // Remove transações existentes apenas dos dias específicos
+        const transacoesRemovidas = await removerTransacoesDias(diasInfo.diasUnicos);
+        console.log(`🗑️ ${transacoesRemovidas} transações antigas removidas dos dias especificados`);
       }
 
       // Salva as novas transações
@@ -655,7 +670,8 @@ app.post('/upload', upload.single('pdf'), async (req, res) => {
         message: `Arquivo PDF processado com sucesso! ${transacoesSalvas} transações salvas.`,
         tipo: 'pdf',
         totalTransacoes: transacoesSalvas,
-        periodo: periodo
+        diasProcessados: diasInfo ? diasInfo.diasUnicos : [],
+        intervaloDias: diasInfo ? `${diasInfo.dataInicio} - ${diasInfo.dataFim}` : null
       });
       
     } else if (fileExtension === '.csv') {
@@ -663,15 +679,17 @@ app.post('/upload', upload.single('pdf'), async (req, res) => {
       
       const transacoes = await processarCSV(filePath);
       
-      // Detecta o período das transações do extrato
-      const periodo = detectarPeriodoExtrato(transacoes);
+      // Detecta os dias únicos das transações do extrato
+      const diasInfo = detectarDiasExtrato(transacoes);
       
-      if (periodo) {
-        console.log(`📅 Período detectado: ${periodo.dataInicio} até ${periodo.dataFim} (${periodo.totalDias} dias)`);
+      if (diasInfo) {
+        console.log(`📅 Dias detectados: ${diasInfo.totalDiasUnicos} dias únicos`);
+        console.log(`📅 Intervalo: ${diasInfo.dataInicio} até ${diasInfo.dataFim}`);
+        console.log(`📅 Dias: ${diasInfo.diasUnicos.join(', ')}`);
         
-        // Remove transações existentes do mesmo período
-        const transacoesRemovidas = await removerTransacoesPeriodo(periodo.dataInicio, periodo.dataFim);
-        console.log(`🗑️ ${transacoesRemovidas} transações antigas removidas do período`);
+        // Remove transações existentes apenas dos dias específicos
+        const transacoesRemovidas = await removerTransacoesDias(diasInfo.diasUnicos);
+        console.log(`🗑️ ${transacoesRemovidas} transações antigas removidas dos dias especificados`);
       }
       
       // Salva as novas transações
@@ -681,7 +699,8 @@ app.post('/upload', upload.single('pdf'), async (req, res) => {
         message: `Arquivo CSV processado com sucesso! ${transacoesSalvas} transações salvas.`,
         tipo: 'csv',
         totalTransacoes: transacoesSalvas,
-        periodo: periodo
+        diasProcessados: diasInfo ? diasInfo.diasUnicos : [],
+        intervaloDias: diasInfo ? `${diasInfo.dataInicio} - ${diasInfo.dataFim}` : null
       });
       
     } else {
