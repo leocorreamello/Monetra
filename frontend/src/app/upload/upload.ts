@@ -75,16 +75,30 @@ export class UploadComponent implements OnInit {
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Verifica se o arquivo é PDF ou CSV
-      const allowedTypes = ['application/pdf', 'text/csv', 'application/vnd.ms-excel'];
-      const allowedExtensions = ['.pdf', '.csv'];
+      // Verifica se o arquivo é PDF, CSV ou TXT
+      const allowedTypes = [
+        'application/pdf', 
+        'text/csv', 
+        'application/vnd.ms-excel',
+        'text/plain',
+        'text/txt',
+        'application/csv',
+        'application/x-csv',
+        'text/x-csv',
+        'text/comma-separated-values',
+        '' // Alguns sistemas podem não definir MIME type
+      ];
+      const allowedExtensions = ['.pdf', '.csv', '.txt'];
       
       const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
       
+      // Aceita se o tipo MIME é permitido OU se a extensão é permitida
       if (allowedTypes.includes(file.type) || allowedExtensions.includes(fileExtension)) {
+        console.log(`Arquivo aceito: ${file.name} (tipo: ${file.type}, extensão: ${fileExtension})`);
         this.uploadFile(file);
       } else {
-        alert('Por favor, selecione um arquivo PDF ou CSV válido.');
+        console.log(`Arquivo rejeitado: ${file.name} (tipo: ${file.type}, extensão: ${fileExtension})`);
+        alert('Por favor, selecione um arquivo PDF, CSV ou TXT válido.');
       }
     }
   }
@@ -102,7 +116,7 @@ export class UploadComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erro no upload:', error);
-        alert('Erro ao processar o arquivo. Verifique o formato do PDF.');
+        alert('Erro ao processar o arquivo. Verifique se é um arquivo PDF, CSV ou TXT válido.');
         this.isLoading = false;
       }
     });

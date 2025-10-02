@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 const upload = multer({ 
   storage: storage,
   fileFilter: (req, file, cb) => {
-    const allowedExtensions = ['.pdf', '.csv'];
+    const allowedExtensions = ['.pdf', '.csv', '.txt'];
     const fileExtension = path.extname(file.originalname).toLowerCase();
     
     console.log(`📁 Verificando arquivo: ${file.originalname}`);
@@ -34,7 +34,7 @@ const upload = multer({
       cb(null, true);
     } else {
       console.log(`❌ Arquivo rejeitado: ${fileExtension}`);
-      cb(new Error(`Tipo de arquivo não suportado. Apenas arquivos PDF e CSV são aceitos.`), false);
+      cb(new Error(`Tipo de arquivo não suportado. Apenas arquivos PDF, CSV e TXT são aceitos.`), false);
     }
   },
   limits: {
@@ -273,6 +273,87 @@ function processarCSV(filePath) {
       
     } catch (error) {
       console.error('❌ Erro ao processar CSV:', error);
+      reject(error);
+    }
+  });
+}
+
+// Função para processar arquivo TXT
+function processarTXT(filePath) {
+  return new Promise((resolve, reject) => {
+    try {
+      const data = fs.readFileSync(filePath, 'utf-8');
+      const linhas = data.split('\n').map(linha => linha.trim()).filter(linha => linha.length > 0);
+      
+      console.log('📄 Processando arquivo TXT...');
+      console.log(`📊 Total de linhas: ${linhas.length}`);
+      
+      const transacoes = [];
+      
+      // Processa cada linha do TXT
+      for (let i = 0; i < linhas.length; i++) {
+        const linha = linhas[i];
+        
+        // Ignora linhas vazias ou muito curtas
+        if (!linha || linha.length < 10) continue;
+        
+        // Divide a linha pelos pontos e vírgulas
+        const campos = linha.split(';');
+        
+        if (campos.length < 3) {
+          console.log(`⚠️ Linha ignorada (poucos campos): ${linha}`);
+          continue;
+        }
+        
+        const data = campos[0];
+        const descricao = campos[1];
+        const valorStr = campos[2];
+        
+        // Valida se a data está no formato correto (DD/MM/AAAA)
+        if (!data.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+          console.log(`⚠️ Data inválida ignorada: ${data}`);
+          continue;
+        }
+        
+        // Processa o valor
+        if (!valorStr) {
+          console.log(`⚠️ Valor vazio ignorado na linha: ${linha}`);
+          continue;
+        }
+        
+        // Remove possíveis espaços e converte o valor
+        const valorLimpo = valorStr.trim().replace(',', '.');
+        const valorNumerico = parseFloat(valorLimpo);
+        
+        if (isNaN(valorNumerico)) {
+          console.log(`⚠️ Valor não numérico ignorado: ${valorStr}`);
+          continue;
+        }
+        
+        const tipo = valorNumerico < 0 ? 'saida' : 'entrada';
+        const [dia, mes, ano] = data.split('/');
+        
+        // Categorização automática
+        const categoria = categorizarTransacao(descricao, valorNumerico);
+        
+        console.log(`💰 TXT: ${data} | "${descricao}" | ${valorNumerico} | ${tipo} | ${categoria}`);
+        
+        transacoes.push({
+          data,
+          descricao: descricao.trim(),
+          valor: valorNumerico,
+          tipo,
+          categoria,
+          mes,
+          ano
+        });
+      }
+      
+      console.log(`✅ TXT processado: ${transacoes.length} transações encontradas`);
+      resolve(transacoes);
+      
+    } catch (error) {
+      console.error('❌ Erro ao processar TXT:', error);
       reject(error);
     }
   });
@@ -703,9 +784,35 @@ app.post('/upload', upload.single('pdf'), async (req, res) => {
         intervaloDias: diasInfo ? `${diasInfo.dataInicio} - ${diasInfo.dataFim}` : null
       });
       
+    } else if (fileExtension === '.txt') {
+      console.log('📄 Processando como TXT...');
+      
+      const transacoes = await processarTXT(filePath);
+      
+      // Detecta os dias únicos do extrato
+      const diasInfo = detectarDiasExtrato(transacoes);
+      
+      if (diasInfo && diasInfo.diasUnicos.length > 0) {
+        console.log(`🗓️ Dias detectados no extrato TXT: ${diasInfo.diasUnicos.join(', ')}`);
+        console.log(`📅 Intervalo: ${diasInfo.dataInicio} até ${diasInfo.dataFim}`);
+        
+        // Remove transações existentes desses dias específicos
+        await removerTransacoesDias(diasInfo.diasUnicos);
+      }
+      
+      const transacoesSalvas = await salvarTransacoes(transacoes);
+      
+      res.json({ 
+        message: `Arquivo TXT processado com sucesso! ${transacoesSalvas} transações salvas.`,
+        tipo: 'txt',
+        totalTransacoes: transacoesSalvas,
+        diasProcessados: diasInfo ? diasInfo.diasUnicos : [],
+        intervaloDias: diasInfo ? `${diasInfo.dataInicio} - ${diasInfo.dataFim}` : null
+      });
+      
     } else {
       return res.status(400).json({ 
-        error: `Tipo de arquivo não suportado: ${fileExtension}. Apenas PDF e CSV são aceitos.` 
+        error: `Tipo de arquivo não suportado: ${fileExtension}. Apenas PDF, CSV e TXT são aceitos.` 
       });
     }
     

@@ -54,14 +54,26 @@ export class UploadComponent {
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      // Verifica se o arquivo é PDF ou CSV
-      const allowedTypes = ['application/pdf', 'text/csv', 'application/vnd.ms-excel'];
-      const allowedExtensions = ['.pdf', '.csv'];
+      // Verifica se o arquivo é PDF, CSV ou TXT
+      const allowedTypes = [
+        'application/pdf', 
+        'text/csv', 
+        'application/vnd.ms-excel',
+        'text/plain',
+        'text/txt',
+        'application/csv',
+        'application/x-csv',
+        'text/x-csv',
+        'text/comma-separated-values',
+        '' // Alguns sistemas podem não definir MIME type
+      ];
+      const allowedExtensions = ['.pdf', '.csv', '.txt'];
       
       const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
       
       if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
-        alert('Apenas arquivos PDF e CSV são aceitos!');
+        console.log(`Arquivo rejeitado: ${file.name} (tipo: ${file.type}, extensão: ${fileExtension})`);
+        alert('Apenas arquivos PDF, CSV e TXT são aceitos!');
         return;
       }
 
