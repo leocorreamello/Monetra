@@ -54,9 +54,8 @@ export class UploadComponent {
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      // Verifica se o arquivo é PDF, CSV ou TXT
+      // Verifica se o arquivo é CSV ou TXT
       const allowedTypes = [
-        'application/pdf', 
         'text/csv', 
         'application/vnd.ms-excel',
         'text/plain',
@@ -67,13 +66,23 @@ export class UploadComponent {
         'text/comma-separated-values',
         '' // Alguns sistemas podem não definir MIME type
       ];
-      const allowedExtensions = ['.pdf', '.csv', '.txt'];
+      const allowedExtensions = ['.csv', '.txt'];
       
       const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
       
-      if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
-        console.log(`Arquivo rejeitado: ${file.name} (tipo: ${file.type}, extensão: ${fileExtension})`);
-        alert('Apenas arquivos PDF, CSV e TXT são aceitos!');
+      // Validação mais permissiva: aceita se tem extensão correta OU tipo MIME correto
+      const hasValidExtension = allowedExtensions.includes(fileExtension);
+      const hasValidMimeType = allowedTypes.includes(file.type);
+      
+      console.log(`🔍 Arquivo: ${file.name}, Tipo: ${file.type}, Extensão: ${fileExtension}`);
+      console.log(`✅ Extensão válida: ${hasValidExtension}, MIME válido: ${hasValidMimeType}`);
+      
+      if (!hasValidExtension && !hasValidMimeType) {
+        console.log(`❌ Arquivo rejeitado`);
+        alert(`Arquivo não suportado. 
+Extensão: ${fileExtension} 
+Tipo: ${file.type}
+Apenas arquivos CSV e TXT são aceitos!`);
         return;
       }
 
@@ -88,8 +97,25 @@ export class UploadComponent {
           this.isLoading = false;
         },
         error: (error) => {
-          console.error('Erro no upload:', error);
-          alert('Erro no upload: ' + (error.error?.error || 'Erro desconhecido'));
+          console.error('❌ Erro detalhado no upload:', error);
+          console.error('📄 Status:', error.status);
+          console.error('📝 Mensagem:', error.error);
+          
+          let errorMessage = 'Erro ao processar o arquivo.';
+          
+          if (error.status === 0) {
+            errorMessage += ' Servidor não está respondendo. Verifique se o backend está rodando na porta 3000.';
+          } else if (error.status === 400) {
+            errorMessage += ' ' + (error.error?.error || 'Arquivo inválido ou formato não suportado.');
+          } else if (error.status === 413) {
+            errorMessage += ' Arquivo muito grande (limite: 10MB).';
+          } else if (error.status === 500) {
+            errorMessage += ' Erro interno do servidor. Verifique os logs do backend.';
+          } else {
+            errorMessage += ` Código de erro: ${error.status}`;
+          }
+          
+          alert(errorMessage);
           this.isLoading = false;
         }
       });

@@ -132,6 +132,28 @@ export class GraficosComponent implements OnInit {
     return !!(this.selectedAno || this.selectedMes || this.selectedCategoria || this.selectedTipo);
   }
 
+  deleteSelectedAnoMes() {
+    if (!this.selectedAno || !this.selectedMes) {
+      alert('Selecione um ano e mês para excluir.');
+      return;
+    }
+
+    if (confirm(`Tem certeza que deseja excluir todas as transações de ${this.getMonthName(this.selectedMes)}/${this.selectedAno}?`)) {
+      this.http.delete(`${this.apiUrl}/transactions?mes=${this.selectedMes}&ano=${this.selectedAno}`)
+        .subscribe({
+          next: () => {
+            this.loadTransactions();
+            this.selectedAno = '';
+            this.selectedMes = '';
+          },
+          error: (error) => {
+            console.error('Erro ao excluir transações:', error);
+            alert('Erro ao excluir transações.');
+          }
+        });
+    }
+  }
+
   updateCharts() {
     this.updatePieChart();
     this.updateLineChart();
@@ -247,16 +269,43 @@ export class GraficosComponent implements OnInit {
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Verifica se o arquivo é PDF ou CSV
-      const allowedTypes = ['application/pdf', 'text/csv', 'application/vnd.ms-excel'];
-      const allowedExtensions = ['.pdf', '.csv'];
+      console.log(`🔍 Arquivo selecionado: ${file.name}`);
+      console.log(`📁 Tipo MIME: "${file.type}"`);
+      console.log(`📄 Tamanho: ${file.size} bytes`);
+      
+      // Verifica se o arquivo é CSV ou TXT
+      const allowedTypes = [
+        'text/csv', 
+        'application/vnd.ms-excel',
+        'text/plain',
+        'text/txt',
+        'application/csv',
+        'application/x-csv',
+        'text/x-csv',
+        'text/comma-separated-values',
+        'application/octet-stream', // Alguns sistemas usam este tipo genérico
+        '' // Alguns sistemas podem não definir MIME type
+      ];
+      const allowedExtensions = ['.csv', '.txt'];
       
       const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+      console.log(`🔖 Extensão detectada: "${fileExtension}"`);
       
-      if (allowedTypes.includes(file.type) || allowedExtensions.includes(fileExtension)) {
+      // Validação mais permissiva: aceita se tem extensão correta OU tipo MIME correto
+      const hasValidExtension = allowedExtensions.includes(fileExtension);
+      const hasValidMimeType = allowedTypes.includes(file.type);
+      
+      console.log(`✅ Extensão válida: ${hasValidExtension}`);
+      console.log(`✅ Tipo MIME válido: ${hasValidMimeType}`);
+      
+      if (hasValidExtension || hasValidMimeType) {
+        console.log(`🎉 Arquivo aceito para upload!`);
         this.uploadFile(file);
       } else {
-        alert('Por favor, selecione um arquivo PDF ou CSV válido.');
+        console.log(`❌ Arquivo rejeitado - extensão: ${fileExtension}`);
+        alert(`Arquivo não suportado. 
+Extensão: ${fileExtension} 
+Por favor, selecione um arquivo CSV ou TXT válido.`);
       }
     }
   }
@@ -264,7 +313,7 @@ export class GraficosComponent implements OnInit {
   uploadFile(file: File) {
     this.isLoading = true;
     const formData = new FormData();
-    formData.append('pdf', file);
+    formData.append('pdf', file); // Mantém 'pdf' pois o servidor espera esse nome
 
     this.http.post(`${this.apiUrl}/upload`, formData).subscribe({
       next: (response) => {
@@ -276,9 +325,26 @@ export class GraficosComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erro no upload:', error);
+        console.error('❌ Erro detalhado no upload:', error);
+        console.error('📄 Status:', error.status);
+        console.error('📝 Mensagem:', error.error);
+        
+        let errorMessage = 'Erro ao processar o arquivo.';
+        
+        if (error.status === 0) {
+          errorMessage += ' Servidor não está respondendo. Verifique se o backend está rodando na porta 3000.';
+        } else if (error.status === 400) {
+          errorMessage += ' ' + (error.error?.error || 'Arquivo inválido ou formato não suportado.');
+        } else if (error.status === 413) {
+          errorMessage += ' Arquivo muito grande (limite: 10MB).';
+        } else if (error.status === 500) {
+          errorMessage += ' Erro interno do servidor. Verifique os logs do backend.';
+        } else {
+          errorMessage += ` Código de erro: ${error.status}`;
+        }
+        
+        alert(errorMessage);
         this.isLoading = false;
-        alert('Erro no upload do arquivo. Tente novamente.');
       }
     });
   }
