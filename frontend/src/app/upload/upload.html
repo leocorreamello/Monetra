@@ -11,7 +11,7 @@
     <div class="controls-section">
       <!-- Upload de arquivo -->
       <div class="file-upload-zone">
-        <input type="file" accept=".pdf,.csv" (change)="onFileSelected($event)" />
+        <input type="file" accept=".csv,.txt" (change)="onFileSelected($event)" />
         <div class="upload-icon">📄</div>
         <h3 class="upload-title">Enviar Arquivo Extrato</h3>
         <p class="upload-subtitle">Arraste seu arquivo aqui ou clique para selecionar</p>
@@ -33,7 +33,7 @@
           
           <div class="controls-section">
             <div class="file-upload-zone">
-              <input type="file" accept=".pdf,.csv" (change)="onFileSelected($event)" />
+              <input type="file" accept=".csv,.txt" (change)="onFileSelected($event)" />
               <div class="upload-icon">📄</div>
               <h3 class="upload-title">Enviar Extrato</h3>
               <p class="upload-subtitle">Clique aqui</p>
@@ -175,7 +175,7 @@
       <div class="empty-state" *ngIf="filteredTransactions.length === 0 && !isLoading">
         <div class="empty-state-content">
           <div class="empty-state-icon">
-            <span *ngIf="transactions.length === 0">📄</span>
+            <span *ngIf="transactions.length === 0">📊</span>
             <span *ngIf="transactions.length > 0">🔍</span>
           </div>
           <h3 class="empty-state-title">
@@ -183,14 +183,14 @@
           </h3>
           <p class="empty-state-text">
             {{ transactions.length === 0 ? 
-                'Faça upload do seu extrato bancário (PDF ou CSV) para gerar gráficos e análises inteligentes dos seus dados financeiros.' : 
+                'Faça upload do seu extrato bancário (CSV ou TXT) para gerar gráficos e análises inteligentes dos seus dados financeiros.' : 
                 'Ajuste os filtros acima para encontrar as transações que você está procurando.' }}
           </p>
           <div class="empty-state-actions" *ngIf="transactions.length === 0">
             <div class="supported-formats">
               <small>Formatos suportados:</small>
               <div class="format-badges">
-                <span class="format-badge">📄 PDF</span>
+                <span class="format-badge">📄 TXT</span>
                 <span class="format-badge">📊 CSV</span>
               </div>
             </div>
