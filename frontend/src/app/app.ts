@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NavigationComponent } from './navigation/navigation';
 import { HomeComponent } from './home/home';
 import { UploadComponent } from './upload/upload';
+import { GraficosComponent } from './graficos/graficos';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,8 @@ import { UploadComponent } from './upload/upload';
     CommonModule,
     NavigationComponent,
     HomeComponent,
-    UploadComponent
+    UploadComponent,
+    GraficosComponent
   ],
   templateUrl: './app.html',
   styleUrls: ['./app.css']

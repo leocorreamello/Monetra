@@ -87,7 +87,8 @@ import { CommonModule } from '@angular/common';
   styles: [`
     .wavy-container {
       position: relative;
-      height: calc(100vh - 70px);
+      min-height: 100vh; /* MUDANÇA: usar min-height para se estender completamente */
+      padding-top: 70px; /* MUDANÇA: compensar o header fixo */
       display: flex;
       flex-direction: column;
       align-items: center;

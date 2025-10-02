@@ -11,5 +11,17 @@
     <div *ngIf="navigation.activeTab === 'planilhas'" class="tab-content">
       <app-upload></app-upload>
     </div>
+    
+    <!-- Gráficos Tab -->
+    <div *ngIf="navigation.activeTab === 'graficos'" class="tab-content">
+      <app-graficos></app-graficos>
+    </div>
   </main>
+  
+  <!-- Footer global -->
+  <footer class="global-footer">
+    <div class="footer-content">
+      Copyright © 2025 by Leonardo Mello. All rights reserved.
+    </div>
+  </footer>
 </div>

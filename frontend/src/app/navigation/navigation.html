@@ -20,6 +20,13 @@
         (click)="setActiveTab('planilhas')">
         <span class="nav-text">Planilhas</span>
       </button>
+      
+      <button 
+        class="nav-item" 
+        [class.active]="activeTab === 'graficos'"
+        (click)="setActiveTab('graficos')">
+        <span class="nav-text">Gráficos</span>
+      </button>
     </div>
 
     <!-- User Profile (placeholder for future) -->

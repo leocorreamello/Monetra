@@ -171,12 +171,31 @@
         </div>
       </div>
 
-      <!-- Estado vazio -->
+      <!-- Estado vazio melhorado -->
       <div class="empty-state" *ngIf="filteredTransactions.length === 0 && !isLoading">
-        <div class="empty-state-icon">💼</div>
-        <p class="empty-state-text">
-          {{ transactions.length === 0 ? 'Nenhuma transação encontrada. Faça upload de um extrato para começar!' : 'Nenhuma transação encontrada para os filtros selecionados.' }}
-        </p>
+        <div class="empty-state-content">
+          <div class="empty-state-icon">
+            <span *ngIf="transactions.length === 0">📄</span>
+            <span *ngIf="transactions.length > 0">🔍</span>
+          </div>
+          <h3 class="empty-state-title">
+            {{ transactions.length === 0 ? 'Visualize suas Finanças!' : 'Nenhum resultado encontrado' }}
+          </h3>
+          <p class="empty-state-text">
+            {{ transactions.length === 0 ? 
+                'Faça upload do seu extrato bancário (PDF ou CSV) para gerar gráficos e análises inteligentes dos seus dados financeiros.' : 
+                'Ajuste os filtros acima para encontrar as transações que você está procurando.' }}
+          </p>
+          <div class="empty-state-actions" *ngIf="transactions.length === 0">
+            <div class="supported-formats">
+              <small>Formatos suportados:</small>
+              <div class="format-badges">
+                <span class="format-badge">📄 PDF</span>
+                <span class="format-badge">📊 CSV</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

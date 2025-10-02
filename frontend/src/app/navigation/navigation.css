@@ -2,8 +2,10 @@
   background: linear-gradient(135deg, #0f0c1e 0%, #1a1730 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  position: sticky;
+  position: fixed; /* MUDANÇA: de sticky para fixed para garantir que fique no topo */
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
   backdrop-filter: blur(15px);
 }
