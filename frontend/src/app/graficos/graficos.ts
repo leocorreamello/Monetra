@@ -135,7 +135,6 @@ export class GraficosComponent implements OnInit {
   updateCharts() {
     this.updatePieChart();
     this.updateLineChart();
-    this.updateBarChart();
   }
 
   updatePieChart() {
@@ -290,6 +289,7 @@ export class GraficosComponent implements OnInit {
       'transporte': '🚗 Transporte',
       'moradia': '🏠 Moradia',
       'transferencia': '💸 Transferência',
+      'renda': '💰 Renda',
       'saude': '🏥 Saúde',
       'lazer': '🎮 Lazer',
       'educacao': '📚 Educação',
@@ -617,6 +617,55 @@ export class GraficosComponent implements OnInit {
     this.hoverInfo.visible = false;
   }
 
+  // === MÉTODOS PARA ANÁLISE ANUAL POR CATEGORIA ===
 
+  // Obter meses disponíveis nos dados filtrados
+  getAvailableMonths(): string[] {
+    const months = [...new Set(this.filteredTransactions.map(t => t.mes))]
+      .filter(mes => mes)
+      .sort((a, b) => parseInt(a) - parseInt(b));
+    return months;
+  }
+
+  // Obter categorias que têm receitas
+  getReceitasCategorias(): string[] {
+    const categorias = [...new Set(
+      this.filteredTransactions
+        .filter(t => t.tipo === 'entrada')
+        .map(t => t.categoria)
+    )].filter(cat => cat);
+    return categorias.sort();
+  }
+
+  // Obter categorias que têm despesas
+  getDespesasCategorias(): string[] {
+    const categorias = [...new Set(
+      this.filteredTransactions
+        .filter(t => t.tipo === 'saida')
+        .map(t => t.categoria)
+    )].filter(cat => cat);
+    return categorias.sort();
+  }
+
+  // Obter valor de uma categoria específica em um mês específico
+  getMonthCategoryValue(mes: string, categoria: string, tipo: 'entrada' | 'saida'): number {
+    return this.filteredTransactions
+      .filter(t => t.mes === mes && t.categoria === categoria && t.tipo === tipo)
+      .reduce((sum, t) => sum + Math.abs(t.valor), 0);
+  }
+
+  // Obter total de um mês por tipo (entrada ou saída)
+  getMonthTotal(mes: string, tipo: 'entrada' | 'saida'): number {
+    return this.filteredTransactions
+      .filter(t => t.mes === mes && t.tipo === tipo)
+      .reduce((sum, t) => sum + Math.abs(t.valor), 0);
+  }
+
+  // Obter saldo de um mês (receitas - despesas)
+  getMonthBalance(mes: string): number {
+    const entradas = this.getMonthTotal(mes, 'entrada');
+    const saidas = this.getMonthTotal(mes, 'saida');
+    return entradas - saidas;
+  }
 
 }

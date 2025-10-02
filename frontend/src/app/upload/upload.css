@@ -6,7 +6,7 @@
 .upload-container {
   max-width: 1600px; /* MUDANÇA: aumentar de 1400px para 1600px */
   margin: 0 auto;
-  padding: 102px 15px 0 15px; /* MUDANÇA: remover padding-bottom já que o footer não é mais fixo */
+  padding: 102px 15px 40px 15px; /* 70px (nav) + 32px (espaçamento) + 40px (gap com footer) */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #ffffff;
 }
@@ -746,7 +746,7 @@ td:nth-child(5) {
 @media (max-width: 1400px) {
   .upload-container {
     max-width: 1300px;
-    padding: 0 20px;
+    padding: 102px 20px 40px 20px;
   }
 }
 
@@ -793,7 +793,7 @@ td:nth-child(5) {
   
   .upload-container {
     max-width: 100%;
-    padding: 0 15px;
+    padding: 102px 15px 40px 15px;
   }
   
   .table-container {
@@ -867,47 +867,38 @@ td:nth-child(5) {
   }
 }
 
-/* Empty State Melhorado */
+/* Estado vazio - similar ao original */
 .empty-state {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   min-height: 400px;
-  padding: 2rem;
+  text-align: center;
 }
 
 .empty-state-content {
-  text-align: center;
-  max-width: 450px;
-  padding: 2rem;
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8));
-  border-radius: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  color: white;
+  max-width: 500px;
+  padding: 40px;
 }
 
 .empty-state-icon {
   font-size: 4rem;
-  margin-bottom: 1.5rem;
-  opacity: 0.9;
+  margin-bottom: 24px;
+  opacity: 0.6;
 }
 
 .empty-state-title {
   font-size: 1.5rem;
-  font-weight: 600;
-  color: white;
-  margin-bottom: 1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 12px;
 }
 
 .empty-state-text {
+  color: #94a3b8;
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.8);
   line-height: 1.6;
-  margin-bottom: 1.5rem;
-}
-
-.empty-state-actions {
-  margin-top: 1.5rem;
+  margin-bottom: 24px;
 }
 
 .supported-formats {

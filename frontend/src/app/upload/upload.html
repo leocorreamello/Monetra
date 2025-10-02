@@ -179,11 +179,11 @@
             <span *ngIf="transactions.length > 0">🔍</span>
           </div>
           <h3 class="empty-state-title">
-            {{ transactions.length === 0 ? 'Bem-vindo ao Monetra!' : 'Nenhum resultado encontrado' }}
+            {{ transactions.length === 0 ? 'Visualize suas Finanças!' : 'Nenhum resultado encontrado' }}
           </h3>
           <p class="empty-state-text">
             {{ transactions.length === 0 ? 
-                'Faça upload do seu extrato bancário (PDF ou CSV) para começar a organizar suas finanças de forma inteligente.' : 
+                'Faça upload do seu extrato bancário (PDF ou CSV) para gerar gráficos e análises inteligentes dos seus dados financeiros.' : 
                 'Ajuste os filtros acima para encontrar as transações que você está procurando.' }}
           </p>
           <div class="empty-state-actions" *ngIf="transactions.length === 0">

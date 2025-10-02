@@ -140,6 +140,102 @@
 
         <!-- Grid de gráficos -->
         <div class="charts-container">
+          <!-- Análise Anual por Categoria -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Análise Anual por Categoria</h3>
+              <p class="chart-subtitle">Receitas e despesas detalhadas por mês</p>
+            </div>
+            <div class="chart-content">
+              <div class="annual-analysis" *ngIf="filteredTransactions.length > 0">
+                <!-- Seção de Receitas -->
+                <div class="analysis-section receitas">
+                  <h4 class="section-title">
+                    <span class="section-icon">📈</span>
+                    RECEITAS
+                  </h4>
+                  <div class="analysis-table">
+                    <!-- Cabeçalho da tabela -->
+                    <div class="table-header">
+                      <div class="category-header">Categoria</div>
+                      <div class="month-header" *ngFor="let month of getAvailableMonths()">
+                        {{ getMonthName(month) }}
+                      </div>
+                    </div>
+                    <!-- Linhas de categorias de receita -->
+                    <div class="table-row" *ngFor="let categoria of getReceitasCategorias()">
+                      <div class="category-name">
+                        {{ getCategoryDisplayName(categoria) }}
+                      </div>
+                      <div class="month-value" *ngFor="let month of getAvailableMonths()">
+                        <span class="value-amount" 
+                              *ngIf="getMonthCategoryValue(month, categoria, 'entrada') > 0; else emptyCell">
+                          {{ formatCurrency(getMonthCategoryValue(month, categoria, 'entrada')) }}
+                        </span>
+                        <ng-template #emptyCell>
+                          <span class="empty-value">-</span>
+                        </ng-template>
+                      </div>
+                    </div>
+                    <!-- Linha de total de receitas -->
+                    <div class="table-row total-row">
+                      <div class="category-name total-label">TOTAL</div>
+                      <div class="month-value total-value" *ngFor="let month of getAvailableMonths()">
+                        {{ formatCurrency(getMonthTotal(month, 'entrada')) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Seção de Despesas -->
+                <div class="analysis-section despesas">
+                  <h4 class="section-title">
+                    <span class="section-icon">📉</span>
+                    DESPESAS
+                  </h4>
+                  <div class="analysis-table">
+                    <!-- Cabeçalho da tabela -->
+                    <div class="table-header">
+                      <div class="category-header">Categoria</div>
+                      <div class="month-header" *ngFor="let month of getAvailableMonths()">
+                        {{ getMonthName(month) }}
+                      </div>
+                    </div>
+                    <!-- Linhas de categorias de despesa -->
+                    <div class="table-row" *ngFor="let categoria of getDespesasCategorias()">
+                      <div class="category-name">
+                        {{ getCategoryDisplayName(categoria) }}
+                      </div>
+                      <div class="month-value" *ngFor="let month of getAvailableMonths()">
+                        <span class="value-amount" 
+                              *ngIf="getMonthCategoryValue(month, categoria, 'saida') > 0; else emptyCell">
+                          {{ formatCurrency(getMonthCategoryValue(month, categoria, 'saida')) }}
+                        </span>
+                        <ng-template #emptyCell>
+                          <span class="empty-value">-</span>
+                        </ng-template>
+                      </div>
+                    </div>
+                    <!-- Linha de total de despesas -->
+                    <div class="table-row total-row">
+                      <div class="category-name total-label">TOTAL</div>
+                      <div class="month-value total-value" *ngFor="let month of getAvailableMonths()">
+                        {{ formatCurrency(getMonthTotal(month, 'saida')) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Estado vazio -->
+              <div class="empty-chart" *ngIf="filteredTransactions.length === 0">
+                <div class="empty-icon">📊</div>
+                <h4>Sem dados para análise</h4>
+                <p>Faça upload de extratos para visualizar a análise anual por categoria.</p>
+              </div>
+            </div>
+          </div>
+
           <!-- Gráfico de Linha Temporal - NOVO SIMPLES -->
           <div class="chart-card">
             <div class="chart-header">
@@ -362,35 +458,6 @@
                   <div class="legend-content">
                     <span class="legend-text">{{ label }}</span>
                     <span class="legend-value">{{ formatCurrency(pieChartData.datasets[0].data[i]) }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Gráfico de Barras -->
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Comparativo por Categoria</h3>
-              <p class="chart-subtitle">Entradas vs Saídas por categoria</p>
-            </div>
-            <div class="chart-content">
-              <div class="bar-chart" *ngIf="barChartData.labels.length > 0">
-                <canvas id="barChart" width="400" height="200"></canvas>
-                <!-- Simulação visual do gráfico de barras -->
-                <div class="bar-simulation">
-                  <div class="bar-group" *ngFor="let label of barChartData.labels; let i = index">
-                    <div class="bar-label">{{ label.split(' ')[1] || label }}</div>
-                    <div class="bar-values">
-                      <div class="bar entrada" 
-                           [style.height.%]="getBarHeightPercentage(0, i)"
-                           title="Entradas: {{ formatCurrency(barChartData.datasets[0].data[i]) }}">
-                      </div>
-                      <div class="bar saida" 
-                           [style.height.%]="getBarHeightPercentage(1, i)"
-                           title="Saídas: {{ formatCurrency(barChartData.datasets[1].data[i]) }}">
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
