@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { API_BASE_URL } from '../config/api.config';
 
 interface Transaction {
@@ -23,7 +23,7 @@ interface ChartData {
 @Component({
   selector: 'app-graficos',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './graficos.html',
   styleUrls: ['./graficos.css']
 })
@@ -736,3 +736,4 @@ Por favor, selecione um arquivo CSV ou TXT válido.`);
   }
 
 }
+
