@@ -34,23 +34,26 @@
       </button>
     </div>
 
-    <div class="user-section" (click)="$event.stopPropagation()">
+    <div class="nav-actions">
       <ng-container *ngIf="user$ | async as user; else guest">
-        <button type="button" class="user-avatar" (click)="toggleUserMenu()">
-          <span class="user-initial">{{ getInitials(user) }}</span>
-        </button>
+        <div class="user-section" (click)="$event.stopPropagation()">
+          <button type="button" class="user-avatar" (click)="toggleUserMenu()">
+            <span class="user-initial">{{ getInitials(user) }}</span>
+          </button>
 
-        <div class="user-dropdown" *ngIf="userMenuOpen">
-          <div class="user-details">
-            <span class="user-name">{{ user.name || 'Account' }}</span>
-            <span class="user-email">{{ user.email }}</span>
+          <div class="user-dropdown" *ngIf="userMenuOpen">
+            <div class="user-details">
+              <span class="user-name">{{ user.name || 'Conta' }}</span>
+              <span class="user-email">{{ user.email }}</span>
+            </div>
+            <button type="button" class="logout-button" (click)="logout()">Sair</button>
           </div>
-          <button type="button" class="logout-button" (click)="logout()">Sign out</button>
         </div>
       </ng-container>
 
       <ng-template #guest>
-        <a class="login-link" routerLink="/login">Sign in</a>
+        <a class="login-link" routerLink="/login">Entrar</a>
+        <a class="signup-link" routerLink="/register">Criar conta</a>
       </ng-template>
     </div>
   </div>

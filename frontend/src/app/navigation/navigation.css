@@ -1,4 +1,4 @@
-.navigation-container {
+﻿.navigation-container {
   background: linear-gradient(135deg, #0f0c1e 0%, #1a1730 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
@@ -18,10 +18,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 }
 
 .brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 12px;
   color: #ffffff;
@@ -39,10 +40,15 @@
 }
 
 .nav-menu {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
   background: rgba(255, 255, 255, 0.05);
-  padding: 8px;
+  padding: 10px 18px;
   border-radius: 12px;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -100,12 +106,18 @@
   letter-spacing: 0.3px;
 }
 
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .user-section {
   position: relative;
   display: flex;
   align-items: center;
-  min-width: 120px;
   justify-content: flex-end;
+  gap: 12px;
 }
 
 .user-avatar {
@@ -195,6 +207,27 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+.signup-link {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.signup-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+@media (max-width: 1024px) {
+  .nav-content {
+    padding: 0 24px;
+  }
+}
+
 @media (max-width: 768px) {
   .nav-content {
     padding: 0 20px;
@@ -202,17 +235,11 @@
   }
 
   .nav-menu {
-    gap: 4px;
-    padding: 6px;
+    display: none;
   }
 
-  .nav-item {
-    padding: 10px 16px;
-    font-size: 13px;
-  }
-
-  .user-section {
-    min-width: 100px;
+  .nav-actions {
+    margin-left: auto;
   }
 }
 
@@ -221,17 +248,9 @@
     padding: 0 16px;
   }
 
-  .brand-text {
-    display: none;
-  }
-
-  .nav-menu {
-    display: none;
-  }
-
-  .user-avatar {
-    width: 36px;
-    height: 36px;
+  .login-link,
+  .signup-link {
+    padding: 8px 14px;
+    font-size: 13px;
   }
 }
-
