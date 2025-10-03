@@ -1,21 +1,17 @@
-.app-container {
+﻿.app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #0b1120;
 }
 
 .app-main {
   flex: 1;
-  padding-top: 90px;
-  padding-left: 0;
-  padding-right: 0;
+  padding-top: 70px;
 }
 
 .tab-content {
   animation: fadeIn 0.4s ease-out;
   min-height: calc(100vh - 200px);
-  padding: 0 24px 48px;
 }
 
 .global-footer {
@@ -51,11 +47,8 @@
     padding-top: 80px;
   }
 
-  .tab-content {
-    padding: 0 16px 40px;
-  }
-
   .footer-content {
     padding: 0 16px;
   }
 }
+
