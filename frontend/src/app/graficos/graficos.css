@@ -57,7 +57,7 @@
 .graficos-container {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 40px 15px 40px 15px; /* 70px (nav) + 32px (espaÃ§amento) + 40px (gap com footer) */
+  padding: 40px 15px 16px 15px; /* top gap + footer gap */ /* 70px (nav) + 32px (espaçamento) + 40px (gap com footer) */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #ffffff;
   position: relative;
@@ -430,3 +430,4 @@
     transform: translateY(0);
   }
 }
+
