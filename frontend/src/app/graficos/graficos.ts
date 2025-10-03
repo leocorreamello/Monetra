@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { API_BASE_URL } from '../config/api.config';
 
 interface Transaction {
   id: number;
@@ -62,7 +63,7 @@ export class GraficosComponent implements OnInit {
 
 
 
-  private apiUrl = 'http://localhost:3000';
+  private readonly apiUrl = API_BASE_URL;
 
   constructor(private http: HttpClient) {}
 
