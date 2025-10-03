@@ -1,92 +1,63 @@
-/* Reset básico */
+﻿/* Reset básico */
 * {
   box-sizing: border-box;
 }
 
-/* Background global para a aba gráficos */
+/* Fundo dinâmico inspirado nas telas de autenticação */
 :host {
   display: block;
   min-height: 100vh;
-  background: 
-    linear-gradient(135deg, 
-      #020617 0%, 
-      #0c1426 15%, 
-      #1e293b 35%, 
-      #0f172a 65%, 
-      #020617 100%),
-    radial-gradient(ellipse 600px 400px at 50% 0%, 
-      rgba(59, 130, 246, 0.15) 0%, 
-      transparent 50%);
+  background: radial-gradient(circle at top, rgba(59, 130, 246, 0.3) 0%, rgba(17, 24, 39, 0.96) 55%, rgba(2, 6, 23, 1) 100%);
   background-attachment: fixed;
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
-/* Overlay com neon azul desfocado */
-:host::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle 800px at 20% 30%, 
-      rgba(0, 123, 255, 0.08) 0%, 
-      transparent 40%),
-    radial-gradient(circle 600px at 80% 70%, 
-      rgba(59, 130, 246, 0.06) 0%, 
-      transparent 40%),
-    radial-gradient(circle 400px at 50% 90%, 
-      rgba(139, 92, 246, 0.05) 0%, 
-      transparent 30%);
-  filter: blur(1px);
-  pointer-events: none;
-  z-index: -1;
-  animation: neonPulse 8s ease-in-out infinite alternate;
-}
-
-/* Efeito de partículas/luz adicional */
+:host::before,
 :host::after {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle 300px at 10% 20%, 
-      rgba(0, 191, 255, 0.04) 0%, 
-      transparent 50%),
-    radial-gradient(circle 200px at 90% 10%, 
-      rgba(59, 130, 246, 0.03) 0%, 
-      transparent 50%),
-    radial-gradient(circle 250px at 30% 80%, 
-      rgba(139, 92, 246, 0.03) 0%, 
-      transparent 50%);
-  filter: blur(2px);
+  inset: 0;
   pointer-events: none;
+  z-index: -1;
+}
+
+:host::before {
+  background:
+    radial-gradient(circle 540px at 20% 20%, rgba(59, 130, 246, 0.35) 0%, transparent 60%),
+    radial-gradient(circle 420px at 78% 18%, rgba(96, 165, 250, 0.28) 0%, transparent 62%),
+    radial-gradient(circle 360px at 50% 82%, rgba(129, 140, 248, 0.22) 0%, transparent 68%);
+  filter: blur(14px);
+  opacity: 0.9;
+  animation: pageGlowCharts 16s ease-in-out infinite alternate;
+}
+
+:host::after {
+  background:
+    radial-gradient(circle 520px at 12% 88%, rgba(56, 189, 248, 0.16) 0%, transparent 70%),
+    radial-gradient(circle 420px at 88% 72%, rgba(59, 130, 246, 0.18) 0%, transparent 72%),
+    radial-gradient(circle 500px at 52% -8%, rgba(165, 180, 252, 0.2) 0%, transparent 75%);
+  filter: blur(22px);
+  opacity: 0.65;
+  animation: orbitGlowCharts 20s ease-in-out infinite alternate;
   z-index: -2;
-  animation: neonFloat 12s ease-in-out infinite alternate;
 }
 
-@keyframes neonPulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 0.8; }
-  100% { opacity: 0.7; }
+@keyframes pageGlowCharts {
+  0% { opacity: 0.6; transform: translate3d(0, 0, 0); }
+  50% { opacity: 0.82; transform: translate3d(10px, -12px, 0); }
+  100% { opacity: 0.68; transform: translate3d(-12px, 8px, 0); }
 }
 
-@keyframes neonFloat {
-  0% { transform: translateY(0px) rotate(0deg); }
-  33% { transform: translateY(-10px) rotate(1deg); }
-  66% { transform: translateY(5px) rotate(-0.5deg); }
-  100% { transform: translateY(-5px) rotate(0.5deg); }
+@keyframes orbitGlowCharts {
+  0% { opacity: 0.45; transform: scale(1) translate3d(0, 0, 0); }
+  50% { opacity: 0.64; transform: scale(1.04) translate3d(-10px, 12px, 0); }
+  100% { opacity: 0.5; transform: scale(0.99) translate3d(8px, -8px, 0); }
 }
-
 .graficos-container {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 102px 15px 40px 15px; /* 70px (nav) + 32px (espaçamento) + 40px (gap com footer) */
+  padding: 102px 15px 40px 15px; /* 70px (nav) + 32px (espaÃ§amento) + 40px (gap com footer) */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #ffffff;
   position: relative;
@@ -106,7 +77,7 @@
   overflow: hidden;
 }
 
-/* Títulos e textos do cabeçalho */
+/* TÃ­tulos e textos do cabeÃ§alho */
 .header-title {
   text-align: center;
   margin-bottom: 24px;
@@ -130,7 +101,7 @@
   margin: 0;
 }
 
-/* Seção de controles principal */
+/* SeÃ§Ã£o de controles principal */
 .controls-section {
   display: flex;
   justify-content: center;
@@ -213,7 +184,7 @@
   gap: 20px;
 }
 
-/* Upload Sidebar - quando há dados */
+/* Upload Sidebar - quando hÃ¡ dados */
 .upload-sidebar {
   background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(20px);
@@ -362,7 +333,7 @@
   box-shadow: none;
 }
 
-/* Área de conteúdo principal */
+/* Ãrea de conteÃºdo principal */
 .content-area {
   min-height: 400px;
 }
@@ -400,7 +371,7 @@
   font-size: 1rem;
 }
 
-/* Grid de gráficos */
+/* Grid de grÃ¡ficos */
 .charts-grid {
   display: flex;
   flex-direction: column;
@@ -472,14 +443,14 @@
   color: #ef4444;
 }
 
-/* Container de gráficos */
+/* Container de grÃ¡ficos */
 .charts-container {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
 }
 
-/* Cards de gráficos */
+/* Cards de grÃ¡ficos */
 .chart-card {
   background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(20px);
@@ -512,7 +483,7 @@
   position: relative;
 }
 
-/* Gráfico de Pizza SVG */
+/* GrÃ¡fico de Pizza SVG */
 .pie-svg-container {
   position: relative;
   display: flex;
@@ -662,7 +633,7 @@
 
 
 
-/* Simulação do gráfico de linha */
+/* SimulaÃ§Ã£o do grÃ¡fico de linha */
 .line-simulation {
   height: 200px;
   background: rgba(71, 85, 105, 0.1);
@@ -686,7 +657,7 @@
   transform: rotate(-45deg);
 }
 
-/* Simulação do gráfico de barras */
+/* SimulaÃ§Ã£o do grÃ¡fico de barras */
 .bar-simulation {
   display: flex;
   gap: 16px;
@@ -802,7 +773,7 @@
   color: #cbd5e1;
 }
 
-/* Animações */
+/* AnimaÃ§Ãµes */
 .fade-in {
   animation: fadeIn 0.6s ease-out;
 }
@@ -861,7 +832,7 @@
   }
 }
 
-/* === NOVO GRÁFICO DE LINHA SIMPLES === */
+/* === NOVO GRÃFICO DE LINHA SIMPLES === */
 
 .line-chart-simple {
   background: rgba(15, 23, 42, 0.6);
@@ -990,9 +961,9 @@
   }
 }
 
-/* ==================== NOVO GRÁFICO DE LINHA TEMPORAL ==================== */
+/* ==================== NOVO GRÃFICO DE LINHA TEMPORAL ==================== */
 
-/* Container do gráfico de linha moderno */
+/* Container do grÃ¡fico de linha moderno */
 .line-chart-card {
   position: relative;
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
@@ -1071,7 +1042,7 @@
   stroke-dasharray: 2 4;
 }
 
-/* Áreas preenchidas */
+/* Ãreas preenchidas */
 .area-path {
   opacity: 0.6;
   animation: areaFadeIn 1.5s ease-out;
@@ -1228,7 +1199,7 @@
   margin: 4px 0;
 }
 
-/* Resumo da evolução */
+/* Resumo da evoluÃ§Ã£o */
 .evolution-summary {
   display: flex;
   justify-content: space-between;
@@ -1304,7 +1275,7 @@
   max-width: 300px;
 }
 
-/* ==================== ANIMAÇÕES ==================== */
+/* ==================== ANIMAÃ‡Ã•ES ==================== */
 
 @keyframes drawLine {
   to {
@@ -1385,7 +1356,7 @@
   }
 }
 
-/* ==================== TOOLTIP PARA GRÁFICO DE LINHA ==================== */
+/* ==================== TOOLTIP PARA GRÃFICO DE LINHA ==================== */
 
 .svg-container {
   position: relative;
@@ -1464,7 +1435,7 @@
   color: #ef4444;
 }
 
-/* Animação de entrada do tooltip */
+/* AnimaÃ§Ã£o de entrada do tooltip */
 @keyframes tooltipFadeIn {
   from {
     opacity: 0;
@@ -1480,7 +1451,7 @@
   animation: tooltipFadeIn 0.2s ease-out;
 }
 
-/* ==================== ANÁLISE ANUAL POR CATEGORIA ==================== */
+/* ==================== ANÃLISE ANUAL POR CATEGORIA ==================== */
 
 .annual-analysis {
   display: flex;
@@ -1701,7 +1672,7 @@
   box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
 }
 
-/* Animações */
+/* AnimaÃ§Ãµes */
 .analysis-section {
   animation: sectionFadeIn 0.6s ease-out;
 }

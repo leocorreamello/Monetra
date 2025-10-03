@@ -1,37 +1,37 @@
-<div class="auth-wrapper">
+﻿<div class="auth-wrapper">
   <section class="auth-card">
     <header class="auth-header">
-      <h1>Create your account</h1>
-      <p>Register to sync your financial data securely in the cloud.</p>
+      <h1>Crie sua conta</h1>
+      <p>Cadastre-se e sincronize suas finanças com segurança na nuvem.</p>
     </header>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
       <div class="form-field" [class.invalid]="name?.invalid && (name?.touched || name?.dirty)">
-        <label for="name">Name</label>
-        <input id="name" type="text" formControlName="name" placeholder="How should we call you?" autocomplete="name" />
-        <small *ngIf="name?.errors?.['minlength']">Name must have at least 2 characters.</small>
-        <small *ngIf="name?.errors?.['maxlength']">Name can have up to 60 characters.</small>
+        <label for="name">Nome completo</label>
+        <input id="name" type="text" formControlName="name" placeholder="Como devemos te chamar?" autocomplete="name" />
+        <small *ngIf="name?.errors?.['minlength']">Informe pelo menos 2 caracteres.</small>
+        <small *ngIf="name?.errors?.['maxlength']">Máximo de 60 caracteres.</small>
       </div>
 
       <div class="form-field" [class.invalid]="email?.invalid && (email?.touched || email?.dirty)">
-        <label for="email">Email</label>
-        <input id="email" type="email" formControlName="email" placeholder="name@example.com" autocomplete="email" />
-        <small *ngIf="email?.errors?.['required']">Email is required.</small>
-        <small *ngIf="email?.errors?.['email']">Provide a valid email address.</small>
+        <label for="email">E-mail</label>
+        <input id="email" type="email" formControlName="email" placeholder="nome@exemplo.com" autocomplete="email" />
+        <small *ngIf="email?.errors?.['required']">Informe seu e-mail.</small>
+        <small *ngIf="email?.errors?.['email']">Digite um e-mail válido.</small>
       </div>
 
       <div class="form-field" [class.invalid]="password?.invalid && (password?.touched || password?.dirty)">
-        <label for="password">Password</label>
-        <input id="password" type="password" formControlName="password" placeholder="Create a strong password" autocomplete="new-password" />
-        <small *ngIf="password?.errors?.['required']">Password is required.</small>
-        <small *ngIf="password?.errors?.['minlength']">Password must have at least 8 characters.</small>
+        <label for="password">Senha</label>
+        <input id="password" type="password" formControlName="password" placeholder="Crie uma senha forte" autocomplete="new-password" />
+        <small *ngIf="password?.errors?.['required']">Informe uma senha.</small>
+        <small *ngIf="password?.errors?.['minlength']">A senha deve ter pelo menos 8 caracteres.</small>
       </div>
 
       <div class="form-field" [class.invalid]="confirmPassword?.invalid && (confirmPassword?.touched || confirmPassword?.dirty)">
-        <label for="confirmPassword">Confirm password</label>
-        <input id="confirmPassword" type="password" formControlName="confirmPassword" placeholder="Repeat your password" autocomplete="new-password" />
-        <small *ngIf="confirmPassword?.errors?.['required']">Confirm your password.</small>
-        <small *ngIf="confirmPassword?.errors?.['mismatch']">Passwords must match.</small>
+        <label for="confirmPassword">Confirmar senha</label>
+        <input id="confirmPassword" type="password" formControlName="confirmPassword" placeholder="Repita a senha" autocomplete="new-password" />
+        <small *ngIf="confirmPassword?.errors?.['required']">Confirme a senha.</small>
+        <small *ngIf="confirmPassword?.errors?.['mismatch']">As senhas precisam ser iguais.</small>
       </div>
 
       <div class="form-feedback" *ngIf="errorMessage">
@@ -39,13 +39,19 @@
       </div>
 
       <button type="submit" [disabled]="isSubmitting">
-        {{ isSubmitting ? 'Creating account...' : 'Create account' }}
+        {{ isSubmitting ? 'Criando conta...' : 'Criar conta' }}
       </button>
     </form>
 
     <footer class="auth-footer">
-      <span>Already have an account?</span>
-      <a routerLink="/login">Sign in</a>
+      <span>Já possui uma conta?</span>
+      <a routerLink="/login">Entrar</a>
     </footer>
   </section>
 </div>
+
+<footer class="global-footer">
+  <div class="footer-content">
+    Copyright © 2025 by Leonardo Mello. Todos os direitos reservados.
+  </div>
+</footer>

@@ -1,23 +1,23 @@
-<div class="auth-wrapper">
+﻿<div class="auth-wrapper">
   <section class="auth-card">
     <header class="auth-header">
-      <h1>Welcome back</h1>
-      <p>Access your Monetra workspace with your email and password.</p>
+      <h1>Bem-vindo de volta</h1>
+      <p>Acesse sua conta Monetra para acompanhar seus dados financeiros.</p>
     </header>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
       <div class="form-field" [class.invalid]="email?.invalid && (email?.touched || email?.dirty)">
-        <label for="email">Email</label>
-        <input id="email" type="email" formControlName="email" placeholder="name@example.com" autocomplete="email" />
-        <small *ngIf="email?.errors?.['required']">Email is required.</small>
-        <small *ngIf="email?.errors?.['email']">Provide a valid email address.</small>
+        <label for="email">E-mail</label>
+        <input id="email" type="email" formControlName="email" placeholder="nome@exemplo.com" autocomplete="email" />
+        <small *ngIf="email?.errors?.['required']">Informe seu e-mail.</small>
+        <small *ngIf="email?.errors?.['email']">Digite um e-mail válido.</small>
       </div>
 
       <div class="form-field" [class.invalid]="password?.invalid && (password?.touched || password?.dirty)">
-        <label for="password">Password</label>
-        <input id="password" type="password" formControlName="password" placeholder="Enter your password" autocomplete="current-password" />
-        <small *ngIf="password?.errors?.['required']">Password is required.</small>
-        <small *ngIf="password?.errors?.['minlength']">Password must have at least 6 characters.</small>
+        <label for="password">Senha</label>
+        <input id="password" type="password" formControlName="password" placeholder="Digite sua senha" autocomplete="current-password" />
+        <small *ngIf="password?.errors?.['required']">Informe sua senha.</small>
+        <small *ngIf="password?.errors?.['minlength']">A senha deve ter pelo menos 6 caracteres.</small>
       </div>
 
       <div class="form-feedback" *ngIf="errorMessage">
@@ -25,13 +25,19 @@
       </div>
 
       <button type="submit" [disabled]="isSubmitting">
-        {{ isSubmitting ? 'Signing in...' : 'Sign in' }}
+        {{ isSubmitting ? 'Entrando...' : 'Entrar' }}
       </button>
     </form>
 
     <footer class="auth-footer">
-      <span>Need an account?</span>
-      <a routerLink="/register">Create one now</a>
+      <span>Ainda não possui conta?</span>
+      <a routerLink="/register">Criar conta</a>
     </footer>
   </section>
 </div>
+
+<footer class="global-footer">
+  <div class="footer-content">
+    Copyright © 2025 by Leonardo Mello. Todos os direitos reservados.
+  </div>
+</footer>

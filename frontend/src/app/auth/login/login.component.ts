@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -85,6 +85,6 @@ export class LoginComponent implements OnInit {
       return message;
     }
 
-    return 'Login failed. Please check your credentials.';
+    return 'Não foi possível entrar. Verifique suas credenciais.';
   }
 }

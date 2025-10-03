@@ -1,96 +1,63 @@
-/* Reset básico */
+﻿/* Reset básico */
 * {
   box-sizing: border-box;
 }
 
-/* Background global para a aba upload/planilhas */
+/* Fundo dinâmico inspirado nas telas de autenticação */
 :host {
   display: block;
   min-height: 100vh;
-  background: 
-    linear-gradient(135deg, 
-      #020617 0%, 
-      #0c1426 15%, 
-      #1e293b 35%, 
-      #374151 50%, 
-      #1e293b 65%, 
-      #0c1426 85%, 
-      #020617 100%),
-    radial-gradient(ellipse 700px 500px at 30% 0%, 
-      rgba(16, 185, 129, 0.12) 0%, 
-      transparent 50%);
+  background: radial-gradient(circle at top, rgba(37, 99, 235, 0.32) 0%, rgba(15, 23, 42, 0.96) 55%, rgba(2, 6, 23, 1) 100%);
   background-attachment: fixed;
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
-/* Overlay com neon verde/azul desfocado */
-:host::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle 700px at 15% 25%, 
-      rgba(16, 185, 129, 0.08) 0%, 
-      transparent 45%),
-    radial-gradient(circle 500px at 85% 75%, 
-      rgba(59, 130, 246, 0.06) 0%, 
-      transparent 40%),
-    radial-gradient(circle 350px at 50% 10%, 
-      rgba(0, 255, 159, 0.05) 0%, 
-      transparent 35%);
-  filter: blur(1.5px);
-  pointer-events: none;
-  z-index: -1;
-  animation: neonWave 10s ease-in-out infinite alternate;
-}
-
-/* Efeito de ondas/luz adicional */
+:host::before,
 :host::after {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle 400px at 5% 15%, 
-      rgba(0, 255, 159, 0.03) 0%, 
-      transparent 50%),
-    radial-gradient(circle 300px at 95% 20%, 
-      rgba(16, 185, 129, 0.04) 0%, 
-      transparent 50%),
-    radial-gradient(circle 200px at 70% 85%, 
-      rgba(59, 130, 246, 0.03) 0%, 
-      transparent 50%);
-  filter: blur(2.5px);
+  inset: 0;
   pointer-events: none;
+  z-index: -1;
+}
+
+:host::before {
+  background:
+    radial-gradient(circle 520px at 18% 22%, rgba(96, 165, 250, 0.34) 0%, transparent 65%),
+    radial-gradient(circle 420px at 82% 18%, rgba(168, 85, 247, 0.26) 0%, transparent 65%),
+    radial-gradient(circle 360px at 50% 78%, rgba(14, 165, 233, 0.22) 0%, transparent 70%);
+  filter: blur(12px);
+  opacity: 0.9;
+  animation: pageGlow 14s ease-in-out infinite alternate;
+}
+
+:host::after {
+  background:
+    radial-gradient(circle 460px at 12% 85%, rgba(56, 189, 248, 0.18) 0%, transparent 68%),
+    radial-gradient(circle 380px at 88% 70%, rgba(59, 130, 246, 0.16) 0%, transparent 70%),
+    radial-gradient(circle 520px at 50% -10%, rgba(148, 163, 246, 0.22) 0%, transparent 72%);
+  filter: blur(20px);
+  opacity: 0.6;
+  animation: orbitGlow 18s ease-in-out infinite alternate;
   z-index: -2;
-  animation: neonDrift 15s ease-in-out infinite alternate;
 }
 
-@keyframes neonWave {
-  0% { opacity: 0.5; transform: translateX(0px); }
-  25% { opacity: 0.7; }
-  50% { opacity: 0.6; transform: translateX(3px); }
-  75% { opacity: 0.8; }
-  100% { opacity: 0.6; transform: translateX(-2px); }
+@keyframes pageGlow {
+  0% { opacity: 0.65; transform: translate3d(0, 0, 0); }
+  50% { opacity: 0.85; transform: translate3d(12px, -8px, 0); }
+  100% { opacity: 0.7; transform: translate3d(-10px, 6px, 0); }
 }
 
-@keyframes neonDrift {
-  0% { transform: translate(0px, 0px) rotate(0deg); opacity: 0.4; }
-  33% { transform: translate(-5px, -8px) rotate(0.8deg); opacity: 0.6; }
-  66% { transform: translate(3px, 5px) rotate(-0.6deg); opacity: 0.5; }
-  100% { transform: translate(-2px, -3px) rotate(0.4deg); opacity: 0.7; }
+@keyframes orbitGlow {
+  0% { opacity: 0.45; transform: scale(1) translate3d(0, 0, 0); }
+  50% { opacity: 0.65; transform: scale(1.05) translate3d(-8px, 10px, 0); }
+  100% { opacity: 0.5; transform: scale(0.98) translate3d(6px, -6px, 0); }
 }
-
 .upload-container {
-  max-width: 1600px; /* MUDANÇA: aumentar de 1400px para 1600px */
+  max-width: 1600px; /* MUDANÃ‡A: aumentar de 1400px para 1600px */
   margin: 0 auto;
-  padding: 102px 15px 40px 15px; /* 70px (nav) + 32px (espaçamento) + 40px (gap com footer) */
+  padding: 102px 15px 40px 15px; /* 70px (nav) + 32px (espaÃ§amento) + 40px (gap com footer) */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #ffffff;
   position: relative;
@@ -102,16 +69,16 @@
   background: linear-gradient(135deg, #0f172a 0%, #1e293b  50%, #334155 100%);
   border-radius: 20px;
   padding: 32px;
-  margin-bottom: 32px; /* MUDANÇA: aumentar espaçamento inferior */
+  margin-bottom: 32px; /* MUDANÃ‡A: aumentar espaÃ§amento inferior */
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
-  transition: all 0.4s ease; /* Transição suave para mudança de layout */
+  transition: all 0.4s ease; /* TransiÃ§Ã£o suave para mudanÃ§a de layout */
 }
 
-/* Estado compacto quando há transações */
+/* Estado compacto quando hÃ¡ transaÃ§Ãµes */
 .upload-header.compact {
   padding: 20px;
   margin-bottom: 0;
@@ -131,7 +98,7 @@
   font-size: 0.85rem;
 }
 
-/* Títulos e textos do cabeçalho */
+/* TÃ­tulos e textos do cabeÃ§alho */
 .header-title {
   text-align: center;
   margin-bottom: 24px;
@@ -155,7 +122,7 @@
   margin: 0;
 }
 
-/* Seção de controles principal */
+/* SeÃ§Ã£o de controles principal */
 .controls-section {
   display: flex;
   justify-content: center;
@@ -235,11 +202,11 @@
   margin: 0;
 }
 
-/* Layout principal com sidebar - AUMENTAR espaço da tabela */
+/* Layout principal com sidebar - AUMENTAR espaÃ§o da tabela */
 .main-content {
   display: grid;
-  grid-template-columns: 260px 1fr; /* MUDANÇA: sidebar menor para tabela maior */
-  gap: 20px; /* MUDANÇA: gap menor para mais espaço */
+  grid-template-columns: 260px 1fr; /* MUDANÃ‡A: sidebar menor para tabela maior */
+  gap: 20px; /* MUDANÃ‡A: gap menor para mais espaÃ§o */
   margin-top: 40px;
   transition: all 0.4s ease;
   align-items: start;
@@ -247,26 +214,26 @@
 }
 
 .main-content.with-upload {
-  grid-template-columns: 260px 1fr; /* MUDANÇA: consistente */
+  grid-template-columns: 260px 1fr; /* MUDANÃ‡A: consistente */
   gap: 20px;
   margin-top: 40px;
 }
 
-/* Layout com sidebar vertical quando há transações - CORRIGIDO */
+/* Layout com sidebar vertical quando hÃ¡ transaÃ§Ãµes - CORRIGIDO */
 .main-content.with-upload {
   grid-template-columns: 280px 1fr;
   gap: 24px;
-  margin-top: 40px; /* CORRIGIDO: espaçamento consistente */
+  margin-top: 40px; /* CORRIGIDO: espaÃ§amento consistente */
 }
 
 /* Sidebar container - CORRIGIDO para centralizar */
 .sidebar-container {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* CORRIGIDO: mais espaçamento */
+  gap: 20px; /* CORRIGIDO: mais espaÃ§amento */
   height: fit-content;
   position: sticky;
-  top: 40px; /* CORRIGIDO: mais espaçamento do topo */
+  top: 40px; /* CORRIGIDO: mais espaÃ§amento do topo */
 }
 
 /* Upload sidebar - estilo compacto para ficar em cima dos filtros */
@@ -401,7 +368,7 @@
   padding: 8px;
 }
 
-/* Ações da sidebar - VOLTAR AO ESTILO ORIGINAL */
+/* AÃ§Ãµes da sidebar - VOLTAR AO ESTILO ORIGINAL */
 .sidebar-actions {
   margin-top: 20px;
   padding-top: 16px;
@@ -460,20 +427,20 @@
   box-shadow: none;
 }
 
-/* Quando não há transações, a sidebar de filtros mantém position sticky - CORRIGIDO */
+/* Quando nÃ£o hÃ¡ transaÃ§Ãµes, a sidebar de filtros mantÃ©m position sticky - CORRIGIDO */
 .filters-sidebar.standalone {
   height: fit-content;
   position: sticky;
   top: 40px; /* CORRIGIDO: consistente com container */
 }
 
-/* Área de conteúdo principal - CORRIGIDO para centralizar */
+/* Ãrea de conteÃºdo principal - CORRIGIDO para centralizar */
 .content-area {
   min-height: 600px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding-top: 20px; /* CORRIGIDO: espaçamento do topo */
+  padding-top: 20px; /* CORRIGIDO: espaÃ§amento do topo */
 }
 
 .content-area.with-sidebar {
@@ -529,7 +496,7 @@ table {
   background: transparent;
 }
 
-/* CABEÇALHO DA TABELA REDESENHADO */
+/* CABEÃ‡ALHO DA TABELA REDESENHADO */
 thead {
   background: linear-gradient(135deg, #334155 0%, #475569 100%);
   position: sticky;
@@ -568,7 +535,7 @@ th:not(:last-child)::after {
 
 /* Larguras das colunas REDESENHADAS */
 th:nth-child(1) { width: 12%; min-width: 100px; } /* Data */
-th:nth-child(2) { width: 14%; min-width: 120px; } /* Descrição */
+th:nth-child(2) { width: 14%; min-width: 120px; } /* DescriÃ§Ã£o */
 th:nth-child(3) { width: 30%; min-width: 300px; } /* Valor */
 th:nth-child(4) { width: 13%; min-width: 130px; } /* Tipo */
 th:nth-child(5) { width: 15%; min-width: 150px; } /* Categoria */
@@ -610,7 +577,7 @@ tbody tr:nth-child(even):hover {
   background: rgba(59, 130, 246, 0.08);
 }
 
-/* CÉLULAS DA TABELA REDESENHADAS */
+/* CÃ‰LULAS DA TABELA REDESENHADAS */
 td {
   border: none;
   color: #e2e8f0;
@@ -624,7 +591,7 @@ td {
   position: relative;
 }
 
-/* Separadores visuais entre células */
+/* Separadores visuais entre cÃ©lulas */
 td:not(:last-child)::after {
   content: '';
   position: absolute;
@@ -635,7 +602,7 @@ td:not(:last-child)::after {
   background: rgba(71, 85, 105, 0.15);
 }
 
-/* Larguras das células */
+/* Larguras das cÃ©lulas */
 td:nth-child(1) { 
   width: 10%;
   min-width: 100px;
@@ -839,7 +806,7 @@ td:nth-child(5) {
 @media (max-width: 1200px) {
   .main-content,
   .main-content.with-upload {
-    grid-template-columns: 240px 1fr; /* MUDANÇA: sidebar ainda menor */
+    grid-template-columns: 240px 1fr; /* MUDANÃ‡A: sidebar ainda menor */
     gap: 18px;
     margin-top: 30px;
   }
@@ -854,7 +821,7 @@ td:nth-child(5) {
 @media (max-width: 1024px) {
   .main-content,
   .main-content.with-upload {
-    grid-template-columns: 220px 1fr; /* MUDANÇA: sidebar menor */
+    grid-template-columns: 220px 1fr; /* MUDANÃ‡A: sidebar menor */
     gap: 16px;
     margin-top: 24px;
   }
@@ -864,7 +831,7 @@ td:nth-child(5) {
   }
   
   .table-container {
-    max-height: 70vh; /* MUDANÇA: ajustar para telas menores */
+    max-height: 70vh; /* MUDANÃ‡A: ajustar para telas menores */
   }
   
   /* ...existing code... */
@@ -883,10 +850,10 @@ td:nth-child(5) {
   }
   
   .table-container {
-    max-height: 65vh; /* MUDANÇA: ajustar para mobile */
+    max-height: 65vh; /* MUDANÃ‡A: ajustar para mobile */
   }
   
-  /* Ajustar proporções das colunas em mobile */
+  /* Ajustar proporÃ§Ãµes das colunas em mobile */
   th:nth-child(1) { width: 12%; }
   th:nth-child(2) { width: 46%; }
   th:nth-child(3) { width: 14%; }
@@ -906,18 +873,18 @@ td:nth-child(5) {
   .table-container {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    max-height: 60vh; /* MUDANÇA: altura menor em telas muito pequenas */
+    max-height: 60vh; /* MUDANÃ‡A: altura menor em telas muito pequenas */
   }
   
   table {
-    min-width: 650px; /* MUDANÇA: aumentar largura mínima */
+    min-width: 650px; /* MUDANÃ‡A: aumentar largura mÃ­nima */
     font-size: 0.8rem;
     table-layout: fixed;
   }
   
   /* Larguras fixas para scroll horizontal em mobile */
   th:nth-child(1) { width: 80px; }
-  th:nth-child(2) { width: 280px; } /* MUDANÇA: mais espaço para descrição */
+  th:nth-child(2) { width: 280px; } /* MUDANÃ‡A: mais espaÃ§o para descriÃ§Ã£o */
   th:nth-child(3) { width: 90px; }
   th:nth-child(4) { width: 90px; }
   th:nth-child(5) { width: 110px; }
@@ -1016,7 +983,7 @@ td:nth-child(5) {
   backdrop-filter: blur(10px);
 }
 
-/* Animação suave para o estado vazio */
+/* AnimaÃ§Ã£o suave para o estado vazio */
 .empty-state-content {
   animation: fadeInUp 0.6s ease-out;
 }
