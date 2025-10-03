@@ -57,7 +57,7 @@
 .upload-container {
   max-width: 1600px; /* MUDANÃ‡A: aumentar de 1400px para 1600px */
   margin: 0 auto;
-  padding: 102px 15px 40px 15px; /* 70px (nav) + 32px (espaÃ§amento) + 40px (gap com footer) */
+  padding: 43px 15px 40px 15px; /* 70px (nav) + 32px (espaÃ§amento) + 40px (gap com footer) */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #ffffff;
   position: relative;
@@ -799,7 +799,7 @@ td:nth-child(5) {
 @media (max-width: 1400px) {
   .upload-container {
     max-width: 1300px;
-    padding: 102px 20px 40px 20px;
+    padding: 74px 20px 40px 20px;
   }
 }
 
@@ -846,7 +846,7 @@ td:nth-child(5) {
   
   .upload-container {
     max-width: 100%;
-    padding: 102px 15px 40px 15px;
+    padding: 74px 15px 40px 15px;
   }
   
   .table-container {
@@ -998,3 +998,4 @@ td:nth-child(5) {
     transform: translateY(0);
   }
 }
+
