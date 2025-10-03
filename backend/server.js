@@ -1,15 +1,20 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const { connectDatabase } = require('./config/database');
+const authRoutes = require('./routes/auth');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/auth', authRoutes);
 
 const storage = multer.diskStorage({
   destination: './uploads/',
@@ -620,8 +625,16 @@ app.delete('/transactions/all', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${port}`);
-  console.log('📊 Sistema de gestão financeira ativo');
-  console.log('💾 Banco de dados SQLite conectado');
-});
+connectDatabase()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`[core] Server running on http://localhost:${port}`);
+      console.log('[core] Finance features available');
+      console.log('[core] SQLite database ready');
+      console.log('[core] MongoDB connection ready');
+    });
+  })
+  .catch((error) => {
+    console.error('[core] Failed to start server', error);
+    process.exit(1);
+  });

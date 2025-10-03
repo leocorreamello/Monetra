@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { WavyBackgroundComponent } from '../components/wavy-background/wavy-background';
 
 @Component({
@@ -10,16 +11,9 @@ import { WavyBackgroundComponent } from '../components/wavy-background/wavy-back
   styleUrls: ['./home-v2.css']
 })
 export class HomeComponent {
-  constructor() { }
-  
+  constructor(private router: Router) {}
+
   goToPlanilhas() {
-    // Encontrar e clicar no botão de planilhas da navegação
-    const navButtons = document.querySelectorAll('.nav-item');
-    navButtons.forEach(button => {
-      const text = button.textContent?.toLowerCase();
-      if (text?.includes('planilhas')) {
-        (button as HTMLElement).click();
-      }
-    });
+    this.router.navigate(['/planilhas']);
   }
 }

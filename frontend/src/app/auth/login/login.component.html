@@ -1,0 +1,37 @@
+<div class="auth-wrapper">
+  <section class="auth-card">
+    <header class="auth-header">
+      <h1>Welcome back</h1>
+      <p>Access your Monetra workspace with your email and password.</p>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-field" [class.invalid]="email?.invalid && (email?.touched || email?.dirty)">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="name@example.com" autocomplete="email" />
+        <small *ngIf="email?.errors?.['required']">Email is required.</small>
+        <small *ngIf="email?.errors?.['email']">Provide a valid email address.</small>
+      </div>
+
+      <div class="form-field" [class.invalid]="password?.invalid && (password?.touched || password?.dirty)">
+        <label for="password">Password</label>
+        <input id="password" type="password" formControlName="password" placeholder="Enter your password" autocomplete="current-password" />
+        <small *ngIf="password?.errors?.['required']">Password is required.</small>
+        <small *ngIf="password?.errors?.['minlength']">Password must have at least 6 characters.</small>
+      </div>
+
+      <div class="form-feedback" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Signing in...' : 'Sign in' }}
+      </button>
+    </form>
+
+    <footer class="auth-footer">
+      <span>Need an account?</span>
+      <a routerLink="/register">Create one now</a>
+    </footer>
+  </section>
+</div>

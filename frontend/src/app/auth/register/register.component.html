@@ -1,0 +1,51 @@
+<div class="auth-wrapper">
+  <section class="auth-card">
+    <header class="auth-header">
+      <h1>Create your account</h1>
+      <p>Register to sync your financial data securely in the cloud.</p>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="form-field" [class.invalid]="name?.invalid && (name?.touched || name?.dirty)">
+        <label for="name">Name</label>
+        <input id="name" type="text" formControlName="name" placeholder="How should we call you?" autocomplete="name" />
+        <small *ngIf="name?.errors?.['minlength']">Name must have at least 2 characters.</small>
+        <small *ngIf="name?.errors?.['maxlength']">Name can have up to 60 characters.</small>
+      </div>
+
+      <div class="form-field" [class.invalid]="email?.invalid && (email?.touched || email?.dirty)">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="name@example.com" autocomplete="email" />
+        <small *ngIf="email?.errors?.['required']">Email is required.</small>
+        <small *ngIf="email?.errors?.['email']">Provide a valid email address.</small>
+      </div>
+
+      <div class="form-field" [class.invalid]="password?.invalid && (password?.touched || password?.dirty)">
+        <label for="password">Password</label>
+        <input id="password" type="password" formControlName="password" placeholder="Create a strong password" autocomplete="new-password" />
+        <small *ngIf="password?.errors?.['required']">Password is required.</small>
+        <small *ngIf="password?.errors?.['minlength']">Password must have at least 8 characters.</small>
+      </div>
+
+      <div class="form-field" [class.invalid]="confirmPassword?.invalid && (confirmPassword?.touched || confirmPassword?.dirty)">
+        <label for="confirmPassword">Confirm password</label>
+        <input id="confirmPassword" type="password" formControlName="confirmPassword" placeholder="Repeat your password" autocomplete="new-password" />
+        <small *ngIf="confirmPassword?.errors?.['required']">Confirm your password.</small>
+        <small *ngIf="confirmPassword?.errors?.['mismatch']">Passwords must match.</small>
+      </div>
+
+      <div class="form-feedback" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Creating account...' : 'Create account' }}
+      </button>
+    </form>
+
+    <footer class="auth-footer">
+      <span>Already have an account?</span>
+      <a routerLink="/login">Sign in</a>
+    </footer>
+  </section>
+</div>
