@@ -1,4 +1,4 @@
-﻿import { Component, HostListener } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -13,48 +13,72 @@ import { User } from '../auth/auth.models';
   styleUrls: ['./navigation.css']
 })
 export class NavigationComponent {
-  user$!: Observable<User | null>;
-  userMenuOpen = false;
+  activeTab: string = 'home';
+  isMobileMenuOpen: boolean = false;
+  userMenuOpen: boolean = false;
+  
+  // Observable do usuário vindo do AuthService
+  user$: Observable<User | null>;
 
   constructor(private authService: AuthService) {
-    this.user$ = authService.currentUser$;
+    this.user$ = this.authService.currentUser$;
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement | null;
-    if (target && !target.closest('.user-section')) {
-      this.userMenuOpen = false;
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+    // Fechar menu mobile quando selecionar um item
+    if (this.isMobileMenuOpen) {
+      this.closeMobileMenu();
     }
   }
 
-  toggleUserMenu(): void {
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    // Prevenir scroll da página quando menu estiver aberto
+    if (this.isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+    document.body.style.overflow = 'auto';
+  }
+
+  // Fechar menu ao clicar no overlay
+  onOverlayClick(event: Event) {
+    if (event.target === event.currentTarget) {
+      this.closeMobileMenu();
+    }
+  }
+
+  toggleUserMenu() {
     this.userMenuOpen = !this.userMenuOpen;
   }
 
-  closeUserMenu(): void {
-    this.userMenuOpen = false;
-  }
-
-  logout(): void {
-    this.closeUserMenu();
-    this.authService.logout();
-  }
-
-  getInitials(user: User | null): string {
-    if (!user) {
-      return '';
-    }
-
-    const name = user.name?.trim();
-    if (name) {
-      const parts = name.split(' ').filter(Boolean);
-      if (parts.length === 1) {
-        return parts[0].charAt(0).toUpperCase();
+  getInitials(user: any): string {
+    if (!user) return 'U';
+    
+    if (user.name) {
+      const names = user.name.split(' ');
+      if (names.length >= 2) {
+        return (names[0][0] + names[1][0]).toUpperCase();
       }
-      return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+      return names[0][0].toUpperCase();
     }
+    
+    if (user.email) {
+      return user.email[0].toUpperCase();
+    }
+    
+    return 'U';
+  }
 
-    return user.email.charAt(0).toUpperCase();
+  logout() {
+    this.authService.logout();
+    this.closeMobileMenu();
+    this.userMenuOpen = false;
   }
 }

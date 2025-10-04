@@ -11,8 +11,8 @@ import { WavyBackgroundComponent } from '../components/wavy-background/wavy-back
   styleUrls: ['./home-v2.css']
 })
 export class HomeComponent {
-  constructor(private router: Router) {}
-
+  constructor(private router: Router) { }
+  
   goToPlanilhas() {
     this.router.navigate(['/planilhas']);
   }

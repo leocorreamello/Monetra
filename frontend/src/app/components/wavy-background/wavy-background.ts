@@ -407,18 +407,267 @@ import { CommonModule } from '@angular/common';
       }
     }
 
-    @media (max-width: 768px) {
+    /* =================================
+       RESPONSIVIDADE COMPLETA WAVY BACKGROUND
+       ================================= */
+
+    /* Extra Small devices (320px - 575px) - Smartphones pequenos */
+    @media (max-width: 575.98px) {
+      .wavy-container {
+        height: calc(100vh - 55px);
+      }
+      
+      .wave-svg {
+        height: 70%;
+        opacity: 0.7;
+      }
+      
+      .wave-svg1 {
+        bottom: -15%;
+        animation-duration: 10s;
+      }
+      
+      .wave-svg2 {
+        bottom: -20%;
+        animation-duration: 12s;
+      }
+      
+      .wave-svg3 {
+        bottom: -25%;
+        animation-duration: 14s;
+      }
+      
+      .wave-svg4 {
+        bottom: -10%;
+        animation-duration: 11s;
+      }
+      
+      .wave-svg5 {
+        bottom: -30%;
+        animation-duration: 16s;
+      }
+      
+      .particle {
+        width: 1.5px;
+        height: 1.5px;
+        opacity: 0.6;
+      }
+      
+      .floating-element {
+        transform: scale(0.7);
+        animation-duration: 20s;
+      }
+    }
+
+    /* Small devices (576px - 767px) - Smartphones grandes */
+    @media (min-width: 576px) and (max-width: 767.98px) {
       .wavy-container {
         height: calc(100vh - 60px);
       }
       
       .wave-svg {
-        height: 80%;
+        height: 75%;
+        opacity: 0.8;
+      }
+      
+      .wave-svg1 {
+        bottom: -18%;
+      }
+      
+      .wave-svg2 {
+        bottom: -22%;
+      }
+      
+      .wave-svg3 {
+        bottom: -27%;
+      }
+      
+      .wave-svg4 {
+        bottom: -12%;
+      }
+      
+      .wave-svg5 {
+        bottom: -32%;
       }
       
       .particle {
         width: 2px;
         height: 2px;
+        opacity: 0.7;
+      }
+      
+      .floating-element {
+        transform: scale(0.8);
+      }
+    }
+
+    /* Medium devices (768px - 1023px) - Tablets */
+    @media (min-width: 768px) and (max-width: 1023.98px) {
+      .wavy-container {
+        height: calc(100vh - 65px);
+      }
+      
+      .wave-svg {
+        height: 85%;
+        opacity: 0.85;
+      }
+      
+      .particle {
+        width: 2.5px;
+        height: 2.5px;
+        opacity: 0.75;
+      }
+      
+      .floating-element {
+        transform: scale(0.9);
+      }
+    }
+
+    /* Large devices (1024px - 1439px) - Desktop pequeno */
+    @media (min-width: 1024px) and (max-width: 1439.98px) {
+      .wavy-container {
+        height: calc(100vh - 70px);
+      }
+      
+      .wave-svg {
+        height: 90%;
+        opacity: 0.9;
+      }
+      
+      .particle {
+        width: 3px;
+        height: 3px;
+        opacity: 0.8;
+      }
+    }
+
+    /* Extra Large devices (1440px - 1919px) - Desktop grande */
+    @media (min-width: 1440px) and (max-width: 1919.98px) {
+      .wavy-container {
+        height: calc(100vh - 70px);
+      }
+      
+      .wave-svg {
+        height: 95%;
+        opacity: 0.95;
+      }
+      
+      .wave-svg1 {
+        bottom: -20%;
+        animation-duration: 12s;
+      }
+      
+      .wave-svg2 {
+        bottom: -25%;
+        animation-duration: 15s;
+      }
+      
+      .wave-svg3 {
+        bottom: -30%;
+        animation-duration: 18s;
+      }
+      
+      .wave-svg4 {
+        bottom: -15%;
+        animation-duration: 14s;
+      }
+      
+      .wave-svg5 {
+        bottom: -35%;
+        animation-duration: 20s;
+      }
+      
+      .particle {
+        width: 3.5px;
+        height: 3.5px;
+        opacity: 0.85;
+      }
+    }
+
+    /* Extra Extra Large devices (1920px+) - TVs e monitores grandes */
+    @media (min-width: 1920px) {
+      .wavy-container {
+        height: calc(100vh - 80px);
+      }
+      
+      .wave-svg {
+        height: 100%;
+        opacity: 1;
+      }
+      
+      .wave-svg1 {
+        bottom: -25%;
+        animation-duration: 14s;
+      }
+      
+      .wave-svg2 {
+        bottom: -30%;
+        animation-duration: 17s;
+      }
+      
+      .wave-svg3 {
+        bottom: -35%;
+        animation-duration: 20s;
+      }
+      
+      .wave-svg4 {
+        bottom: -20%;
+        animation-duration: 16s;
+      }
+      
+      .wave-svg5 {
+        bottom: -40%;
+        animation-duration: 22s;
+      }
+      
+      .particle {
+        width: 4px;
+        height: 4px;
+        opacity: 0.9;
+      }
+      
+      .floating-element {
+        transform: scale(1.2);
+        animation-duration: 30s;
+      }
+      
+      /* Adicionar mais detalhes visuais em telas grandes */
+      .waves-background::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(ellipse at center, rgba(96, 165, 250, 0.1) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 2;
+      }
+      
+      .waves-background::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+          radial-gradient(circle at 20% 30%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 80% 70%, rgba(244, 114, 182, 0.06) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 2;
+        animation: backgroundPulse 25s ease-in-out infinite;
+      }
+      
+      @keyframes backgroundPulse {
+        0%, 100% {
+          opacity: 0.5;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.8;
+          transform: scale(1.05);
+        }
       }
     }
   `]

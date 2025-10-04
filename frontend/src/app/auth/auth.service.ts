@@ -1,7 +1,7 @@
 ﻿import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, map, of, tap, throwError } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
 import { AuthResponse, LoginPayload, RegisterPayload, User } from './auth.models';
 
@@ -25,18 +25,25 @@ export class AuthService {
 
   private initializeUserFromStorage(): void {
     const token = this.getToken();
+    console.log('AuthService: Inicializando do storage, token existe?', !!token);
+    
     if (!token) {
+      console.log('AuthService: Nenhum token encontrado');
       return;
     }
 
     if (!this.isTokenValid(token)) {
+      console.log('AuthService: Token inválido ou expirado');
       this.clearSession();
       return;
     }
 
     const storedUser = this.getStoredUser();
     if (storedUser) {
+      console.log('AuthService: Usuário encontrado no storage:', storedUser.email);
       this.currentUserSubject.next(storedUser);
+    } else {
+      console.log('AuthService: Nenhum usuário no storage');
     }
   }
 
@@ -91,8 +98,16 @@ export class AuthService {
   }
 
   login(payload: LoginPayload): Observable<AuthResponse> {
+    console.log('AuthService: Tentando fazer login com:', payload.email);
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, payload).pipe(
-      tap(response => this.handleAuthResponse(response))
+      tap(response => {
+        console.log('AuthService: Login bem-sucedido para:', response.user.email);
+        this.handleAuthResponse(response);
+      }),
+      catchError(error => {
+        console.error('AuthService: Erro no login:', error);
+        return throwError(() => error);
+      })
     );
   }
 

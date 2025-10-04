@@ -4,6 +4,7 @@
       <span class="brand-text">Monetra</span>
     </div>
 
+    <!-- Menu Desktop -->
     <div class="nav-menu">
       <button
         type="button"
@@ -15,25 +16,29 @@
         <span class="nav-text">Home</span>
       </button>
 
-      <button
-        type="button"
-        class="nav-item"
-        routerLink="/planilhas"
-        routerLinkActive="active"
-      >
-        <span class="nav-text">Planilhas</span>
-      </button>
+      <!-- Abas protegidas - só aparecem quando logado -->
+      <ng-container *ngIf="user$ | async">
+        <button
+          type="button"
+          class="nav-item"
+          routerLink="/planilhas"
+          routerLinkActive="active"
+        >
+          <span class="nav-text">Planilhas</span>
+        </button>
 
-      <button
-        type="button"
-        class="nav-item"
-        routerLink="/graficos"
-        routerLinkActive="active"
-      >
-        <span class="nav-text">Graficos</span>
-      </button>
+        <button
+          type="button"
+          class="nav-item"
+          routerLink="/graficos"
+          routerLinkActive="active"
+        >
+          <span class="nav-text">Graficos</span>
+        </button>
+      </ng-container>
     </div>
 
+    <!-- Ações Desktop -->
     <div class="nav-actions">
       <ng-container *ngIf="user$ | async as user; else guest">
         <div class="user-section" (click)="$event.stopPropagation()">
@@ -56,5 +61,99 @@
         <a class="signup-link" routerLink="/register">Criar conta</a>
       </ng-template>
     </div>
+
+    <!-- Botão Menu Mobile -->
+    <button type="button" class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+      <span class="menu-icon">☰</span>
+    </button>
   </div>
 </nav>
+
+<!-- Overlay Mobile -->
+<div class="mobile-menu-overlay" 
+     [class.active]="isMobileMenuOpen" 
+     (click)="onOverlayClick($event)">
+</div>
+
+<!-- Menu Mobile -->
+<div class="mobile-menu" [class.active]="isMobileMenuOpen">
+  <div class="mobile-menu-header">
+    <div class="brand">
+      <span class="brand-text">Monetra</span>
+    </div>
+    <button type="button" class="mobile-menu-close" (click)="closeMobileMenu()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <div class="mobile-nav-items">
+    <button
+      type="button"
+      class="mobile-nav-item"
+      routerLink="/home"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="setActiveTab('home')"
+    >
+      <i class="fas fa-home" style="margin-right: 12px;"></i>
+      Home
+    </button>
+
+    <!-- Abas protegidas - só aparecem quando logado -->
+    <ng-container *ngIf="user$ | async">
+      <button
+        type="button"
+        class="mobile-nav-item"
+        routerLink="/planilhas"
+        routerLinkActive="active"
+        (click)="setActiveTab('planilhas')"
+      >
+        <i class="fas fa-table" style="margin-right: 12px;"></i>
+        Planilhas
+      </button>
+
+      <button
+        type="button"
+        class="mobile-nav-item"
+        routerLink="/graficos"
+        routerLinkActive="active"
+        (click)="setActiveTab('graficos')"
+      >
+        <i class="fas fa-chart-line" style="margin-right: 12px;"></i>
+        Gráficos
+      </button>
+    </ng-container>
+  </div>
+
+  <!-- Ações Mobile -->
+  <div class="mobile-nav-actions">
+    <ng-container *ngIf="user$ | async as user; else mobileGuest">
+      <div style="text-align: center; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px;">
+        <div class="user-avatar" style="margin: 0 auto 8px;">
+          <span class="user-initial">{{ getInitials(user) }}</span>
+        </div>
+        <div style="color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 600;">
+          {{ user.name || 'Conta' }}
+        </div>
+        <div style="color: rgba(255,255,255,0.6); font-size: 12px;">
+          {{ user.email }}
+        </div>
+      </div>
+      <button type="button" class="mobile-signup-link" (click)="logout()" style="background: rgba(248, 113, 113, 0.2); border: 1px solid rgba(248, 113, 113, 0.5);">
+        <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i>
+        Sair
+      </button>
+    </ng-container>
+
+    <ng-template #mobileGuest>
+      <a class="mobile-login-link" routerLink="/login" (click)="closeMobileMenu()">
+        <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>
+        Entrar
+      </a>
+      <a class="mobile-signup-link" routerLink="/register" (click)="closeMobileMenu()">
+        <i class="fas fa-user-plus" style="margin-right: 8px;"></i>
+        Criar conta
+      </a>
+    </ng-template>
+  </div>
+</div>
