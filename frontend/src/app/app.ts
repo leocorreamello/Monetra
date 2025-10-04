@@ -1,15 +1,10 @@
 import { Component } from '@angular/core';
-import { UploadComponent } from './upload/upload';
-import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http'; // Adicione aqui se necessário
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [UploadComponent, CommonModule, HttpClientModule], // Adicione HttpClientModule
-  templateUrl: './app.html',
-  styleUrls: ['./app.css']
+  imports: [RouterOutlet],
+  template: '<router-outlet></router-outlet>'
 })
-export class AppComponent {
-  title = 'frontend';
-}
+export class AppComponent {}

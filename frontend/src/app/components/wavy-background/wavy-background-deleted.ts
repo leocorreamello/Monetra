@@ -1,0 +1,1 @@
+// Este arquivo foi removido - use wavy-background-clean.ts
