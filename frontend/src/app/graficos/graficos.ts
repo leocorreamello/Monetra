@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { API_BASE_URL } from '../config/api.config';
 
 interface Transaction {
   id: number;
@@ -22,7 +23,7 @@ interface ChartData {
 @Component({
   selector: 'app-graficos',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './graficos.html',
   styleUrls: ['./graficos.css']
 })
@@ -62,7 +63,7 @@ export class GraficosComponent implements OnInit {
 
 
 
-  private apiUrl = 'http://localhost:3000';
+  private readonly apiUrl = API_BASE_URL;
 
   constructor(private http: HttpClient) {}
 
@@ -361,7 +362,8 @@ Por favor, selecione um arquivo CSV ou TXT válido.`);
       'educacao': '📚 Educação',
       'vestuario': '👕 Vestuário',
       'servicos': '🔧 Serviços',
-      'investimentos': '💰 Investimentos',
+      'investimento': '📈 Investimento',
+      'investimentos': '📈 Investimentos',
       'outros': '📦 Outros'
     };
     return categoryNames[categoria] || categoria;
@@ -735,3 +737,4 @@ Por favor, selecione um arquivo CSV ou TXT válido.`);
   }
 
 }
+

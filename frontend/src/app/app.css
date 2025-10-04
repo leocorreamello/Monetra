@@ -1,6 +1,4 @@
-/* Estilos do componente principal */
-
-.app-container {
+﻿.app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -8,14 +6,29 @@
 
 .app-main {
   flex: 1;
-  margin: 0; /* MUDANÇA: garantir que não há margin */
-  padding: 0; /* MUDANÇA: garantir que não há padding */
+  padding-top: 70px;
 }
 
 .tab-content {
   animation: fadeIn 0.4s ease-out;
-  height: 100%; /* MUDANÇA: ocupar toda a altura disponível */
-  margin: 0; /* MUDANÇA: remover margins */
+  min-height: calc(100vh - 200px);
+}
+
+.global-footer {
+  margin-top: auto;
+  padding: 20px 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  background: rgba(12, 18, 31, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(88, 99, 146, 0.2);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
 @keyframes fadeIn {
@@ -29,29 +42,13 @@
   }
 }
 
-/* Responsividade */
 @media (max-width: 768px) {
-  .app-title {
-    font-size: 2rem;
-    flex-direction: column;
-    gap: 8px;
-    text-align: center;
-  }
-  
-  .title-icon {
-    font-size: 2.5rem;
-  }
-  
-  .title-subtitle {
-    margin-left: 0;
-    font-size: 0.9rem;
-  }
-  
-  .header-content {
-    padding: 0 20px;
-  }
-  
   .app-main {
-    padding: 0 10px;
+    padding-top: 80px;
+  }
+
+  .footer-content {
+    padding: 0 16px;
   }
 }
+
