@@ -222,35 +222,397 @@
   color: #ffffff;
 }
 
-@media (max-width: 1024px) {
-  .nav-content {
-    padding: 0 24px;
-  }
+/* Mobile menu toggle button */
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
-@media (max-width: 768px) {
-  .nav-content {
-    padding: 0 20px;
-    height: 60px;
-  }
+.mobile-menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
 
+/* Mobile menu overlay */
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 999;
+  backdrop-filter: blur(10px);
+}
+
+.mobile-menu-overlay.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Mobile menu content */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 280px;
+  height: 100vh;
+  background: linear-gradient(135deg, #0f0c1e 0%, #1a1730 100%);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 1000;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-menu.active {
+  right: 0;
+}
+
+.mobile-menu-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mobile-menu-close {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.mobile-nav-items {
+  padding: 24px 0;
+}
+
+.mobile-nav-item {
+  display: block;
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+}
+
+.mobile-nav-item:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border-left-color: #3b82f6;
+}
+
+.mobile-nav-item.active {
+  color: #ffffff;
+  background: rgba(59, 130, 246, 0.1);
+  border-left-color: #3b82f6;
+}
+
+.mobile-nav-actions {
+  padding: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-login-link,
+.mobile-signup-link {
+  display: block;
+  width: 100%;
+  padding: 12px 0;
+  text-align: center;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.mobile-login-link {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-login-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.mobile-signup-link {
+  color: #ffffff;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.mobile-signup-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* =================================
+   RESPONSIVIDADE COMPLETA NAVEGAÇÃO
+   ================================= */
+
+/* Extra Small devices (320px - 575px) - Smartphones pequenos */
+@media (max-width: 575.98px) {
+  .navigation-container {
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .nav-content {
+    padding: 0 12px;
+    height: 55px;
+  }
+  
+  .brand {
+    font-size: 1.25rem;
+    gap: 8px;
+  }
+  
   .nav-menu {
     display: none;
   }
-
+  
+  .mobile-menu-toggle {
+    display: block;
+    font-size: 22px;
+  }
+  
   .nav-actions {
-    margin-left: auto;
+    display: none;
+  }
+  
+  .user-section {
+    gap: 8px;
+  }
+  
+  .user-avatar {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .user-initial {
+    font-size: 14px;
+  }
+  
+  .mobile-menu {
+    width: 260px;
+  }
+  
+  .mobile-menu-header {
+    padding: 16px 20px;
+  }
+  
+  .mobile-nav-item {
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+  
+  .mobile-nav-actions {
+    padding: 20px;
   }
 }
 
-@media (max-width: 480px) {
+/* Small devices (576px - 767px) - Smartphones grandes */
+@media (min-width: 576px) and (max-width: 767.98px) {
   .nav-content {
     padding: 0 16px;
+    height: 60px;
   }
+  
+  .brand {
+    font-size: 1.35rem;
+    gap: 10px;
+  }
+  
+  .nav-menu {
+    display: none;
+  }
+  
+  .mobile-menu-toggle {
+    display: block;
+  }
+  
+  .nav-actions {
+    display: none;
+  }
+  
+  .user-section {
+    gap: 10px;
+  }
+  
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .user-initial {
+    font-size: 15px;
+  }
+}
 
+/* Medium devices (768px - 1023px) - Tablets */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .nav-content {
+    padding: 0 20px;
+    height: 65px;
+  }
+  
+  .brand {
+    font-size: 1.4rem;
+  }
+  
+  .nav-menu {
+    gap: 8px;
+    padding: 8px 16px;
+  }
+  
+  .nav-item {
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+  
+  .nav-actions {
+    gap: 10px;
+  }
+  
   .login-link,
   .signup-link {
-    padding: 8px 14px;
+    padding: 9px 16px;
     font-size: 13px;
+  }
+}
+
+/* Large devices (1024px - 1439px) - Desktop pequeno */
+@media (min-width: 1024px) and (max-width: 1439.98px) {
+  .nav-content {
+    padding: 0 28px;
+    height: 70px;
+  }
+  
+  .brand {
+    font-size: 1.45rem;
+  }
+  
+  .nav-menu {
+    gap: 10px;
+    padding: 9px 17px;
+  }
+  
+  .nav-item {
+    padding: 11px 20px;
+    font-size: 14px;
+  }
+  
+  .nav-actions {
+    gap: 11px;
+  }
+}
+
+/* Extra Large devices (1440px - 1919px) - Desktop grande */
+@media (min-width: 1440px) and (max-width: 1919.98px) {
+  .nav-content {
+    padding: 0 32px;
+    height: 70px;
+  }
+  
+  .brand {
+    font-size: 1.5rem;
+    gap: 12px;
+  }
+  
+  .nav-menu {
+    gap: 12px;
+    padding: 10px 18px;
+  }
+  
+  .nav-item {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+  
+  .nav-actions {
+    gap: 12px;
+  }
+}
+
+/* Extra Extra Large devices (1920px+) - TVs e monitores grandes */
+@media (min-width: 1920px) {
+  .nav-content {
+    padding: 0 48px;
+    height: 80px;
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+  
+  .brand {
+    font-size: 1.75rem;
+    gap: 14px;
+  }
+  
+  .nav-menu {
+    gap: 16px;
+    padding: 12px 22px;
+    border-radius: 14px;
+  }
+  
+  .nav-item {
+    padding: 14px 28px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+  
+  .nav-actions {
+    gap: 16px;
+  }
+  
+  .login-link,
+  .signup-link {
+    padding: 12px 20px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+  
+  .user-avatar {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .user-initial {
+    font-size: 18px;
+  }
+}
+
+/* Animação para fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

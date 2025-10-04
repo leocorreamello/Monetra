@@ -1,5 +1,46 @@
 /* Estilos globais para o Monetra */
 
+/* =================================
+   VARIÁVEIS CSS RESPONSIVAS
+   ================================= */
+:root {
+  /* Breakpoints baseados nas resoluções mais utilizadas */
+  --breakpoint-xs: 320px;   /* Smartphones pequenos */
+  --breakpoint-sm: 576px;   /* Smartphones grandes */
+  --breakpoint-md: 768px;   /* Tablets */
+  --breakpoint-lg: 1024px;  /* Desktop pequeno */
+  --breakpoint-xl: 1440px;  /* Desktop grande */
+  --breakpoint-xxl: 1920px; /* TVs e monitores grandes */
+  
+  /* Espaçamentos responsivos */
+  --spacing-xs: 0.25rem;    /* 4px */
+  --spacing-sm: 0.5rem;     /* 8px */
+  --spacing-md: 1rem;       /* 16px */
+  --spacing-lg: 1.5rem;     /* 24px */
+  --spacing-xl: 2rem;       /* 32px */
+  --spacing-xxl: 3rem;      /* 48px */
+  
+  /* Tamanhos de fonte responsivos */
+  --text-xs: 0.75rem;       /* 12px */
+  --text-sm: 0.875rem;      /* 14px */
+  --text-base: 1rem;        /* 16px */
+  --text-lg: 1.125rem;      /* 18px */
+  --text-xl: 1.25rem;       /* 20px */
+  --text-2xl: 1.5rem;       /* 24px */
+  --text-3xl: 1.875rem;     /* 30px */
+  --text-4xl: 2.25rem;      /* 36px */
+  --text-5xl: 3rem;         /* 48px */
+  --text-6xl: 3.75rem;      /* 60px */
+  
+  /* Container max-widths */
+  --container-xs: 100%;
+  --container-sm: 540px;
+  --container-md: 720px;
+  --container-lg: 960px;
+  --container-xl: 1140px;
+  --container-xxl: 1320px;
+}
+
 /* Reset e configurações base */
 * {
   margin: 0;
@@ -15,6 +56,19 @@ html, body {
   background: linear-gradient(135deg, #020617 0%, #0c0a1e 50%, #0f172a 100%);
   margin: 0;
   padding: 0;
+  
+  /* Otimizações responsivas */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  
+  /* Suavização de fontes */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* Otimização de scroll em mobile */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -85,14 +139,270 @@ body {
   padding: 0 32px;
 }
 
-/* Responsividade base */
-@media (max-width: 768px) {
+/* =================================
+   UTILIDADES RESPONSIVAS
+   ================================= */
+
+/* Container responsivo */
+.container {
+  width: 100%;
+  padding-right: var(--spacing-md);
+  padding-left: var(--spacing-md);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* Grid responsivo */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: calc(var(--spacing-md) * -0.5);
+  margin-left: calc(var(--spacing-md) * -0.5);
+}
+
+.col {
+  flex: 1 0 0%;
+  padding-right: calc(var(--spacing-md) * 0.5);
+  padding-left: calc(var(--spacing-md) * 0.5);
+}
+
+/* Utilitários de visibilidade */
+.d-none { display: none !important; }
+.d-block { display: block !important; }
+.d-flex { display: flex !important; }
+.d-inline { display: inline !important; }
+.d-inline-block { display: inline-block !important; }
+
+/* Text alignment */
+.text-center { text-align: center !important; }
+.text-left { text-align: left !important; }
+.text-right { text-align: right !important; }
+
+/* =================================
+   MEDIA QUERIES RESPONSIVAS
+   ================================= */
+
+/* Extra Small devices (320px - 575px) */
+@media (max-width: 575.98px) {
+  .container { max-width: var(--container-xs); }
+  
+  .d-xs-none { display: none !important; }
+  .d-xs-block { display: block !important; }
+  .d-xs-flex { display: flex !important; }
+  
+  .text-xs-center { text-align: center !important; }
+  .text-xs-left { text-align: left !important; }
+  .text-xs-right { text-align: right !important; }
+}
+
+/* Small devices (576px - 767px) */
+@media (min-width: 576px) {
+  .container { max-width: var(--container-sm); }
+}
+
+@media (max-width: 767.98px) {
+  .d-sm-none { display: none !important; }
+  .d-sm-block { display: block !important; }
+  .d-sm-flex { display: flex !important; }
+  
+  .text-sm-center { text-align: center !important; }
+  .text-sm-left { text-align: left !important; }
+  .text-sm-right { text-align: right !important; }
+}
+
+/* Medium devices (768px - 1023px) */
+@media (min-width: 768px) {
+  .container { max-width: var(--container-md); }
+}
+
+@media (max-width: 1023.98px) {
+  .d-md-none { display: none !important; }
+  .d-md-block { display: block !important; }
+  .d-md-flex { display: flex !important; }
+  
+  .text-md-center { text-align: center !important; }
+  .text-md-left { text-align: left !important; }
+  .text-md-right { text-align: right !important; }
+}
+
+/* Large devices (1024px - 1439px) */
+@media (min-width: 1024px) {
+  .container { max-width: var(--container-lg); }
+}
+
+@media (max-width: 1439.98px) {
+  .d-lg-none { display: none !important; }
+  .d-lg-block { display: block !important; }
+  .d-lg-flex { display: flex !important; }
+  
+  .text-lg-center { text-align: center !important; }
+  .text-lg-left { text-align: left !important; }
+  .text-lg-right { text-align: right !important; }
+}
+
+/* Extra Large devices (1440px - 1919px) */
+@media (min-width: 1440px) {
+  .container { max-width: var(--container-xl); }
+}
+
+@media (max-width: 1919.98px) {
+  .d-xl-none { display: none !important; }
+  .d-xl-block { display: block !important; }
+  .d-xl-flex { display: flex !important; }
+  
+  .text-xl-center { text-align: center !important; }
+  .text-xl-left { text-align: left !important; }
+  .text-xl-right { text-align: right !important; }
+}
+
+/* Extra Extra Large devices (1920px+) */
+@media (min-width: 1920px) {
+  .container { max-width: var(--container-xxl); }
+}
+
+.d-xxl-none { display: none !important; }
+.d-xxl-block { display: block !important; }
+.d-xxl-flex { display: flex !important; }
+
+.text-xxl-center { text-align: center !important; }
+.text-xxl-left { text-align: left !important; }
+.text-xxl-right { text-align: right !important; }
+
+/* =================================
+   UTILITÁRIOS ADICIONAIS RESPONSIVOS
+   ================================= */
+
+/* Overflow utilities */
+.overflow-hidden { overflow: hidden !important; }
+.overflow-auto { overflow: auto !important; }
+.overflow-scroll { overflow: scroll !important; }
+
+/* Position utilities */
+.position-relative { position: relative !important; }
+.position-absolute { position: absolute !important; }
+.position-fixed { position: fixed !important; }
+.position-sticky { position: sticky !important; }
+
+/* Flex utilities */
+.flex-wrap { flex-wrap: wrap !important; }
+.flex-nowrap { flex-wrap: nowrap !important; }
+.flex-column { flex-direction: column !important; }
+.flex-row { flex-direction: row !important; }
+
+.justify-start { justify-content: flex-start !important; }
+.justify-center { justify-content: center !important; }
+.justify-end { justify-content: flex-end !important; }
+.justify-between { justify-content: space-between !important; }
+.justify-around { justify-content: space-around !important; }
+
+.items-start { align-items: flex-start !important; }
+.items-center { align-items: center !important; }
+.items-end { align-items: flex-end !important; }
+.items-stretch { align-items: stretch !important; }
+
+/* Width utilities */
+.w-full { width: 100% !important; }
+.w-auto { width: auto !important; }
+.w-fit { width: fit-content !important; }
+
+/* Height utilities */
+.h-full { height: 100% !important; }
+.h-auto { height: auto !important; }
+.h-screen { height: 100vh !important; }
+
+/* Margin utilities */
+.m-0 { margin: 0 !important; }
+.m-auto { margin: auto !important; }
+.mx-auto { margin-left: auto !important; margin-right: auto !important; }
+.my-auto { margin-top: auto !important; margin-bottom: auto !important; }
+
+/* Padding utilities */
+.p-0 { padding: 0 !important; }
+
+/* Border radius utilities */
+.rounded-none { border-radius: 0 !important; }
+.rounded-sm { border-radius: 0.125rem !important; }
+.rounded { border-radius: 0.25rem !important; }
+.rounded-lg { border-radius: 0.5rem !important; }
+.rounded-xl { border-radius: 0.75rem !important; }
+.rounded-2xl { border-radius: 1rem !important; }
+.rounded-full { border-radius: 9999px !important; }
+
+/* Animation utilities */
+.transition { transition: all 0.15s ease-in-out !important; }
+.transition-none { transition: none !important; }
+
+/* Transform utilities */
+.transform { transform: translateZ(0) !important; }
+.scale-95 { transform: scale(0.95) !important; }
+.scale-100 { transform: scale(1) !important; }
+.scale-105 { transform: scale(1.05) !important; }
+
+/* Opacity utilities */
+.opacity-0 { opacity: 0 !important; }
+.opacity-25 { opacity: 0.25 !important; }
+.opacity-50 { opacity: 0.5 !important; }
+.opacity-75 { opacity: 0.75 !important; }
+.opacity-100 { opacity: 1 !important; }
+
+/* Z-index utilities */
+.z-0 { z-index: 0 !important; }
+.z-10 { z-index: 10 !important; }
+.z-20 { z-index: 20 !important; }
+.z-30 { z-index: 30 !important; }
+.z-40 { z-index: 40 !important; }
+.z-50 { z-index: 50 !important; }
+
+/* Touch-friendly utilities */
+.touch-manipulation { touch-action: manipulation !important; }
+.touch-auto { touch-action: auto !important; }
+.touch-none { touch-action: none !important; }
+
+/* Smooth scrolling */
+.scroll-smooth { scroll-behavior: smooth !important; }
+
+/* Image responsive utilities */
+.img-responsive {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block !important;
+}
+
+/* Aspect ratio utilities */
+.aspect-video {
+  aspect-ratio: 16 / 9 !important;
+}
+
+.aspect-square {
+  aspect-ratio: 1 / 1 !important;
+}
+
+/* Responsividade base do body e footer */
+@media (max-width: 575.98px) {
   body {
-    padding: 15px 0; /* CORRIGIDO: menos espaçamento em mobile */
+    padding: var(--spacing-sm) 0;
   }
   
   .footer-content {
-    font-size: 0.75rem;
-    padding: 0 20px;
+    font-size: var(--text-xs);
+    padding: 0 var(--spacing-md);
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  body {
+    padding: var(--spacing-md) 0;
+  }
+  
+  .footer-content {
+    font-size: var(--text-sm);
+    padding: 0 var(--spacing-lg);
+  }
+}
+
+@media (min-width: 768px) {
+  .footer-content {
+    font-size: var(--text-sm);
+    padding: 0 var(--spacing-xl);
   }
 }
