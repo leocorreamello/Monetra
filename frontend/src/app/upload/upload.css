@@ -526,12 +526,12 @@ th:not(:last-child)::after {
   background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.2), transparent);
 }
 
-/* Larguras das colunas BALANCEADAS */
-th:nth-child(1) { width: 10%; min-width: 100px; } /* Data */
-th:nth-child(2) { width: 32%; min-width: 300px; } /* Descrição - AJUSTADA */
-th:nth-child(3) { width: 15%; min-width: 140px; } /* Valor */
-th:nth-child(4) { width: 13%; min-width: 120px; } /* Tipo */
-th:nth-child(5) { width: 20%; min-width: 180px; } /* Categoria */
+/* Larguras das colunas - CORREÇÃO MANUAL DO USUÁRIO */
+th:nth-child(1) { width: 7%; min-width: 110px; } /* Data */
+th:nth-child(2) { width: 10%; min-width: 120px; } /* Descrição */
+th:nth-child(3) { width: 36%; min-width: 420px; } /* Valor */
+th:nth-child(4) { width: 13%; min-width: 130px; } /* Tipo */
+th:nth-child(5) { width: 15%; min-width: 180px; } /* Categoria */
 
 /* CORPO DA TABELA REDESENHADO - SEM movimento no hover */
 tbody tr {
@@ -792,45 +792,212 @@ td:nth-child(5) {
    RESPONSIVIDADE COMPLETA UPLOAD
    ================================= */
 
-/* Extra Small devices (320px - 575px) - Smartphones pequenos */
+/* Extra Small devices (320px - 575px) - Design Compacto Mobile */
 @media (max-width: 575.98px) {
   .upload-container {
     max-width: 100%;
-    padding: 60px 8px 12px 8px;
+    padding: 70px 6px 16px 6px;
   }
   
-  .upload-section {
-    margin-bottom: 20px;
-    padding: 16px 12px;
-    border-radius: 12px;
+  .upload-header {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
   }
   
-  .upload-title {
-    font-size: 1.5rem;
-    margin-bottom: 6px;
+  .header-title h1 {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
   }
   
-  .upload-subtitle {
-    font-size: 0.85rem;
+  .header-subtitle {
+    font-size: 0.8rem;
   }
   
-  .upload-zone {
-    padding: 16px 12px;
-    border-radius: 12px;
+  .file-upload-zone {
+    padding: 12px;
+    border-radius: 8px;
+    max-width: none;
   }
   
   .upload-icon {
-    font-size: 2rem;
-    margin-bottom: 8px;
-  }
-  
-  .upload-text {
-    font-size: 0.85rem;
+    font-size: 1.8rem;
     margin-bottom: 6px;
   }
   
-  .upload-hint {
+  .upload-title {
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+  }
+  
+  .upload-subtitle {
+    font-size: 0.7rem;
+  }
+  
+  .main-content,
+  .main-content.with-upload {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  
+  /* Container limpo e moderno */
+  .table-container {
+    max-height: 70vh;
+    overflow-y: auto;
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 4px;
+    backdrop-filter: blur(10px);
+  }
+  
+  /* Esconder cabeçalho da tabela */
+  .table-container table thead {
+    display: none;
+  }
+  
+  /* Transformar linhas da tabela em blocos */
+  .table-container table,
+  .table-container tbody {
+    display: block;
+    width: 100%;
+  }
+  
+  /* Cada linha como bloco simples e limpo */
+  .table-container tbody tr {
+    display: block;
+    background: rgba(30, 30, 30, 0.8);
+    margin: 8px;
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  
+  .table-container tbody tr:hover {
+    background: rgba(40, 40, 40, 0.9);
+    transform: translateX(4px);
+  }
+  
+  /* Cores baseadas no tipo de transação - apenas bordas */
+  .table-container tbody tr:has(td.entrada) {
+    border-left-color: #00d084;
+  }
+  
+  .table-container tbody tr:has(td.saida) {
+    border-left-color: #ff6b6b;
+  }
+  
+  /* Layout simples em blocos - sem positioning absoluto */
+  .table-container tbody tr td {
+    display: block;
+    padding: 4px 0;
+    border: none;
+  }
+  
+  /* Data */
+  .table-container tbody tr td:nth-child(1) {
+    font-size: 0.8rem;
+    color: #a3a3a3;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  
+  /* Descrição */
+  .table-container tbody tr td:nth-child(2) {
+    font-size: 0.9rem;
+    color: #ffffff;
+    font-weight: 500;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  
+  /* Valor */
+  .table-container tbody tr td:nth-child(3) {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  
+  .table-container tbody tr td:nth-child(3).entrada {
+    color: #00d084;
+  }
+  
+  .table-container tbody tr td:nth-child(3).saida {
+    color: #ff6b6b;
+  }
+  
+  /* Tipo */
+  .table-container tbody tr td:nth-child(4) {
     font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-right: 8px;
+  }
+  
+  .table-container tbody tr td:nth-child(4) .tipo-badge.tipo-entrada {
+    background: rgba(0, 208, 132, 0.2);
+    color: #00d084;
+  }
+  
+  .table-container tbody tr td:nth-child(4) .tipo-badge.tipo-saida {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+  }
+  
+  /* Categoria */
+  .table-container tbody tr td:nth-child(5) {
+    font-size: 0.75rem;
+    color: #a3a3a3;
+    display: inline-block;
+  }
+  
+  .empty-state {
+    min-height: 250px;
+  }
+  
+  .empty-state-content {
+    padding: 16px;
+  }
+  
+  .empty-state-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+  
+  .empty-state-title {
+    font-size: 1.1rem;
+    margin-bottom: 6px;
+  }
+  
+  .empty-state-text {
+    font-size: 0.8rem;
+    margin-bottom: 12px;
+  }
+}
+
+/* Small devices (576px - 767px) - Design Aprimorado para Tablets */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .upload-container {
+    max-width: 100%;
+    padding: 70px 10px 16px 10px;
+  }
+  
+  .upload-header {
+    margin-bottom: 18px;
+    padding: 16px;
+  }
+  
+  .header-title h1 {
+    font-size: 1.6rem;
+  }
+  
+  .header-subtitle {
+    font-size: 0.85rem;
   }
   
   .main-content,
@@ -840,123 +1007,202 @@ td:nth-child(5) {
     margin-top: 16px;
   }
   
+  /* Container limpo para tablets */
   .table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    max-height: 50vh;
+    max-height: 65vh;
+    overflow-y: auto;
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 6px;
+    backdrop-filter: blur(10px);
+  }
+  
+  /* Esconder cabeçalho da tabela */
+  .table-container table thead {
+    display: none;
+  }
+  
+  /* Transformar linhas da tabela em blocos */
+  .table-container table,
+  .table-container tbody {
+    display: block;
+    width: 100%;
+  }
+  
+  /* Cada linha como bloco limpo para tablets */
+  .table-container tbody tr {
+    display: block;
+    background: rgba(30, 30, 30, 0.8);
+    margin: 8px;
+    padding: 14px;
     border-radius: 10px;
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
   }
   
-  table {
-    min-width: 600px;
+  .table-container tbody tr:hover {
+    background: rgba(40, 40, 40, 0.9);
+    transform: translateX(4px);
+  }
+  
+  /* Cores baseadas no tipo de transação para tablets */
+  .table-container tbody tr:has(td.entrada) {
+    border-left-color: #00d084;
+    background: rgba(0, 208, 132, 0.05);
+  }
+  
+  .table-container tbody tr:has(td.saida) {
+    border-left-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.05);
+  }
+  
+  .table-container tbody tr:has(td.entrada):hover {
+    background: rgba(0, 208, 132, 0.1);
+  }
+  
+  .table-container tbody tr:has(td.saida):hover {
+    background: rgba(255, 107, 107, 0.1);
+  }
+  
+  .block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  
+  .block-date {
     font-size: 0.75rem;
-    table-layout: fixed;
+    color: #94a3b8;
+    font-weight: 500;
+    background: rgba(71, 85, 105, 0.4);
+    padding: 2px 6px;
+    border-radius: 4px;
   }
   
-  th, td {
-    padding: 8px 6px;
+  .block-amount {
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Segoe UI', system-ui, sans-serif;
   }
   
-  /* Larguras fixas para scroll horizontal */
-  th:nth-child(1), td:nth-child(1) { width: 70px; }
-  th:nth-child(2), td:nth-child(2) { width: 250px; }
-  th:nth-child(3), td:nth-child(3) { width: 80px; }
-  th:nth-child(4), td:nth-child(4) { width: 80px; }
-  th:nth-child(5), td:nth-child(5) { width: 100px; }
-  
-  .categoria-select {
-    font-size: 0.6rem;
-    padding: 2px 4px;
+  .block-amount.entrada {
+    color: #22c55e;
   }
   
-  .empty-state {
-    min-height: 300px;
+  .block-amount.saida {
+    color: #ef4444;
   }
   
-  .empty-state-content {
-    padding: 20px;
-  }
-  
-  .empty-state-icon {
-    font-size: 3rem;
-    margin-bottom: 16px;
-  }
-  
-  .empty-state-title {
-    font-size: 1.2rem;
-    margin-bottom: 8px;
-  }
-  
-  .empty-state-text {
+  .block-description {
     font-size: 0.85rem;
-    margin-bottom: 16px;
+    color: #cbd5e1;
+    margin: 6px 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   
-  .format-badges {
-    flex-wrap: wrap;
-    justify-content: center;
+  .block-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
   }
   
-  .format-badge {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.6rem;
-  }
-}
-
-/* Small devices (576px - 767px) - Smartphones grandes */
-@media (min-width: 576px) and (max-width: 767.98px) {
-  .upload-container {
-    max-width: 100%;
-    padding: 70px 12px 16px 12px;
+  .block-type {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
   }
   
-  .upload-section {
-    margin-bottom: 24px;
-    padding: 20px 16px;
+  .block-type.entrada {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
   }
   
-  .upload-title {
-    font-size: 1.75rem;
+  .block-type.saida {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
   }
   
-  .upload-subtitle {
-    font-size: 0.9rem;
+  /* Layout simples em blocos para tablets - sem positioning absoluto */
+  .table-container tbody tr td {
+    display: block;
+    padding: 4px 0;
+    border: none;
   }
   
-  .main-content,
-  .main-content.with-upload {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    margin-top: 20px;
+  /* Data */
+  .table-container tbody tr td:nth-child(1) {
+    font-size: 0.85rem;
+    color: #a3a3a3;
+    font-weight: 600;
+    margin-bottom: 4px;
   }
   
-  .table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    max-height: 60vh;
+  /* Descrição */
+  .table-container tbody tr td:nth-child(2) {
+    font-size: 1rem;
+    color: #ffffff;
+    font-weight: 500;
+    margin-bottom: 6px;
+    line-height: 1.4;
   }
   
-  table {
-    min-width: 650px;
+  /* Valor */
+  .table-container tbody tr td:nth-child(3) {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  
+  .table-container tbody tr td:nth-child(3).entrada {
+    color: #00d084;
+  }
+  
+  .table-container tbody tr td:nth-child(3).saida {
+    color: #ff6b6b;
+  }
+  
+  /* Tipo */
+  .table-container tbody tr td:nth-child(4) {
     font-size: 0.8rem;
-    table-layout: fixed;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-right: 10px;
   }
   
-  /* Ajustar proporções das colunas */
-  th:nth-child(1), td:nth-child(1) { width: 12%; }
-  th:nth-child(2), td:nth-child(2) { width: 46%; }
-  th:nth-child(3), td:nth-child(3) { width: 14%; }
-  th:nth-child(4), td:nth-child(4) { width: 13%; }
-  th:nth-child(5), td:nth-child(5) { width: 15%; }
+  .table-container tbody tr td:nth-child(4) .tipo-badge.tipo-entrada {
+    background: rgba(0, 208, 132, 0.2);
+    color: #00d084;
+  }
   
-  .categoria-select {
-    font-size: 0.65rem;
-    padding: 3px 6px;
+  .table-container tbody tr td:nth-child(4) .tipo-badge.tipo-saida {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+  }
+  
+  /* Categoria */
+  .table-container tbody tr td:nth-child(5) {
+    font-size: 0.8rem;
+    color: #a3a3a3;
+    display: inline-block;
   }
 }
 
 /* Medium devices (768px - 1023px) - Tablets */
-@media (min-width: 768px) and (max-width: 1023.98px) {
+@media (min-width: 768px) and (max-width: 1299px) {
   .upload-container {
     max-width: 100%;
     padding: 74px 16px 16px 16px;
@@ -974,81 +1220,232 @@ td:nth-child(5) {
     margin-top: 24px;
   }
   
+  /* Container limpo para tablets */
   .table-container {
     max-height: 65vh;
+    overflow-y: auto;
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 8px;
+    backdrop-filter: blur(10px);
   }
   
-  table {
+  /* Esconder cabeçalho da tabela */
+  .table-container table thead {
+    display: none;
+  }
+  
+  /* Transformar linhas da tabela em blocos */
+  .table-container table,
+  .table-container tbody {
+    display: block;
+    width: 100%;
+  }
+  
+  /* Cada linha como bloco limpo para tablets */
+  .table-container tbody tr {
+    display: block;
+    background: rgba(30, 30, 30, 0.8);
+    margin: 10px;
+    padding: 16px;
+    border-radius: 12px;
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  
+  .table-container tbody tr:hover {
+    background: rgba(40, 40, 40, 0.9);
+    transform: translateX(4px);
+  }
+  
+  /* Cores baseadas no tipo de transação para tablets - apenas bordas */
+  .table-container tbody tr:has(td.entrada) {
+    border-left-color: #00d084;
+  }
+  
+  .table-container tbody tr:has(td.saida) {
+    border-left-color: #ff6b6b;
+  }
+  
+  /* Layout simples em blocos para tablets - sem positioning absoluto */
+  .table-container tbody tr td {
+    display: block;
+    padding: 4px 0;
+    border: none;
+  }
+  
+  /* Data */
+  .table-container tbody tr td:nth-child(1) {
+    font-size: 0.9rem;
+    color: #a3a3a3;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  
+  /* Descrição */
+  .table-container tbody tr td:nth-child(2) {
+    font-size: 1.1rem;
+    color: #ffffff;
+    font-weight: 500;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  
+  /* Valor */
+  .table-container tbody tr td:nth-child(3) {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  
+  .table-container tbody tr td:nth-child(3).entrada {
+    color: #00d084;
+  }
+  
+  .table-container tbody tr td:nth-child(3).saida {
+    color: #ff6b6b;
+  }
+  
+  /* Tipo */
+  .table-container tbody tr td:nth-child(4) {
     font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-right: 12px;
   }
   
-  .categoria-select {
-    font-size: 0.7rem;
-    padding: 4px 8px;
+  .table-container tbody tr td:nth-child(4) .tipo-badge.tipo-entrada {
+    background: rgba(0, 208, 132, 0.2);
+    color: #00d084;
+  }
+  
+  .table-container tbody tr td:nth-child(4) .tipo-badge.tipo-saida {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+  }
+  
+  /* Categoria */
+  .table-container tbody tr td:nth-child(5) {
+    font-size: 0.85rem;
+    color: #a3a3a3;
+    display: inline-block;
   }
 }
 
-/* Large devices (1024px - 1439px) - Desktop pequeno */
-@media (min-width: 1024px) and (max-width: 1439.98px) {
+/* Medium Large devices (1300px - 1439px) - Desktop médio */
+@media (min-width: 1300px) and (max-width: 1439.98px) {
   .upload-container {
-    max-width: 1000px;
-    padding: 74px 20px 16px 20px;
+    max-width: 1350px;
+    padding: 74px 28px 16px 28px;
   }
   
   .main-content,
   .main-content.with-upload {
-    grid-template-columns: 220px 1fr;
-    gap: 24px;
-    margin-top: 28px;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+    margin-top: 30px;
   }
   
   .table-container {
-    max-height: 70vh;
+    max-height: 74vh;
+  }
+  
+  /* Colunas - EXATAMENTE como correção manual */
+  th:nth-child(1) { width: 7%; min-width: 110px; } /* Data */
+  th:nth-child(2) { width: 10%; min-width: 120px; } /* Descrição */
+  th:nth-child(3) { width: 36%; min-width: 350px; } /* Valor */
+  th:nth-child(4) { width: 13%; min-width: 120px; } /* Tipo */
+  th:nth-child(5) { width: 15%; min-width: 170px; } /* Categoria */
+  
+  th, td {
+    padding: 14px 17px;
+    font-size: 0.92rem;
+  }
+  
+  th {
+    font-size: 0.87rem;
+  }
+  
+  .sidebar-container {
+    gap: 17px;
+  }
+  
+  .upload-sidebar {
+    padding: 15px;
+  }
+  
+  .filters-sidebar {
+    padding: 17px;
   }
   
   .categoria-select {
-    font-size: 0.75rem;
-    padding: 5px 10px;
+    font-size: 0.77rem;
+    padding: 6px 11px;
   }
 }
 
 /* Extra Large devices (1440px - 1919px) - Desktop grande */
 @media (min-width: 1440px) and (max-width: 1919.98px) {
   .upload-container {
-    max-width: 1550px;
-    padding: 74px 28px 16px 28px;
+    max-width: 1450px;
+    padding: 74px 32px 16px 32px;
   }
   
-  .upload-section {
-    margin-bottom: 32px;
-    padding: 32px 32px;
+  .upload-header {
+    padding: 28px;
+    margin-bottom: 28px;
+  }
+  
+  .upload-header.compact {
+    padding: 18px;
   }
   
   .main-content,
   .main-content.with-upload {
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 260px 1fr;
     gap: 32px;
     margin-top: 32px;
   }
   
   .table-container {
-    max-height: 78vh;
+    max-height: 76vh;
   }
   
-  /* Colunas da tabela balanceadas */
-  th:nth-child(1) { width: 10%; min-width: 110px; } /* Data */
-  th:nth-child(2) { width: 33%; min-width: 350px; } /* Descrição */
-  th:nth-child(3) { width: 15%; min-width: 140px; } /* Valor */
+  /* Colunas - EXATAMENTE como correção manual */
+  th:nth-child(1) { width: 7%; min-width: 110px; } /* Data */
+  th:nth-child(2) { width: 10%; min-width: 120px; } /* Descrição */
+  th:nth-child(3) { width: 36%; min-width: 400px; } /* Valor */
   th:nth-child(4) { width: 13%; min-width: 130px; } /* Tipo */
-  th:nth-child(5) { width: 19%; min-width: 180px; } /* Categoria */
+  th:nth-child(5) { width: 15%; min-width: 200px; } /* Categoria */
   
   th, td {
-    padding: 16px 18px;
+    padding: 15px 18px;
     font-size: 0.95rem;
   }
   
   th {
     font-size: 0.9rem;
+  }
+  
+  .sidebar-container {
+    gap: 16px;
+  }
+  
+  .upload-sidebar {
+    padding: 16px;
+  }
+  
+  .filters-sidebar {
+    padding: 18px;
+  }
+  
+  .categoria-select {
+    font-size: 0.8rem;
+    padding: 7px 12px;
   }
 }
 
@@ -1096,9 +1493,9 @@ td:nth-child(5) {
     max-height: 80vh;
   }
   
-  /* Colunas balanceadas para 1920px */
+  /* Colunas - EXATAMENTE como correção manual */
   th:nth-child(1) { width: 7%; min-width: 110px; } /* Data */
-  th:nth-child(2) { width: 10%; min-width: 120px; } /* Descrição - BALANCEADA */
+  th:nth-child(2) { width: 10%; min-width: 120px; } /* Descrição */
   th:nth-child(3) { width: 36%; min-width: 420px; } /* Valor */
   th:nth-child(4) { width: 13%; min-width: 130px; } /* Tipo */
   th:nth-child(5) { width: 15%; min-width: 180px; } /* Categoria */
@@ -1178,12 +1575,12 @@ td:nth-child(5) {
     border-radius: 18px;
   }
   
-  /* Colunas equilibradas para monitores grandes */
-  th:nth-child(1) { width: 9%; min-width: 120px; } /* Data */
-  th:nth-child(2) { width: 38%; min-width: 480px; } /* Descrição - BALANCEADA */
-  th:nth-child(3) { width: 15%; min-width: 170px; } /* Valor */
+  /* Colunas - EXATAMENTE como correção manual */
+  th:nth-child(1) { width: 7%; min-width: 110px; } /* Data */
+  th:nth-child(2) { width: 10%; min-width: 120px; } /* Descrição */
+  th:nth-child(3) { width: 36%; min-width: 480px; } /* Valor */
   th:nth-child(4) { width: 13%; min-width: 140px; } /* Tipo */
-  th:nth-child(5) { width: 17%; min-width: 200px; } /* Categoria */
+  th:nth-child(5) { width: 15%; min-width: 200px; } /* Categoria */
   
   table {
     font-size: 1.02rem;
@@ -1330,5 +1727,24 @@ td:nth-child(5) {
 .upload-container,
 .graficos-container {
   padding-bottom: 0px;
+}
+
+/* Scrollbar customizada para mobile */
+.table-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: rgba(71, 85, 105, 0.2);
+  border-radius: 2px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.5);
+  border-radius: 2px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 0.7);
 }
 
