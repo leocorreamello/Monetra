@@ -1,9 +1,9 @@
-/* Reset b√°sico */
+/* Reset b+Ìsico */
 * {
   box-sizing: border-box;
 }
 
-/* Background global para a aba gr√°ficos */
+/* Background global para a aba gr+Ìficos */
 :host {
   display: block;
   min-height: 100vh;
@@ -46,7 +46,7 @@
   animation: neonPulse 8s ease-in-out infinite alternate;
 }
 
-/* Efeito de part√≠culas/luz adicional */
+/* Efeito de part+°culas/luz adicional */
 :host::after {
   content: '';
   position: fixed;
@@ -86,7 +86,7 @@
 .graficos-container {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 102px 15px 40px 15px; /* 70px (nav) + 32px (espa√ßamento) + 40px (gap com footer) */
+    padding: 40px 15px 16px 15px; /* top gap + footer gap */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #ffffff;
   position: relative;
@@ -106,7 +106,7 @@
   overflow: hidden;
 }
 
-/* T√≠tulos e textos do cabe√ßalho */
+/* T+°tulos e textos do cabe+∫alho */
 .header-title {
   text-align: center;
   margin-bottom: 24px;
@@ -130,7 +130,7 @@
   margin: 0;
 }
 
-/* Se√ß√£o de controles principal */
+/* Se+∫+˙o de controles principal */
 .controls-section {
   display: flex;
   justify-content: center;
@@ -213,7 +213,7 @@
   gap: 20px;
 }
 
-/* Upload Sidebar - quando h√° dados */
+/* Upload Sidebar - quando h+Ì dados */
 .upload-sidebar {
   background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(20px);
@@ -343,16 +343,15 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 .delete-button {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
+  color: #ffffff;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 .delete-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(239, 68, 68, 0.35);
 }
 
 .delete-button:disabled {
@@ -361,8 +360,7 @@
   transform: none;
   box-shadow: none;
 }
-
-/* √Årea de conte√∫do principal */
+/* +¸rea de conte+¶do principal */
 .content-area {
   min-height: 400px;
 }
@@ -400,7 +398,7 @@
   font-size: 1rem;
 }
 
-/* Grid de gr√°ficos */
+/* Grid de gr+Ìficos */
 .charts-grid {
   display: flex;
   flex-direction: column;
@@ -472,14 +470,14 @@
   color: #ef4444;
 }
 
-/* Container de gr√°ficos */
+/* Container de gr+Ìficos */
 .charts-container {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
 }
 
-/* Cards de gr√°ficos */
+/* Cards de gr+Ìficos */
 .chart-card {
   background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(20px);
@@ -512,7 +510,7 @@
   position: relative;
 }
 
-/* Gr√°fico de Pizza SVG */
+/* Gr+Ìfico de Pizza SVG */
 .pie-svg-container {
   position: relative;
   display: flex;
@@ -528,17 +526,13 @@
 }
 
 .pie-slice-path {
-  cursor: pointer;
+  cursor: default;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: 100px 100px;
   animation: pieSliceGrow 0.6s ease-out forwards;
   opacity: 0;
 }
 
-.pie-slice-path:hover {
-  filter: brightness(1.1);
-  stroke-width: 3;
-}
 
 @keyframes pieSliceGrow {
   0% {
@@ -662,7 +656,7 @@
 
 
 
-/* Simula√ß√£o do gr√°fico de linha */
+/* Simula+∫+˙o do gr+Ìfico de linha */
 .line-simulation {
   height: 200px;
   background: rgba(71, 85, 105, 0.1);
@@ -686,7 +680,7 @@
   transform: rotate(-45deg);
 }
 
-/* Simula√ß√£o do gr√°fico de barras */
+/* Simula+∫+˙o do gr+Ìfico de barras */
 .bar-simulation {
   display: flex;
   gap: 16px;
@@ -790,7 +784,7 @@
 
 .format-badges {
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
   justify-content: center;
 }
 
@@ -802,7 +796,7 @@
   color: #cbd5e1;
 }
 
-/* Anima√ß√µes */
+/* Anima+∫+¡es */
 .fade-in {
   animation: fadeIn 0.6s ease-out;
 }
@@ -831,7 +825,7 @@
 
 @media (max-width: 768px) {
   .graficos-container {
-    padding: 102px 10px 40px 10px;
+        padding: 40px 10px 16px 10px;
   }
   
   .main-content,
@@ -861,7 +855,7 @@
   }
 }
 
-/* === NOVO GR√ÅFICO DE LINHA SIMPLES === */
+/* === NOVO GR+¸FICO DE LINHA SIMPLES === */
 
 .line-chart-simple {
   background: rgba(15, 23, 42, 0.6);
@@ -990,9 +984,9 @@
   }
 }
 
-/* ==================== NOVO GR√ÅFICO DE LINHA TEMPORAL ==================== */
+/* ==================== NOVO GR+¸FICO DE LINHA TEMPORAL ==================== */
 
-/* Container do gr√°fico de linha moderno */
+/* Container do gr+Ìfico de linha moderno */
 .line-chart-card {
   position: relative;
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
@@ -1071,7 +1065,7 @@
   stroke-dasharray: 2 4;
 }
 
-/* √Åreas preenchidas */
+/* +¸reas preenchidas */
 .area-path {
   opacity: 0.6;
   animation: areaFadeIn 1.5s ease-out;
@@ -1228,7 +1222,7 @@
   margin: 4px 0;
 }
 
-/* Resumo da evolu√ß√£o */
+/* Resumo da evolu+∫+˙o */
 .evolution-summary {
   display: flex;
   justify-content: space-between;
@@ -1304,7 +1298,7 @@
   max-width: 300px;
 }
 
-/* ==================== ANIMA√á√ïES ==================== */
+/* ==================== ANIMA+Á+ÚES ==================== */
 
 @keyframes drawLine {
   to {
@@ -1385,7 +1379,7 @@
   }
 }
 
-/* ==================== TOOLTIP PARA GR√ÅFICO DE LINHA ==================== */
+/* ==================== TOOLTIP PARA GR+¸FICO DE LINHA ==================== */
 
 .svg-container {
   position: relative;
@@ -1464,7 +1458,7 @@
   color: #ef4444;
 }
 
-/* Anima√ß√£o de entrada do tooltip */
+/* Anima+∫+˙o de entrada do tooltip */
 @keyframes tooltipFadeIn {
   from {
     opacity: 0;
@@ -1480,7 +1474,7 @@
   animation: tooltipFadeIn 0.2s ease-out;
 }
 
-/* ==================== AN√ÅLISE ANUAL POR CATEGORIA ==================== */
+/* ==================== AN+¸LISE ANUAL POR CATEGORIA ==================== */
 
 .annual-analysis {
   display: flex;
@@ -1701,7 +1695,7 @@
   box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
 }
 
-/* Anima√ß√µes */
+/* Anima+∫+¡es */
 .analysis-section {
   animation: sectionFadeIn 0.6s ease-out;
 }
@@ -1790,3 +1784,4 @@
     font-size: 1.1rem;
   }
 }
+

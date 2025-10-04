@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { API_BASE_URL } from '../config/api.config';
 
 @Component({
   selector: 'app-upload',
@@ -11,6 +12,7 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./upload.css']
 })
 export class UploadComponent {
+  private readonly apiUrl = API_BASE_URL;
   transactions: any[] = [];
   filteredTransactions: any[] = [];
   isLoading: boolean = false;
@@ -28,7 +30,7 @@ export class UploadComponent {
   }
 
   loadTransactions(): void {
-    this.http.get<any[]>('http://localhost:3000/transactions').subscribe({
+    this.http.get<any[]>(`${this.apiUrl}/transactions`).subscribe({
       next: (data) => {
         this.transactions = data;
         this.extractUniqueValues();
@@ -41,7 +43,7 @@ export class UploadComponent {
   }
 
   loadCategorias(): void {
-    this.http.get<string[]>('http://localhost:3000/categorias').subscribe({
+    this.http.get<string[]>(`${this.apiUrl}/categorias`).subscribe({
       next: (data) => {
         this.categorias = data;
       },
@@ -90,7 +92,7 @@ Apenas arquivos CSV e TXT são aceitos!`);
       const formData = new FormData();
       formData.append('pdf', file); // Mantém 'pdf' pois o servidor espera esse nome
 
-      this.http.post('http://localhost:3000/upload', formData).subscribe({
+      this.http.post(`${this.apiUrl}/upload`, formData).subscribe({
         next: (response) => {
           console.log('Upload realizado com sucesso:', response);
           this.loadTransactions();
@@ -158,7 +160,7 @@ Apenas arquivos CSV e TXT são aceitos!`);
     const confirmDelete = confirm(`Deseja realmente excluir todas as transações de ${this.getMonthName(this.selectedMes)}/${this.selectedAno}?`);
     
     if (confirmDelete) {
-      this.http.delete(`http://localhost:3000/transactions?mes=${this.selectedMes}&ano=${this.selectedAno}`).subscribe({
+      this.http.delete(`${this.apiUrl}/transactions?mes=${this.selectedMes}&ano=${this.selectedAno}`).subscribe({
         next: (response) => {
           console.log('Transações excluídas:', response);
           this.loadTransactions();
@@ -166,13 +168,18 @@ Apenas arquivos CSV e TXT são aceitos!`);
         },
         error: (error) => {
           console.error('Erro ao excluir transações:', error);
+          if (error.status === 404) {
+            alert('Nenhuma transação encontrada para o período selecionado.');
+          } else {
+            alert('Erro ao excluir transações.');
+          }
         }
       });
     }
   }
 
   updateTransactionCategory(transaction: any): void {
-    this.http.put(`http://localhost:3000/transactions/${transaction.id}/categoria`, {
+    this.http.put(`${this.apiUrl}/transactions/${transaction.id}/categoria`, {
       categoria: transaction.categoria
     }).subscribe({
       next: (response) => {
@@ -180,6 +187,11 @@ Apenas arquivos CSV e TXT são aceitos!`);
       },
       error: (error) => {
         console.error('Erro ao atualizar categoria:', error);
+        if (error.status === 404) {
+          alert('Transação não encontrada ou não pertence ao usuário.');
+        } else {
+          alert('Erro ao atualizar categoria.');
+        }
       }
     });
   }

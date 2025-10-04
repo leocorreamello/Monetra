@@ -1,39 +1,60 @@
-<nav class="navigation-container">
+﻿<nav class="navigation-container">
   <div class="nav-content">
-    <!-- Logo/Brand -->
     <div class="brand">
       <span class="brand-text">Monetra</span>
     </div>
 
-    <!-- Navigation Menu -->
     <div class="nav-menu">
-      <button 
-        class="nav-item" 
-        [class.active]="activeTab === 'home'"
-        (click)="setActiveTab('home')">
+      <button
+        type="button"
+        class="nav-item"
+        routerLink="/home"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
         <span class="nav-text">Home</span>
       </button>
-      
-      <button 
-        class="nav-item" 
-        [class.active]="activeTab === 'planilhas'"
-        (click)="setActiveTab('planilhas')">
+
+      <button
+        type="button"
+        class="nav-item"
+        routerLink="/planilhas"
+        routerLinkActive="active"
+      >
         <span class="nav-text">Planilhas</span>
       </button>
-      
-      <button 
-        class="nav-item" 
-        [class.active]="activeTab === 'graficos'"
-        (click)="setActiveTab('graficos')">
-        <span class="nav-text">Gráficos</span>
+
+      <button
+        type="button"
+        class="nav-item"
+        routerLink="/graficos"
+        routerLinkActive="active"
+      >
+        <span class="nav-text">Graficos</span>
       </button>
     </div>
 
-    <!-- User Profile (placeholder for future) -->
-    <div class="user-section">
-      <div class="user-avatar">
-        <span class="user-icon">👤</span>
-      </div>
+    <div class="nav-actions">
+      <ng-container *ngIf="user$ | async as user; else guest">
+        <div class="user-section" (click)="$event.stopPropagation()">
+          <button type="button" class="user-avatar" (click)="toggleUserMenu()">
+            <span class="user-initial">{{ getInitials(user) }}</span>
+          </button>
+
+          <div class="user-dropdown" *ngIf="userMenuOpen">
+            <div class="user-details">
+              <span class="user-name">{{ user.name || 'Conta' }}</span>
+              <span class="user-email">{{ user.email }}</span>
+            </div>
+            <button type="button" class="logout-button" (click)="logout()">Sair</button>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #guest>
+        <a class="login-link" routerLink="/login">Entrar</a>
+        <a class="signup-link" routerLink="/register">Criar conta</a>
+      </ng-template>
     </div>
   </div>
 </nav>

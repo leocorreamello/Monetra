@@ -255,6 +255,7 @@ Por favor, selecione um arquivo CSV ou TXT válido.`);
       'investimento': '📈 Investimento',
       'vestuario': '👕 Vestuário',
       'saque': '🏧 Saque',
+      'investimentos': '📈 Investimentos',
       'taxas': '📋 Taxas',
       'outros': '📦 Outros'
     };
