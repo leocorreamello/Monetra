@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -362,7 +362,8 @@ Por favor, selecione um arquivo CSV ou TXT válido.`);
       'educacao': '📚 Educação',
       'vestuario': '👕 Vestuário',
       'servicos': '🔧 Serviços',
-      'investimentos': '💰 Investimentos',
+      'investimento': '📈 Investimento',
+      'investimentos': '📈 Investimentos',
       'outros': '📦 Outros'
     };
     return categoryNames[categoria] || categoria;
