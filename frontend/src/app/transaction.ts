@@ -18,6 +18,7 @@ export interface Transaction {
 })
 export class TransactionService {
   private apiUrl = 'http://localhost:3000/transactions';
+  private baseUrl = 'http://localhost:3000';
 
   constructor(private http: HttpClient) {}
 
@@ -27,5 +28,13 @@ export class TransactionService {
 
   deleteTransactionsByMesAno(mes: string, ano: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}?mes=${mes}&ano=${ano}`);
+  }
+
+  updateTransactionCategory(id: number, categoria: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/categoria`, { categoria });
+  }
+
+  getCategorias(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/categorias`);
   }
 }

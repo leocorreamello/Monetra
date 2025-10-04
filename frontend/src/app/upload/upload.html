@@ -1,43 +1,202 @@
 <div class="upload-container">
-  <input type="file" (change)="onFileSelected($event)" accept=".pdf" />
-  <p>Arraste seu extrato PDF ou clique para selecionar.</p>
-  <select [(ngModel)]="selectedAno" (change)="filterByAnoMes()">
-    <option value="">Todos os Anos</option>
-    <option *ngFor="let ano of uniqueAnos" [value]="ano">{{ ano }}</option>
-  </select>
-  <select [(ngModel)]="selectedMes" (change)="filterByAnoMes()">
-    <option value="">Todos os Meses</option>
-    <option *ngFor="let mes of uniqueMeses" [value]="mes">{{ mes }}</option>
-  </select>
-  <button (click)="deleteSelectedAnoMes()" [disabled]="!selectedAno || !selectedMes">Excluir Selecionado</button>
-  <table *ngIf="filteredTransactions.length > 0">
-    <thead>
-      <tr>
-        <th>Data</th>
-        <th>Descrição</th>
-        <th>Valor</th>
-        <th>Tipo</th>
-        <th>Categoria</th>
-        <th>Mês</th>
-        <th>Ano</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let transaction of filteredTransactions">
-        <td>{{ transaction.data }}</td>
-        <td>{{ transaction.descricao }}</td>
-        <td [class.entrada]="transaction.tipo === 'entrada'" [class.saida]="transaction.tipo === 'saida'">{{ transaction.valor }}</td>
-        <td>{{ transaction.tipo }}</td>
-        <td>{{ transaction.categoria }}</td>
-        <td>{{ transaction.mes }}</td>
-        <td>{{ transaction.ano }}</td>
-      </tr>
-      <tr>
-        <td colspan="2">Saldo Final</td>
-        <td [class.entrada]="saldoFinal > 0" [class.saida]="saldoFinal < 0">{{ saldoFinal }}</td>
-        <td colspan="4"></td>
-      </tr>
-    </tbody>
-  </table>
-  <p *ngIf="filteredTransactions.length === 0">Nenhuma transação carregada ainda.</p>
+  <!-- Header principal - apenas quando não há transações -->
+  <div class="upload-header" 
+       *ngIf="filteredTransactions.length === 0">
+    <div class="header-title">
+      <h1>Gestão Financeira</h1>
+      <p class="header-subtitle">Importe e analise seus extratos bancários de forma inteligente</p>
+    </div>
+    
+    <!-- Seção de controles -->
+    <div class="controls-section">
+      <!-- Upload de arquivo -->
+      <div class="file-upload-zone">
+        <input type="file" accept=".csv,.txt" (change)="onFileSelected($event)" />
+        <div class="upload-icon">📄</div>
+        <h3 class="upload-title">Enviar Arquivo Extrato</h3>
+        <p class="upload-subtitle">Arraste seu arquivo aqui ou clique para selecionar</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layout principal com sidebar -->
+  <div class="main-content" [class.with-upload]="filteredTransactions.length > 0">
+    <!-- Container da sidebar - agrupa upload + filtros verticalmente -->
+    <div class="sidebar-container">
+      <!-- Upload Sidebar - apenas quando há transações -->
+      <div class="upload-sidebar" *ngIf="filteredTransactions.length > 0">
+        <div class="upload-header">
+          <div class="header-title">
+            <h1>📄 Upload</h1>
+            <p class="header-subtitle">Adicionar extratos</p>
+          </div>
+          
+          <div class="controls-section">
+            <div class="file-upload-zone">
+              <input type="file" accept=".csv,.txt" (change)="onFileSelected($event)" />
+              <div class="upload-icon">📄</div>
+              <h3 class="upload-title">Enviar Extrato</h3>
+              <p class="upload-subtitle">Clique aqui</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar de filtros -->
+      <div class="filters-sidebar" [class.standalone]="filteredTransactions.length === 0">
+        <div class="sidebar-title">
+          🔍 <span>Filtros</span>
+        </div>
+        
+        <div class="filters-list">
+          <!-- Filtros de período -->
+          <div class="filter-group">
+            <label class="filter-label">Ano</label>
+            <select class="compact-select" [(ngModel)]="selectedAno" (change)="applyFilters()">
+              <option value="">Todos</option>
+              <option *ngFor="let ano of uniqueAnos" [value]="ano">{{ ano }}</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">Mês</label>
+            <select class="compact-select" [(ngModel)]="selectedMes" (change)="applyFilters()">
+              <option value="">Todos</option>
+              <option *ngFor="let mes of uniqueMeses" [value]="mes">{{ getMonthName(mes) }}</option>
+            </select>
+          </div>
+          
+          <!-- Filtros de categoria e tipo -->
+          <div class="filter-group">
+            <label class="filter-label">Categoria</label>
+            <select class="compact-select" [(ngModel)]="selectedCategoria" (change)="applyFilters()">
+              <option value="">Todas</option>
+              <option *ngFor="let categoria of categorias" [value]="categoria">
+                {{ getCategoryDisplayName(categoria) }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">Tipo</label>
+            <select class="compact-select" [(ngModel)]="selectedTipo" (change)="applyFilters()">
+              <option value="">Todos</option>
+              <option value="entrada">⬆ Entradas</option>
+              <option value="saida">⬇ Saídas</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="sidebar-actions">
+          <button 
+            class="sidebar-button clear-button" 
+            (click)="clearFilters()"
+            [disabled]="!hasActiveFilters()">
+            🗂️ Limpar
+          </button>
+          
+          <button 
+            class="sidebar-button delete-button" 
+            (click)="deleteSelectedAnoMes()" 
+            [disabled]="!selectedAno || !selectedMes">
+            🗑️ Excluir
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Área de conteúdo principal - agora ocupa mais espaço -->
+    <div class="content-area" [class.with-sidebar]="filteredTransactions.length > 0">
+      <!-- Loading state -->
+      <div class="loading-container" *ngIf="isLoading">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Processando suas transações...</p>
+      </div>
+
+      <!-- Tabela de transações moderna -->
+      <div class="data-table fade-in" *ngIf="filteredTransactions.length > 0 && !isLoading">
+        <div class="table-header">
+          <h2 class="table-title">Suas Transações</h2>
+        </div>
+        
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>📅 Data</th>
+                <th>📝 Descrição</th>
+                <th>💵 Valor</th>
+                <th>📊 Tipo</th>
+                <th>🏷️ Categoria</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let transaction of filteredTransactions">
+                <td>{{ formatDate(transaction.data) }}</td>
+                <td>{{ transaction.descricao }}</td>
+                <td [class.entrada]="transaction.tipo === 'entrada'" [class.saida]="transaction.tipo === 'saida'">
+                  {{ formatCurrency(transaction.valor) }}
+                </td>
+                <td>
+                  <span 
+                    class="tipo-badge" 
+                    [class.tipo-entrada]="transaction.tipo === 'entrada'" 
+                    [class.tipo-saida]="transaction.tipo === 'saida'">
+                    {{ transaction.tipo === 'entrada' ? '⬆ Entrada' : '⬇ Saída' }}
+                  </span>
+                </td>
+                <td>
+                  <select 
+                    class="categoria-select" 
+                    [(ngModel)]="transaction.categoria" 
+                    (change)="updateTransactionCategory(transaction)">
+                    <option *ngFor="let categoria of categorias" [value]="categoria">
+                      {{ getCategoryDisplayName(categoria) }}
+                    </option>
+                  </select>
+                </td>
+              </tr>
+              <tr class="saldo-row">
+                <td colspan="2"><strong>Saldo Final do Período</strong></td>
+                <td [class.entrada]="saldoFinal > 0" 
+                    [class.saida]="saldoFinal < 0"
+                    [class.neutro]="saldoFinal === 0">
+                  <strong>{{ formatCurrency(saldoFinal) }}</strong>
+                </td>
+                <td colspan="2"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Estado vazio melhorado -->
+      <div class="empty-state" *ngIf="filteredTransactions.length === 0 && !isLoading">
+        <div class="empty-state-content">
+          <div class="empty-state-icon">
+            <span *ngIf="transactions.length === 0">📊</span>
+            <span *ngIf="transactions.length > 0">🔍</span>
+          </div>
+          <h3 class="empty-state-title">
+            {{ transactions.length === 0 ? 'Visualize suas Finanças!' : 'Nenhum resultado encontrado' }}
+          </h3>
+          <p class="empty-state-text">
+            {{ transactions.length === 0 ? 
+                'Faça upload do seu extrato bancário (CSV ou TXT) para gerar gráficos e análises inteligentes dos seus dados financeiros.' : 
+                'Ajuste os filtros acima para encontrar as transações que você está procurando.' }}
+          </p>
+          <div class="empty-state-actions" *ngIf="transactions.length === 0">
+            <div class="supported-formats">
+              <small>Formatos suportados:</small>
+              <div class="format-badges">
+                <span class="format-badge">📄 TXT</span>
+                <span class="format-badge">📊 CSV</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
