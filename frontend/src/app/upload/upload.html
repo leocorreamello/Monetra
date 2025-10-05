@@ -124,11 +124,31 @@
             <thead>
               <tr>
                 <th></th>
-                <th>📅 Data</th>
-                <th>📝 Descrição</th>
-                <th>💵 Valor</th>
-                <th>📊 Tipo</th>
-                <th>🏷️ Categoria</th>
+                <th
+                  class="sortable"
+                  [class.active]="sortColumn === 'data'"
+                  (click)="sortBy('data')"
+                  [attr.aria-sort]="sortColumn === 'data' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'"
+                >
+                  <span>Data</span>
+                  <span class="sort-indicator" *ngIf="sortColumn === 'data'">
+                    {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                  </span>
+                </th>
+                <th>Descrição</th>
+                <th
+                  class="sortable"
+                  [class.active]="sortColumn === 'valor'"
+                  (click)="sortBy('valor')"
+                  [attr.aria-sort]="sortColumn === 'valor' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'"
+                >
+                  <span>Valor</span>
+                  <span class="sort-indicator" *ngIf="sortColumn === 'valor'">
+                    {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                  </span>
+                </th>
+                <th>Tipo</th>
+                <th>Categoria</th>
               </tr>
             </thead>
             <tbody>

@@ -26,6 +26,8 @@ export class UploadComponent implements OnInit {
   filteredTransactions: Transaction[] = [];
   categorias: string[] = [];
   isLoading = false;
+  sortColumn: 'data' | 'valor' = 'data';
+  sortDirection: 'asc' | 'desc' = 'asc';
   
   // Filtros
   selectedCategoria = '';
@@ -167,7 +169,71 @@ Por favor, selecione um arquivo CSV ou TXT válido.`);
       );
     });
 
+    this.applySort();
     this.calculateSaldo();
+  }
+
+
+  sortBy(column: 'data' | 'valor') {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+
+    this.applySort();
+    this.calculateSaldo();
+  }
+
+  private applySort(): void {
+    if (this.filteredTransactions.length < 2) {
+      return;
+    }
+
+    const direction = this.sortDirection === 'asc' ? 1 : -1;
+
+    const sorted = [...this.filteredTransactions].sort((a, b) => {
+      let comparison = 0;
+
+      if (this.sortColumn === 'data') {
+        comparison = this.parseDateValue(a.data) - this.parseDateValue(b.data);
+      } else {
+        const valueA = Number(a.valor ?? 0);
+        const valueB = Number(b.valor ?? 0);
+        comparison = valueA - valueB;
+      }
+
+      if (comparison === 0) {
+        comparison = (a.id ?? 0) - (b.id ?? 0);
+      }
+
+      return comparison * direction;
+    });
+
+    this.filteredTransactions = sorted;
+  }
+
+  private parseDateValue(dateString: string): number {
+    if (!dateString) {
+      return 0;
+    }
+
+    const trimmed = String(dateString).trim();
+
+    const brazilianFormatMatch = trimmed.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (brazilianFormatMatch) {
+      const [, day, month, year] = brazilianFormatMatch;
+      const parsedDate = new Date(Number(year), Number(month) - 1, Number(day));
+      return parsedDate.getTime();
+    }
+
+    const parsedTimestamp = Date.parse(trimmed);
+    if (!isNaN(parsedTimestamp)) {
+      return parsedTimestamp;
+    }
+
+    return 0;
   }
 
   calculateSaldo() {
