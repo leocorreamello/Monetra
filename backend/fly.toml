@@ -1,0 +1,35 @@
+# fly.toml app configuration file generated for backend-polished-dust-7849 on 2025-10-05T21:58:03-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "backend-polished-dust-7849"
+primary_region = "gru"
+
+[build]
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3000"
+  SQLITE_PATH = "/data/finance.db"
+  UPLOAD_DIR = "/data/uploads"
+
+[[mounts]]
+  source = "monetra_data"         # use o mesmo nome no 'fly volumes create'
+  destination = "/data"
+  auto_extend_size_threshold = 80
+  auto_extend_size_increment = "1GB"
+  auto_extend_size_limit = "10GB"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1
