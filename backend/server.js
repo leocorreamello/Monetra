@@ -11,6 +11,7 @@ const { authMiddleware } = require('./middleware/auth');
 const authRoutes = require('./routes/auth');
 const app = express();
 const port = process.env.PORT || 3000;
+const host = process.env.HOST || '0.0.0.0';
 
 app.use(cors());
 app.use(express.json());
@@ -47,7 +48,7 @@ const upload = multer({
   }
 });
 
-const db = new sqlite3.Database('./finance.db');
+const defaultSqlitePath = path.join(process.cwd(), 'finance.db');\nconst sqlitePath = process.env.SQLITE_PATH ? path.resolve(process.env.SQLITE_PATH) : defaultSqlitePath;\nfs.mkdirSync(path.dirname(sqlitePath), { recursive: true });\nconst db = new sqlite3.Database(sqlitePath);
 
 const ensureUserIdColumn = () => {
   db.all('PRAGMA table_info(transacoes)', (err, columns) => {
@@ -666,7 +667,7 @@ app.delete('/transactions/all', authMiddleware, (req, res) => {
 
 connectDatabase()
   .then(() => {
-    app.listen(port, () => {
+    app.listen(port, host, () => {
       console.log(`[core] Server running on http://localhost:${port}`);
       console.log('[core] Finance features available');
       console.log('[core] SQLite database ready');
@@ -677,3 +678,6 @@ connectDatabase()
     console.error('[core] Failed to start server', error);
     process.exit(1);
   });
+
+
+
