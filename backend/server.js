@@ -18,16 +18,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/auth', authRoutes);
 
+const uploadDir = process.env.UPLOAD_DIR ? path.resolve(process.env.UPLOAD_DIR) : path.join(process.cwd(), 'uploads');
+fs.mkdirSync(uploadDir, { recursive: true });
+
 const storage = multer.diskStorage({
-  destination: './uploads/',
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  }
+  destination: (_req, _file, cb) => cb(null, uploadDir),
+  filename: (_req, file, cb) => cb(null, file.originalname)
 });
 
-// Configuração do multer com filtro de arquivos
-const upload = multer({ 
-  storage: storage,
+// Configuracao do multer com filtro de arquivos
+const upload = multer({
+  storage,
   fileFilter: (req, file, cb) => {
     const allowedExtensions = ['.csv', '.txt'];
     const fileExtension = path.extname(file.originalname).toLowerCase();
@@ -48,7 +49,10 @@ const upload = multer({
   }
 });
 
-const defaultSqlitePath = path.join(process.cwd(), 'finance.db');\nconst sqlitePath = process.env.SQLITE_PATH ? path.resolve(process.env.SQLITE_PATH) : defaultSqlitePath;\nfs.mkdirSync(path.dirname(sqlitePath), { recursive: true });\nconst db = new sqlite3.Database(sqlitePath);
+const defaultSqlitePath = path.join(process.cwd(), 'finance.db');
+const sqlitePath = process.env.SQLITE_PATH ? path.resolve(process.env.SQLITE_PATH) : defaultSqlitePath;
+fs.mkdirSync(path.dirname(sqlitePath), { recursive: true });
+const db = new sqlite3.Database(sqlitePath);
 
 const ensureUserIdColumn = () => {
   db.all('PRAGMA table_info(transacoes)', (err, columns) => {
@@ -668,7 +672,7 @@ app.delete('/transactions/all', authMiddleware, (req, res) => {
 connectDatabase()
   .then(() => {
     app.listen(port, host, () => {
-      console.log(`[core] Server running on http://localhost:${port}`);
+      console.log(`[core] Server running on http://${host}:${port}`);
       console.log('[core] Finance features available');
       console.log('[core] SQLite database ready');
       console.log('[core] MongoDB connection ready');
