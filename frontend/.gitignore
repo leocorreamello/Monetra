@@ -51,3 +51,5 @@ finance.db
 uploads/
 *.pdf
 *.csv
+*.txt
+public/env.js

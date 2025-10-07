@@ -1,7 +1,9 @@
-interface ImportMetaEnv {
-  readonly NG_APP_API_BASE_URL?: string;
+declare global {
+  interface Window {
+    __env?: {
+      NG_APP_API_BASE_URL?: string;
+    };
+  }
 }
 
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
+export {};
