@@ -20,7 +20,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.6.3",
     "multer": "^2.0.2",
-    "sqlite3": "^5.1.7"
+    "serverless-http": "^3.2.0"
   },
   "devDependencies": {
     "@flydotio/dockerfile": "^0.7.10",
