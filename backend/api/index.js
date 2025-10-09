@@ -5,39 +5,21 @@ const { connectDatabase } = require('../config/database');
 
 const server = express();
 
-server.use((req, _res, next) => {
-  if (req.url === '/api') {
-    req.url = '/';
-  } else if (req.url.startsWith('/api/')) {
-    req.url = req.url.slice(4) || '/';
-  }
+// Middleware para processar requests antes de passá-las ao Express
+server.use(express.json());  // Para garantir que o JSON seja lido corretamente
 
-  if (req.originalUrl === '/api') {
-    req.originalUrl = '/';
-  } else if (req.originalUrl?.startsWith('/api/')) {
-    req.originalUrl = req.originalUrl.slice(4) || '/';
-  }
-
-  next();
-});
-
-server.use(app);
+// Roteamento da API
+server.use('/api', app);  // Redireciona tudo de /api para o app
 
 const handler = serverless(server);
 
+// Função serverless
 module.exports = async (req, res) => {
   try {
     await connectDatabase();
     return handler(req, res);
   } catch (error) {
     console.error('[api] Failed to handle request', error);
-    res.statusCode = 500;
-    res.setHeader('content-type', 'application/json');
-    res.end(
-      JSON.stringify({
-        error: 'Internal Server Error'
-      })
-    );
-    return undefined;
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
