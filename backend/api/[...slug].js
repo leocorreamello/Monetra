@@ -1,20 +1,17 @@
-import { connectDatabase } from '../config/database'; // Ajuste conforme necessário
+import { connectDatabase } from '../../config/database';
 
-// Função que trata todas as rotas dinâmicas
 export default async function handler(req, res) {
   const { slug } = req.query;  // Captura a parte dinâmica da URL
 
   if (slug[0] === 'auth' && slug[1] === 'register') {
     // Lógica para a rota /api/auth/register
     if (req.method === 'POST') {
-      // Lógica de registro do usuário
       const { email, password } = req.body;
-
-      // Conecte-se ao banco de dados
       try {
         await connectDatabase();
         
-        // Aqui você pode adicionar a lógica de criação de usuário no banco de dados
+        // Lógica para criar o usuário no banco
+        console.log('Registrando usuário:', email);
 
         return res.status(201).json({ message: 'Usuário registrado com sucesso!' });
       } catch (error) {

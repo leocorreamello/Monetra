@@ -3,8 +3,9 @@ const cors = require('cors');
 const serverless = require('serverless-http');
 const { connectDatabase } = require('../config/database'); // Certifique-se que o caminho está correto
 
-const app = express();  // A variável 'app' deve ser inicializada aqui, não 'server'
+const app = express();  // Use 'app' para o Express
 
+// Habilitando CORS para múltiplos domínios
 app.use(cors({
   origin: ['https://monetra-smoky.vercel.app', 'https://monetra-c1h5.vercel.app'], // Permitir múltiplos domínios
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -14,8 +15,8 @@ app.use(cors({
 // Middleware para processar requests antes de passá-las ao Express
 app.use(express.json());
 
-// Roteamento de API - Vamos garantir que as funções da API estejam sendo tratadas corretamente.
-app.use('/api', require('./api/[...slug]'));  // Garantir que esse caminho esteja correto
+// Roteamento da API - Certifique-se de que 'api/[...slug].js' esteja no lugar certo
+app.use('/api', require('./api/[...slug]'));
 
 const handler = serverless(app);
 
