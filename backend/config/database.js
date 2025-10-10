@@ -29,6 +29,8 @@ const connectDatabase = async () => {
     cached.promise = mongoose
       .connect(MONGODB_URI, {
         bufferCommands: false,
+        connectTimeoutMS: 5000,  // Tempo limite de 5 segundos para conectar ao banco
+        socketTimeoutMS: 5000,   // Timeout de socket de 5 segundos
       })
       .then((connection) => {
         cached.conn = connection;
