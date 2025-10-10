@@ -5,9 +5,9 @@ const { connectDatabase } = require('../config/database'); // Certifique-se que 
 
 const server = express();
 
-// Habilitando CORS para todas as rotas
+// Habilitando CORS para múltiplos domínios
 server.use(cors({
-  origin: 'https://monetra-smoky.vercel.app', // Substitua pela URL do seu frontend
+  origin: ['https://monetra-smoky.vercel.app', 'https://monetra-c1h5.vercel.app'], // Permita ambos os domínios aqui
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -15,11 +15,13 @@ server.use(cors({
 // Middleware para processar requests antes de passá-las ao Express
 server.use(express.json());
 
+server.use('/api', app);  // Roteamento da API
+
 const handler = serverless(server);
 
 module.exports = async (req, res) => {
   try {
-    console.log("[db] Iniciando conexão com o banco...");
+    console.log("[db] Iniciando conexão com o MongoDB...");
     await connectDatabase();
     console.log("[db] Conexão com o banco bem-sucedida.");
     res.status(200).json({ message: 'Banco de dados conectado com sucesso' });
