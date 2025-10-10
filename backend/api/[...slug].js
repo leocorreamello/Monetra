@@ -1,1 +1,1 @@
-module.exports = require('./_handler');
+module.exports = require('./index');
