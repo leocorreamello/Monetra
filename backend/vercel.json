@@ -4,11 +4,5 @@
     "api/**/*.js": {
       "runtime": "@vercel/node@5.3.26"
     }
-  },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1.js"
-    }
-  ]
+  }
 }
