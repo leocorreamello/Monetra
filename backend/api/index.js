@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const serverless = require('serverless-http');
-const { connectDatabase } = require('../config/database'); // Certifique-se que o caminho está correto
+const { connectDatabase } = require('./src/database'); // Certifique-se que o caminho está correto
 
 const app = express();  // Use 'app' para o Express
 

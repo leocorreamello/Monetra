@@ -1,4 +1,4 @@
-import { connectDatabase } from '../../config/database';
+import { connectDatabase } from './src/database';
 
 export default async function handler(req, res) {
   const { slug } = req.query;  // Captura a parte dinâmica da URL
