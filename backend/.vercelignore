@@ -1,0 +1,54 @@
+# Ignorar arquivos desnecessários no deploy do Vercel
+
+# Development files
+.env.local
+.env.development
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Node modules (Vercel instala automaticamente)
+node_modules/
+
+# Legacy server files (não usados em serverless)
+server.js
+server_backup.js
+
+# Test files
+*.test.js
+*.spec.js
+__tests__/
+
+# Documentation
+*.md
+!README.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker (não usado no Vercel)
+Dockerfile
+.dockerignore
+fly.toml
+
+# Uploads (arquivos locais)
+uploads/
+*.csv
+*.txt
+
+# Database local
+*.db
+*.sqlite
+*.sqlite3
+
+# Git
+.git/
+.gitignore

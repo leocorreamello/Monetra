@@ -1,8 +1,50 @@
 {
   "version": 2,
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "@vercel/node@5.3.26"
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
     }
+  ],
+  "routes": [
+    {
+      "src": "/health",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/auth/register",
+      "dest": "/api/auth/register.js"
+    },
+    {
+      "src": "/auth/login",
+      "dest": "/api/auth/login.js"
+    },
+    {
+      "src": "/auth/me",
+      "dest": "/api/auth/me.js"
+    },
+    {
+      "src": "/transactions/([^/]+)/categoria",
+      "dest": "/api/transactions.js"
+    },
+    {
+      "src": "/transactions(.*)?",
+      "dest": "/api/transactions.js"
+    },
+    {
+      "src": "/upload",
+      "dest": "/api/upload.js"
+    },
+    {
+      "src": "/categorias",
+      "dest": "/api/categorias.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
   }
 }
