@@ -11,35 +11,35 @@ if (!cached) {
 const connectDatabase = async () => {
   const { MONGODB_URI } = process.env;
 
-  console.log("[db] Iniciando conexão com o MongoDB...");
+  console.log('[db] Connecting to MongoDB...');
 
   if (!MONGODB_URI) {
-    console.error("[db] MONGODB_URI não está definida no ambiente.");
+    console.error('[db] MONGODB_URI is not defined in the environment.');
     throw new Error('MONGODB_URI environment variable is not defined.');
   }
 
   if (cached.conn) {
-    console.log("[db] Já existe uma conexão, retornando...");
+    console.log('[db] Reusing existing MongoDB connection.');
     return cached.conn;
   }
 
   if (!cached.promise) {
-    console.log("[db] Criando uma nova conexão...");
+    console.log('[db] Creating a new MongoDB connection...');
 
     cached.promise = mongoose
       .connect(MONGODB_URI, {
         bufferCommands: false,
-        connectTimeoutMS: 5000,  // Tempo limite de 5 segundos para conectar ao banco
-        socketTimeoutMS: 5000,   // Timeout de socket de 5 segundos
+        connectTimeoutMS: 5000,
+        socketTimeoutMS: 5000
       })
       .then((connection) => {
         cached.conn = connection;
-        console.log('[db] Conectado ao MongoDB com sucesso');
+        console.log('[db] Connected to MongoDB successfully.');
         return connection;
       })
       .catch((error) => {
         cached.promise = null;
-        console.error('[db] Falha ao conectar ao MongoDB:', error);
+        console.error('[db] Failed to connect to MongoDB:', error);
         throw error;
       });
   }

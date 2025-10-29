@@ -1,28 +1,40 @@
-import { connectDatabase } from './src/database';
+const app = require('../src/app');
+const { connectDatabase } = require('./src/database');
 
-export default async function handler(req, res) {
-  const { slug } = req.query;  // Captura a parte dinâmica da URL
-
-  if (slug[0] === 'auth' && slug[1] === 'register') {
-    // Lógica para a rota /api/auth/register
-    if (req.method === 'POST') {
-      const { email, password } = req.body;
-      try {
-        await connectDatabase();
-        
-        // Lógica para criar o usuário no banco
-        console.log('Registrando usuário:', email);
-
-        return res.status(201).json({ message: 'Usuário registrado com sucesso!' });
-      } catch (error) {
-        console.error('Erro ao registrar usuário:', error);
-        return res.status(500).json({ error: 'Erro ao registrar usuário' });
-      }
-    } else {
-      return res.status(405).json({ error: 'Método não permitido' });
-    }
-  } else {
-    // Para todas as outras rotas, você pode adicionar tratamento de erro 404
-    return res.status(404).json({ error: 'Rota não encontrada' });
+const stripApiPrefix = (url) => {
+  if (!url.startsWith('/api')) {
+    return url;
   }
-}
+
+  const stripped = url.slice(4);
+
+  if (stripped.startsWith('/')) {
+    return stripped;
+  }
+
+  if (stripped.startsWith('?')) {
+    return `/${stripped}`;
+  }
+
+  return stripped.length > 0 ? `/${stripped}` : '/';
+};
+
+module.exports = async (req, res) => {
+  try {
+    await connectDatabase();
+
+    if (req.url) {
+      req.url = stripApiPrefix(req.url);
+    }
+
+    return app(req, res);
+  } catch (error) {
+    console.error('[api] Failed to handle request', error);
+
+    if (!res.headersSent) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ error: 'Internal Server Error' }));
+    }
+  }
+};
