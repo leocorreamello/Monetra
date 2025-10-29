@@ -51,18 +51,23 @@ const runValidations = async (req, validators) => {
 };
 
 module.exports = async (req, res) => {
-  // Configurar headers CORS
+  // Configurar headers CORS PRIMEIRO
   const origin = req.headers.origin || '*';
   res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Max-Age', '86400');
   res.setHeader('Content-Type', 'application/json');
 
-  // Handle preflight
+  // Handle preflight - RETORNAR 204 (No Content)
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    console.log('[login] Handling OPTIONS preflight from:', origin);
+    return res.status(204).end();
   }
+
+  // Log para debug
+  console.log('[login] POST request from:', origin);
 
   // Apenas POST é permitido
   if (req.method !== 'POST') {

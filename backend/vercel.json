@@ -8,24 +8,38 @@
   ],
   "routes": [
     {
+      "src": "/(.*)",
+      "headers": {
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+        "Access-Control-Allow-Headers": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+      },
+      "continue": true
+    },
+    {
       "src": "/health",
       "dest": "/api/index.js"
     },
     {
       "src": "/auth/register",
-      "dest": "/api/auth/register.js"
+      "dest": "/api/auth/register.js",
+      "methods": ["POST", "OPTIONS"]
     },
     {
       "src": "/auth/login",
-      "dest": "/api/auth/login.js"
+      "dest": "/api/auth/login.js",
+      "methods": ["POST", "OPTIONS"]
     },
     {
       "src": "/auth/me",
-      "dest": "/api/auth/me.js"
+      "dest": "/api/auth/me.js",
+      "methods": ["GET", "OPTIONS"]
     },
     {
       "src": "/transactions/([^/]+)/categoria",
-      "dest": "/api/transactions.js"
+      "dest": "/api/transactions.js",
+      "methods": ["PUT", "OPTIONS"]
     },
     {
       "src": "/transactions(.*)?",
@@ -33,41 +47,13 @@
     },
     {
       "src": "/upload",
-      "dest": "/api/upload.js"
+      "dest": "/api/upload.js",
+      "methods": ["POST", "OPTIONS"]
     },
     {
       "src": "/categorias",
-      "dest": "/api/categorias.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.js"
+      "dest": "/api/categorias.js",
+      "methods": ["GET", "OPTIONS"]
     }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Credentials",
-          "value": "true"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
-        }
-      ]
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
