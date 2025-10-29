@@ -2,7 +2,7 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
-const { connectDatabase } = require('../src/database');
+const { connectDatabase } = require('../../api/src/database');
 const User = require('../../models/User');
 
 const getTokenConfig = () => {

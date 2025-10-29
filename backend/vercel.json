@@ -1,59 +1,14 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "headers": {
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,OPTIONS,PATCH,DELETE,POST,PUT",
-        "Access-Control-Allow-Headers": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
-      },
-      "continue": true
-    },
-    {
-      "src": "/health",
-      "dest": "/api/index.js"
-    },
-    {
-      "src": "/auth/register",
-      "dest": "/api/auth/register.js",
-      "methods": ["POST", "OPTIONS"]
-    },
-    {
-      "src": "/auth/login",
-      "dest": "/api/auth/login.js",
-      "methods": ["POST", "OPTIONS"]
-    },
-    {
-      "src": "/auth/me",
-      "dest": "/api/auth/me.js",
-      "methods": ["GET", "OPTIONS"]
-    },
-    {
-      "src": "/transactions/([^/]+)/categoria",
-      "dest": "/api/transactions.js",
-      "methods": ["PUT", "OPTIONS"]
-    },
-    {
-      "src": "/transactions(.*)?",
-      "dest": "/api/transactions.js"
-    },
-    {
-      "src": "/upload",
-      "dest": "/api/upload.js",
-      "methods": ["POST", "OPTIONS"]
-    },
-    {
-      "src": "/categorias",
-      "dest": "/api/categorias.js",
-      "methods": ["GET", "OPTIONS"]
-    }
+  "rewrites": [
+    { "source": "/health", "destination": "/api/index.js" },
+    { "source": "/auth/register", "destination": "/api/auth/register.js" },
+    { "source": "/auth/login", "destination": "/api/auth/login.js" },
+    { "source": "/auth/me", "destination": "/api/auth/me.js" },
+    { "source": "/transactions/:id/categoria", "destination": "/api/transactions.js" },
+    { "source": "/transactions", "destination": "/api/transactions.js" },
+    { "source": "/upload", "destination": "/api/upload.js" },
+    { "source": "/categorias", "destination": "/api/categorias.js" },
+    { "source": "/test-cors", "destination": "/api/test-cors.js" }
   ]
 }

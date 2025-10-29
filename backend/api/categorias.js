@@ -1,6 +1,6 @@
 require('dotenv').config();
-const { connectDatabase } = require('./src/database');
-const { requireAuth } = require('./src/auth-helper');
+const { connectDatabase } = require('../api/src/database');
+const { requireAuth } = require('../api/src/auth-helper');
 const { listarCategorias } = require('../src/services/transactions');
 
 const handler = async (req, res) => {
