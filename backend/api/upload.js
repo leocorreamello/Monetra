@@ -1,7 +1,8 @@
 require('dotenv').config();
 const path = require('path');
 const { connectDatabase } = require('../api/src/database');
-const { requireAuth } = require('../api/src/auth-helper');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 const {
   detectarDiasExtrato,
   parseCsvContent,
@@ -66,18 +67,20 @@ const parseMultipartFormData = (req) => {
   });
 };
 
-const handler = async (req, res) => {
-  // Configurar headers CORS
+module.exports = async (req, res) => {
+  // Configurar headers CORS PRIMEIRO
   const origin = req.headers.origin || '*';
   res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Max-Age', '86400');
   res.setHeader('Content-Type', 'application/json');
 
   // Handle preflight
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    console.log('[upload] Handling OPTIONS preflight');
+    return res.status(204).end();
   }
 
   // Apenas POST é permitido
@@ -88,6 +91,37 @@ const handler = async (req, res) => {
   try {
     // Conectar ao banco de dados
     await connectDatabase();
+
+    // Autenticar usuário
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.toLowerCase().startsWith('bearer ')) {
+      console.log('[upload] No authorization header');
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    
+    if (!token) {
+      console.log('[upload] No token provided');
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    let user;
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      user = await User.findById(decoded.sub);
+      
+      if (!user) {
+        console.log('[upload] User not found');
+        return res.status(401).json({ message: 'Not authorized' });
+      }
+      
+      console.log('[upload] User authenticated:', user.email);
+    } catch (jwtError) {
+      console.error('[upload] JWT verification failed:', jwtError.message);
+      return res.status(401).json({ message: 'Not authorized' });
+    }
 
     // Parse do arquivo enviado
     const file = await parseMultipartFormData(req);
@@ -122,11 +156,11 @@ const handler = async (req, res) => {
 
     // Remover transações dos dias que estão sendo importados
     if (diasInfo?.diasUnicos?.length) {
-      await removerTransacoesDias(diasInfo.diasUnicos, req.user.id);
+      await removerTransacoesDias(diasInfo.diasUnicos, user.id);
     }
 
     // Salvar transações
-    const totalSalvas = await salvarTransacoes(transacoes, req.user.id);
+    const totalSalvas = await salvarTransacoes(transacoes, user.id);
 
     return res.status(200).json({
       message: `Arquivo ${tipoArquivo.toUpperCase()} processado com sucesso! ${totalSalvas} transações salvas.`,
@@ -144,6 +178,3 @@ const handler = async (req, res) => {
     });
   }
 };
-
-// Exportar com autenticação obrigatória
-module.exports = requireAuth(handler);
